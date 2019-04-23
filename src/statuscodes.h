@@ -14,24 +14,24 @@
    limitations under the License.
 */
 
-#ifndef __LIBCOYOTE_COMMON_H__
-#define __LIBCOYOTE_COMMON_H__
+#ifndef __LIBCOYOTE_STATUSCODES_H__
+#define __LIBCOYOTE_STATUSCODES_H__
 
-/**Headers we will likely use a lot.**/
-#include <stdint.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
+#include "common.h"
 
-#ifdef __cplusplus
-#include <vector>
-#include <map>
-#include <string>
-#include <memory>
-#include <functional>
-#else
-#include <stdbool.h>
-#endif //__cplusplus
+namespace Coyote
+{
+	enum StatusCode : int8_t
+	{
+		STATUS_INVALID 				= -1,
+		STATUS_OK 					= 0,
+		STATUS_FAILED 				= 1,
+		STATUS_UNIMPLEMENTED 		= 2,
+		STATUS_INTERNALERROR 		= 3,
+		STATUS_MISUSED 				= 4,
+		STATUS_NETWORKERROR 		= 5,
+		STATUS_MAX
+	};
+}
 
-#endif //__LIBCOYOTE_COMMON_H__
+#endif //__LIBCOYOTE_STATUSCODES_H__

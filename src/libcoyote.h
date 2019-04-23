@@ -13,25 +13,20 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+#ifndef __LIBCOYOTE_H__
+#define __LIBCOYOTE_H__
 
-#ifndef __LIBCOYOTE_COMMON_H__
-#define __LIBCOYOTE_COMMON_H__
-
-/**Headers we will likely use a lot.**/
-#include <stdint.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-
-#ifdef __cplusplus
-#include <vector>
-#include <map>
-#include <string>
-#include <memory>
-#include <functional>
-#else
-#include <stdbool.h>
+#ifndef __cplusplus
+#error "This is the C++ set of bindings, you're looking for libcoyote_c.h"
 #endif //__cplusplus
 
-#endif //__LIBCOYOTE_COMMON_H__
+#define COYOTE_API_VERSION "0.1"
+#include "common.h"
+#include "datastructures.h"
+
+namespace Coyote
+{
+	
+}
+
+#endif //__LIBCOYOTE_H__

@@ -14,24 +14,22 @@
    limitations under the License.
 */
 
-#ifndef __LIBCOYOTE_COMMON_H__
-#define __LIBCOYOTE_COMMON_H__
+#ifndef __LIBCOYOTE_JSONPROC_H__
+#define __LIBCOYOTE_JSONPROC_H__
 
-/**Headers we will likely use a lot.**/
-#include <stdint.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
+#include "common.h"
+#include "statuscodes.h"
+#include "datastructures.h"
+#include <json/json.h>
 
-#ifdef __cplusplus
-#include <vector>
-#include <map>
-#include <string>
-#include <memory>
-#include <functional>
-#else
-#include <stdbool.h>
-#endif //__cplusplus
+namespace JsonProc
+{
+	const std::string MkGetAssets(void);
+	const std::string MkGetPresets(void);
+	const std::string MkGetTimeCode(void);
+	const std::string MkGetHardwareState(void);
+	Json::Value CreateJsonMsg(const std::string &CommandName, const std::map<std::string, Json::Value> *Values = nullptr);
+	Coyote::StatusCode DecodeAssets(const std::string &JSON, std::vector<Coyote::Asset> &Out);
+}
 
-#endif //__LIBCOYOTE_COMMON_H__
+#endif //__LIBCOYOTE_JSONPROC_H__
