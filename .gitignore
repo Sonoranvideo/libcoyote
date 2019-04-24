@@ -7,5 +7,7 @@
 **/*.so.*
 **/Makefile
 **/CMakeCache.txt
+**/.vs
 src/build
 build
+
