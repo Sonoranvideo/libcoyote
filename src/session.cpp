@@ -14,16 +14,18 @@
    limitations under the License.
 */
 
-#include "common.h"
-#include "curlrequests.h"
-#include "statuscodes.h"
-#include "datastructures.h"
-#include "session.h"
-#include "jsonproc.h"
+#include "include/internal/common.h"
+#include "include/internal/curlrequests.h"
+#include "include/internal/jsonproc.h"
+#include "include/statuscodes.h"
+#include "include/datastructures.h"
+#include "include/session.h"
 #include <json/json.h>
 #include <iostream>
+
 #define DEF_SESS InternalSession &SESS = *static_cast<InternalSession*>(this->Internal)
 #define MAPARG(x) { #x, x }
+
 struct InternalSession
 {
 	CurlRequests::CurlSession CurlObj;

@@ -21,8 +21,9 @@
 #endif //__cplusplus
 
 #define COYOTE_API_VERSION "0.1"
-#include "common.h"
 #include "datastructures.h"
+#include "session.h"
+#include "statuscodes.h"
 
 namespace Coyote
 {

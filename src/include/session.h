@@ -22,6 +22,9 @@
 #endif //__cplusplus
 #include <string>
 #include <stdint.h>
+#include <vector>
+#include "statuscodes.h"
+#include "datastructures.h"
 
 namespace Coyote
 {

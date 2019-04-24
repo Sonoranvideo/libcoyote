@@ -18,8 +18,8 @@
 #define __LIBCOYOTE_JSONPROC_H__
 
 #include "common.h"
-#include "statuscodes.h"
-#include "datastructures.h"
+#include "../statuscodes.h"
+#include "../datastructures.h"
 #include <json/json.h>
 
 namespace JsonProc

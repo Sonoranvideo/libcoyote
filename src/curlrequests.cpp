@@ -14,8 +14,8 @@
    limitations under the License.
 */
 
-#include "common.h"
-#include "curlrequests.h"
+#include "include/internal/common.h"
+#include "include/internal/curlrequests.h"
 #include <curl/curl.h>
 
 typedef std::unique_ptr<curl_slist, std::function<decltype(curl_slist_free_all)> > CurlHeaderPtr;

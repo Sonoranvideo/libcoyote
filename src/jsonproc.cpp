@@ -14,12 +14,12 @@
    limitations under the License.
 */
 
-#include "common.h"
-#include "jsonproc.h"
+#include "include/internal/common.h"
+#include "include/internal/jsonproc.h"
 #include <json/json.h>
 #include <iostream>
-#include "libcoyote.h"
-#include "datastructures.h"
+#include "include/libcoyote.h"
+#include "include/datastructures.h"
 
 using namespace JsonProc;
 #define OUTPUT_MEMBERS	{\
