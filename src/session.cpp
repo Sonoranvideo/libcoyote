@@ -34,6 +34,7 @@ struct InternalSession
 	
 	const std::string GetURL(void) const;
 	Json::Value PerformJsonAction(const std::string &CommandName, Coyote::StatusCode *StatusOut = nullptr, const std::map<std::string, Json::Value> *Values = nullptr);
+	Coyote::StatusCode CreatePreset_Multi(const Coyote::Preset &Ref, const std::string &Cmd);
 
 };
 
@@ -184,6 +185,42 @@ Coyote::StatusCode Coyote::Session::RenameAsset(const std::string &CurrentName, 
 	
 	return Status;
 }
+
+
+Coyote::StatusCode Coyote::Session::CreatePreset(const Coyote::Preset &Ref)
+{
+	DEF_SESS;
+	return SESS.CreatePreset_Multi(Ref, "CreatePreset");
+}
+Coyote::StatusCode Coyote::Session::UpdatePreset(const Coyote::Preset &Ref)
+{
+	DEF_SESS;
+	return SESS.CreatePreset_Multi(Ref, "UpdatePreset");
+}
+Coyote::StatusCode Coyote::Session::LoadPreset(const Coyote::Preset &Ref)
+{
+	DEF_SESS;
+	return SESS.CreatePreset_Multi(Ref, "LoadPreset");
+}
+
+Coyote::StatusCode InternalSession::CreatePreset_Multi(const Coyote::Preset &Ref, const std::string &Cmd)
+{
+	Coyote::StatusCode Status{};
+
+	const Json::Value &Converted = JsonProc::CoyotePresetToJSON(Ref);
+	
+	const std::vector<std::string> Keys { Converted.getMemberNames() };
+	
+	std::map<std::string, Json::Value> Values{};
+	
+	for (std::string Key : Keys) Values[Key] = Converted[Key];
+	
+	this->PerformJsonAction("CreatePreset", &Status, &Values);
+	
+	return Status;
+}
+	
+	
 
 Coyote::StatusCode Coyote::Session::ReorderPresets(const int32_t PK1, const int32_t PK2)
 {

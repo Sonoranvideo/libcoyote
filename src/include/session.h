@@ -55,6 +55,9 @@ namespace Coyote
 		StatusCode RenameAsset(const std::string &CurrentName, const std::string &NewName);
 		StatusCode ReorderPresets(const int32_t PK1, const int32_t PK2);
 		StatusCode DeletePreset(const int32_t PK);
+		StatusCode CreatePreset(const Coyote::Preset &Ref);
+		StatusCode UpdatePreset(const Coyote::Preset &Ref);
+		StatusCode LoadPreset(const Coyote::Preset &Ref);
 		virtual ~Session(void);
 	};
 	
