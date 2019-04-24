@@ -185,6 +185,30 @@ Coyote::StatusCode Coyote::Session::RenameAsset(const std::string &CurrentName, 
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::ReorderPresets(const int32_t PK1, const int32_t PK2)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	const std::map<std::string, Json::Value> Values { MAPARG(PK1), MAPARG(PK2) };
+	
+	SESS.PerformJsonAction("ReorderPresets", &Status, &Values);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::DeletePreset(const int32_t PK)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	const std::map<std::string, Json::Value> Values { MAPARG(PK) };
+	
+	SESS.PerformJsonAction("DeletePreset", &Status, &Values);
+	
+	return Status;
+}
+
 Coyote::StatusCode Coyote::Session::SeekTo(const int32_t PK, const uint32_t TimeIndex)
 {
 	DEF_SESS;

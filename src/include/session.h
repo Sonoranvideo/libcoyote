@@ -53,6 +53,8 @@ namespace Coyote
 		StatusCode InstallAsset(const std::string &AssetPath);
 		StatusCode DeleteAsset(const std::string &AssetName);
 		StatusCode RenameAsset(const std::string &CurrentName, const std::string &NewName);
+		StatusCode ReorderPresets(const int32_t PK1, const int32_t PK2);
+		StatusCode DeletePreset(const int32_t PK);
 		virtual ~Session(void);
 	};
 	
