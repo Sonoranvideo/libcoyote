@@ -26,6 +26,15 @@ namespace Coyote
 		virtual ~BaseObject(void) = default;
 	};
 	
+	struct TimeCode : public BaseObject
+	{
+		double ScrubBar;
+		uint32_t Time;
+		uint32_t TRT;
+		
+		inline operator uint32_t(void) const { return this->Time; }
+	};
+	
 	struct Asset : public BaseObject
 	{
 		std::string FileName; ///The part we care about most
@@ -76,6 +85,8 @@ namespace Coyote
 		bool IsPlaying : 1;
 		bool IsPaused : 1;
 		bool Selected : 1;
+		
+		inline operator int32_t(void) const { return this->PK; }
 
 	};
 }

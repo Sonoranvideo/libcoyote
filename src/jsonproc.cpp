@@ -160,6 +160,28 @@ Json::Value CoyotePresetToJSON(const Coyote::Preset &Ref)
 	return Set;
 }
 
+Json::Value CoyoteTimeCodeToJSON(const Coyote::TimeCode &Ref)
+{
+	Json::Value Set { Json::objectValue };
+	
+	Set["Time"] = Ref.Time;
+	Set["TRT"] = Ref.TRT;
+	Set["ScrubBar"] = Ref.ScrubBar;
+	
+	return Set;
+}
+
+Coyote::TimeCode *JsonProc::JSONToCoyoteTimeCode(const Json::Value &Ref)
+{
+	auto RetVal = new Coyote::TimeCode{};
+	
+	RetVal->Time = Ref["Time"].asUInt();
+	RetVal->TRT = Ref["TRT"].asUInt();
+	RetVal->ScrubBar = Ref["ScrubBar"].asDouble();
+	
+	return RetVal;
+}
+
 Coyote::Preset *JsonProc::JSONToCoyotePreset(const Json::Value &Ref)
 {
 	auto RetVal = new Coyote::Preset{};

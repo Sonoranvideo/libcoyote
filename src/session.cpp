@@ -23,7 +23,7 @@
 #include <json/json.h>
 #include <iostream>
 #define DEF_SESS InternalSession &SESS = *static_cast<InternalSession*>(this->Internal)
-
+#define MAPARG(x) { #x, x }
 struct InternalSession
 {
 	CurlRequests::CurlSession CurlObj;
@@ -104,7 +104,117 @@ Json::Value InternalSession::PerformJsonAction(const std::string &CommandName, C
 	
 	return IncomingMsg;
 }
+
+Coyote::StatusCode Coyote::Session::Take(const int32_t PK)
+{
+	DEF_SESS;
 	
+	Coyote::StatusCode Status{};
+	
+	const std::map<std::string, Json::Value> Values { MAPARG(PK) };
+	
+	SESS.PerformJsonAction("Take", &Status, &Values);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::Pause(const int32_t PK)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	const std::map<std::string, Json::Value> Values { MAPARG(PK) };
+	
+	SESS.PerformJsonAction("Pause", &Status, &Values);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::End(const int32_t PK)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	const std::map<std::string, Json::Value> Values { MAPARG(PK) };
+	
+	SESS.PerformJsonAction("End", &Status, &Values);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::DeleteAsset(const std::string &AssetName)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	const std::map<std::string, Json::Value> Values { MAPARG(AssetName) };
+	
+	SESS.PerformJsonAction("DeleteAsset", &Status, &Values);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::InstallAsset(const std::string &AssetPath)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	const std::map<std::string, Json::Value> Values { MAPARG(AssetPath) };
+	
+	SESS.PerformJsonAction("InstallAsset", &Status, &Values);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::RenameAsset(const std::string &CurrentName, const std::string &NewName)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	const std::map<std::string, Json::Value> Values { MAPARG(CurrentName), MAPARG(NewName) };
+	
+	SESS.PerformJsonAction("RenameAsset", &Status, &Values);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::SeekTo(const int32_t PK, const uint32_t TimeIndex)
+{
+	DEF_SESS;
+	
+	const std::map<std::string, Json::Value> Values { MAPARG(PK), MAPARG(TimeIndex) };
+
+	Coyote::StatusCode Status{};
+
+	SESS.PerformJsonAction("SeekTo", &Status, &Values);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::GetTimeCode(Coyote::TimeCode &Out)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	const Json::Value &Msg = SESS.PerformJsonAction("GetTimeCode", &Status);
+	
+	if (Status != Coyote::STATUS_OK) return Status;
+	
+	const Json::Value &Data = JsonProc::GetDataField(Msg);
+	
+	assert(Data.isObject());
+	
+	std::unique_ptr<Coyote::TimeCode> TimeCodePtr { JsonProc::JSONToCoyoteTimeCode(Data) };
+	Out = std::move(*TimeCodePtr); //Moving is not actually useful for a struct full of POD data types, but it's the thought that counts.
+	
+	return Status;
+}
 	
 Coyote::StatusCode Coyote::Session::GetAssets(std::vector<Coyote::Asset> &Out)
 {
@@ -155,6 +265,7 @@ Coyote::StatusCode Coyote::Session::GetPresets(std::vector<Coyote::Preset> &Out)
 	
 	return Status;
 }
+
 
 #ifdef TESTING_SESSION
 int main(void)

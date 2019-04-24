@@ -36,6 +36,8 @@ namespace JsonProc
 	Json::Value CoyoteAssetToJSON(const struct Coyote::Asset &Ref);
 	Coyote::Output *JSONToCoyoteOutput(const Json::Value &Ref);
 	Json::Value CoyoteOutputToJSON(const struct Coyote::Output &Ref);
+	Coyote::TimeCode *JSONToCoyoteTimeCode(const Json::Value &Ref);
+	Json::Value CoyoteTimeCodeToJSON(const struct Coyote::TimeCode &Ref);
 	Coyote::Preset *JSONToCoyotePreset(const Json::Value &Ref);
 	Json::Value CoyotePresetToJSON(const struct Coyote::Preset &Ref);
 

@@ -40,7 +40,16 @@ namespace Coyote
 		
 		StatusCode GetAssets(std::vector<Coyote::Asset> &Out);
 		StatusCode GetPresets(std::vector<Coyote::Preset> &Out);
+		StatusCode GetTimeCode(Coyote::TimeCode &Out);
 		
+		//Input parameter names must match the expected JSON names
+		StatusCode Take(const int32_t PK);
+		StatusCode Pause(const int32_t PK);
+		StatusCode End(const int32_t PK);
+		StatusCode SeekTo(const int32_t PK, const uint32_t TimeIndex);
+		StatusCode InstallAsset(const std::string &AssetPath);
+		StatusCode DeleteAsset(const std::string &AssetName);
+		StatusCode RenameAsset(const std::string &CurrentName, const std::string &NewName);
 		virtual ~Session(void);
 	};
 	
