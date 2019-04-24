@@ -92,19 +92,3 @@ bool CurlRequests::CurlSession::SendJSON(const std::string &URL, const std::stri
 	
 	return false;
 }
-
-#ifdef TESTING //Because it saves me, the developer, trouble.
-int main(void)
-{
-	setvbuf(stdout, nullptr, _IONBF, 0);
-	setvbuf(stderr, nullptr, _IONBF, 0);
-	CurlRequests::CurlSession Session;
-	
-	std::vector<uint8_t> Response;
-	Session.SendJSON("http://127.0.0.1:8000", "{ \"CoyoteAPIVersion\" : 0.1, \"CommandName\" : \"GetPresets\" }", &Response);
-	
-	puts((char*)Response.data());
-	
-	return 0;
-}
-#endif //TESTING

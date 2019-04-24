@@ -292,27 +292,3 @@ Coyote::StatusCode Coyote::Session::GetPresets(std::vector<Coyote::Preset> &Out)
 	return Status;
 }
 
-
-#ifdef TESTING_SESSION
-int main(void)
-{
-	std::vector<Coyote::Preset> Results;
-	
-	Coyote::Session SessObj("localhost");
-	
-	if (SessObj.GetPresets(Results) == Coyote::STATUS_OK)
-	{
-		std::cout << "Worked" << std::endl;
-	}
-	else
-	{
-		std::cout << "Failed" << std::endl;
-	}
-	
-	for (size_t Inc = 0u, Size = Results.size(); Inc < Size; ++Inc)
-	{
-		std::cout << Results[Inc].Name << std::endl;
-	}
-	
-}
-#endif
