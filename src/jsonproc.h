@@ -30,6 +30,19 @@ namespace JsonProc
 	const std::string MkGetHardwareState(void);
 	Json::Value CreateJsonMsg(const std::string &CommandName, const std::map<std::string, Json::Value> *Values = nullptr);
 	Coyote::StatusCode DecodeAssets(const std::string &JSON, std::vector<Coyote::Asset> &Out);
+	Json::Value ProcessJsonMsg(const std::string &Msg);
+	Json::Value GetDataField(const Json::Value &Ref);
+	Coyote::Asset *JSONToCoyoteAsset(const Json::Value &Val);
+	Json::Value CoyoteAssetToJSON(const struct Coyote::Asset &Ref);
+	Coyote::Output *JSONToCoyoteOutput(const Json::Value &Ref);
+	Json::Value CoyoteOutputToJSON(const struct Coyote::Output &Ref);
+	Coyote::Preset *JSONToCoyotePreset(const Json::Value &Ref);
+	Json::Value CoyotePresetToJSON(const struct Coyote::Preset &Ref);
+
+	Coyote::StatusCode GetStatusCode(const Json::Value &JsonObject);
+
+
+
 }
 
 #endif //__LIBCOYOTE_JSONPROC_H__

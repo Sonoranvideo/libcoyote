@@ -86,9 +86,7 @@ static const std::map<std::string, std::map<std::string, Json::ValueType> > Comm
 };
 
 //Static function declarationsmms
-static Json::Value *ProcessJsonMsg(const std::string &Msg);
 static struct Coyote::Output *JSONToCoyoteOutput(const Json::Value &Ref);
-static Json::Value CoyoteOutputToJSON(const struct Coyote::Output &Ref);
 static Json::Value CoyoteAssetToJSON(const struct Coyote::Asset &Ref);
 static struct Coyote::Asset *JSONToCoyoteAsset(const Json::Value &Val);
 static inline Coyote::StatusCode GetStatusCode(const Json::Value &JsonObject);
@@ -135,8 +133,72 @@ const std::string JsonProc::MkGetHardwareState(void)
 	Json::Value Message { CreateJsonMsg("GetHardwareState") };
 	return Message.toStyledString();
 }
+Json::Value CoyotePresetToJSON(const Coyote::Preset &Ref)
+{
+	Json::Value Set { Json::objectValue };
+	
+	Set["Output1"] = CoyoteOutputToJSON(Ref.Output1);
+	Set["Output2"] = CoyoteOutputToJSON(Ref.Output2);
+	Set["Output3"] = CoyoteOutputToJSON(Ref.Output3);
+	Set["Output4"] = CoyoteOutputToJSON(Ref.Output4);
+	Set["Name"] = Ref.Name;
+	Set["Layout"] = Ref.Layout;
+	Set["Notes"] = Ref.Notes;
+	Set["Color"] = Ref.Color;
+	Set["PK"] = Ref.PK;
+	Set["Index"] = Ref.Index;
+	Set["Loop"] = Ref.Loop;
+	Set["Link"] = Ref.Link;
+	Set["DisplayLink"] = Ref.DisplayLink;
+	Set["Fade"] = Ref.Fade;
+	Set["LeftVolume"] = Ref.LeftVolume;
+	Set["RightVolume"] = Ref.RightVolume;
+	Set["IsPlaying"] = Ref.IsPlaying;
+	Set["IsPaused"] = Ref.IsPaused;
+	Set["Selected"] = Ref.Selected;
+	
+	return Set;
+}
 
-static struct Coyote::Output *JSONToCoyoteOutput(const Json::Value &Ref)
+Coyote::Preset *JsonProc::JSONToCoyotePreset(const Json::Value &Ref)
+{
+	auto RetVal = new Coyote::Preset{};
+	
+	std::unique_ptr<Coyote::Output> OutputPtr { JSONToCoyoteOutput(Ref["Output1"]) };
+	
+	RetVal->Output1 = std::move(*OutputPtr);
+	
+	OutputPtr.reset(JSONToCoyoteOutput(Ref["Output2"]));
+	RetVal->Output2 = std::move(*OutputPtr);
+	
+	OutputPtr.reset(JSONToCoyoteOutput(Ref["Output3"]));
+	RetVal->Output3 = std::move(*OutputPtr);
+	
+	OutputPtr.reset(JSONToCoyoteOutput(Ref["Output4"]));
+	RetVal->Output4 = std::move(*OutputPtr);
+	
+	OutputPtr.release();
+
+	RetVal->Name = Ref["Name"].asString();
+	RetVal->Layout = Ref["Layout"].asString();
+	RetVal->Notes = Ref["Notes"].asString();
+	RetVal->Color = Ref["Color"].asString();
+	RetVal->PK = Ref["PK"].asInt();
+	RetVal->Index = Ref["Index"].asInt();
+	RetVal->Loop = Ref["Loop"].asInt();
+	RetVal->Link = Ref["Link"].asInt();
+	RetVal->DisplayLink = Ref["DisplayLink"].asInt();
+	RetVal->Fade = Ref["Fade"].asInt();
+	RetVal->LeftVolume = Ref["LeftVolume"].asInt();
+	RetVal->RightVolume = Ref["RightVolume"].asInt();
+	RetVal->IsPlaying = Ref["IsPlaying"].asBool();
+	RetVal->IsPaused = Ref["IsPaused"].asBool();
+	RetVal->Selected = Ref["Selected"].asBool();
+	
+	return RetVal;
+}
+
+Coyote::Output *JsonProc::JSONToCoyoteOutput(const Json::Value &Ref)
 {
 	auto RetVal = new Coyote::Output{};
 	
@@ -155,7 +217,7 @@ static struct Coyote::Output *JSONToCoyoteOutput(const Json::Value &Ref)
 	return RetVal;
 }
 
-static Json::Value CoyoteOutputToJSON(const struct Coyote::Output &Ref)
+Json::Value JsonProc::CoyoteOutputToJSON(const struct Coyote::Output &Ref)
 {
 	Json::Value Set { Json::objectValue };
 	
@@ -173,7 +235,7 @@ static Json::Value CoyoteOutputToJSON(const struct Coyote::Output &Ref)
 	return Set;
 }
 
-static Json::Value CoyoteAssetToJSON(const struct Coyote::Asset &Ref)
+Json::Value JsonProc::CoyoteAssetToJSON(const struct Coyote::Asset &Ref)
 {
 	Json::Value Set { Json::objectValue };
 	
@@ -185,7 +247,7 @@ static Json::Value CoyoteAssetToJSON(const struct Coyote::Asset &Ref)
 	return Set;
 }
 
-static struct Coyote::Asset *JSONToCoyoteAsset(const Json::Value &Val)
+Coyote::Asset *JsonProc::JSONToCoyoteAsset(const Json::Value &Val)
 {
 	auto RetVal = new Coyote::Asset{};
 	
@@ -224,56 +286,28 @@ static inline bool HasValidDataField(const Json::Value &JsonObject)
 	return JsonObject.isMember("Data") && JsonObject["Data"].isArray();
 }
 
-static inline Coyote::StatusCode GetStatusCode(const Json::Value &JsonObject)
+Coyote::StatusCode JsonProc::GetStatusCode(const Json::Value &JsonObject)
 {
 	return static_cast<Coyote::StatusCode>(JsonObject["StatusInt"].asInt());
 }
 
-Coyote::StatusCode JsonProc::DecodeAssets(const std::string &JSON, std::vector<Coyote::Asset> &Out)
-{
-	std::unique_ptr<Json::Value> JsonObjPtr { ProcessJsonMsg(JSON) };
-	Json::Value &JsonObj { *JsonObjPtr };
-	
-	const Coyote::StatusCode Status = GetStatusCode(JsonObj);
-	
-	if (Status != Coyote::STATUS_OK || !HasValidDataField(JsonObj))
-	{
-		std::cout << "Failed at decodeassets" << std::endl;
-		return Status;
-	}
-	
-	Json::Value &Data = JsonObj["Data"];
-		
-	for (auto Iter = Data.begin(); Iter != Data.end(); ++Iter)
-	{
-		std::unique_ptr<Coyote::Asset> Ptr { JSONToCoyoteAsset(*Iter) };
-		
-		if (Ptr)
-		{
-			Out.emplace_back(*Ptr);
-		}
-	}
-	
-	return Status;
-}
 
-static std::vector<Coyote::Output> *DecodeOutput(const std::string &JSON)
+Json::Value JsonProc::ProcessJsonMsg(const std::string &Msg)
 {
-	Json::Value Parsed{};
-	
-	return nullptr;
-}
-
-static Json::Value *ProcessJsonMsg(const std::string &Msg)
-{
-	Json::Value *Parsed { new Json::Value { Json::objectValue } };
+	Json::Value Parsed { Json::objectValue };
 	
 	Json::Reader ReaderObj{};
 	
-	ReaderObj.parse(Msg, *Parsed, false);
+	ReaderObj.parse(Msg, Parsed, false);
 	
-	assert(HasValidHeaders(*Parsed));
+	assert(HasValidHeaders(Parsed));
 	
 	return Parsed;
 }
 
+Json::Value JsonProc::GetDataField(const Json::Value &Ref)
+{
+	assert(HasValidDataField(Ref));
+	
+	return Ref["Data"];
+}

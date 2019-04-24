@@ -39,6 +39,7 @@ namespace Coyote
 		Session &operator=(const Session &) = delete;
 		
 		StatusCode GetAssets(std::vector<Coyote::Asset> &Out);
+		StatusCode GetPresets(std::vector<Coyote::Preset> &Out);
 		
 		virtual ~Session(void);
 	};

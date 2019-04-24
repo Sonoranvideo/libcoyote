@@ -31,6 +31,8 @@ struct InternalSession
 	uint16_t PortNum;
 	
 	const std::string GetURL(void) const;
+	Json::Value PerformJsonAction(const std::string &CommandName, Coyote::StatusCode *StatusOut = nullptr, const std::map<std::string, Json::Value> *Values = nullptr);
+
 };
 
 const std::string InternalSession::GetURL(void) const
@@ -81,35 +83,87 @@ Coyote::Session &Coyote::Session::operator=(Session &&In)
 	return *this;
 }
 
-
-Coyote::StatusCode Coyote::Session::GetAssets(std::vector<Coyote::Asset> &Out)
-{
-	DEF_SESS;
+Json::Value InternalSession::PerformJsonAction(const std::string &CommandName, Coyote::StatusCode *StatusOut, const std::map<std::string, Json::Value> *Values)
+{	
+	Json::Value Msg { JsonProc::CreateJsonMsg(CommandName, Values) };
 	
-	Json::Value Msg { JsonProc::CreateJsonMsg("GetAssets") };
-	
-	CurlRequests::CurlSession Session{};
 	
 	std::vector<uint8_t> Response{};
-	
 
-	if (!Session.SendJSON(SESS.GetURL(), Msg.toStyledString(), &Response))
+	if (!this->CurlObj.SendJSON(this->GetURL(), Msg.toStyledString(), &Response))
 	{
 		return Coyote::STATUS_NETWORKERROR;
 	}
 	
+	Json::Value &&IncomingMsg = JsonProc::ProcessJsonMsg((const char*)Response.data());
 	
-	return JsonProc::DecodeAssets((const char*)Response.data(), Out);
+	if (StatusOut)
+	{
+		*StatusOut = JsonProc::GetStatusCode(IncomingMsg);
+	}
+	
+	return IncomingMsg;
+}
+	
+	
+Coyote::StatusCode Coyote::Session::GetAssets(std::vector<Coyote::Asset> &Out)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	const Json::Value &Msg = SESS.PerformJsonAction("GetAssets", &Status);
+	
+	if (Status != Coyote::STATUS_OK) return Status;
+	
+	const Json::Value &Data = JsonProc::GetDataField(Msg);
+	
+	assert(Data.isArray());
+	
+	Out.reserve(Data.size());
+	
+	for (auto Iter = Data.begin(); Iter != Data.end(); ++Iter)
+	{
+		std::unique_ptr<Coyote::Asset> CurAsset { JsonProc::JSONToCoyoteAsset(*Iter) };
+		Out.push_back(std::move(*CurAsset));
+	}
+
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::GetPresets(std::vector<Coyote::Preset> &Out)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	const Json::Value &Msg = SESS.PerformJsonAction("GetPresets", &Status);
+	
+	if (Status != Coyote::STATUS_OK) return Status;
+	
+	const Json::Value &Data = JsonProc::GetDataField(Msg);
+	
+	assert(Data.isArray());
+	
+	Out.reserve(Data.size());
+	
+	for (auto Iter = Data.begin(); Iter != Data.end(); ++Iter)
+	{
+		std::unique_ptr<Coyote::Preset> CurPreset { JsonProc::JSONToCoyotePreset(*Iter) };
+		Out.push_back(std::move(*CurPreset));
+	}
+	
+	return Status;
 }
 
 #ifdef TESTING_SESSION
 int main(void)
 {
-	std::vector<Coyote::Asset> Results;
+	std::vector<Coyote::Preset> Results;
 	
 	Coyote::Session SessObj("localhost");
 	
-	if (SessObj.GetAssets(Results) == Coyote::STATUS_OK)
+	if (SessObj.GetPresets(Results) == Coyote::STATUS_OK)
 	{
 		std::cout << "Worked" << std::endl;
 	}
@@ -120,8 +174,8 @@ int main(void)
 	
 	for (size_t Inc = 0u, Size = Results.size(); Inc < Size; ++Inc)
 	{
-		std::cout << Results[Inc] << std::endl;
+		std::cout << Results[Inc].Name << std::endl;
 	}
-		
+	
 }
 #endif
