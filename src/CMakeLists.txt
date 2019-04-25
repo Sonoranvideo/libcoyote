@@ -7,6 +7,24 @@ else()
 	add_compile_options(-std=gnu++14 -pedantic -Wall -g3 -O0 -Wno-deprecated-declarations -Wno-unused-function)
 endif()
 
+message("== Searching for jsoncpp...")
+
+find_library(json_support jsoncpp)
+if(NOT json_support)
+	message(FATAL_ERROR "Error: jsoncpp library and/or development files were not detected.")
+else()
+	message("== Ok. Found jsoncpp")
+endif()
+
+message("== Searching for libcurl...")
+
+find_library(curl_support curl)
+if(NOT curl_support)
+	message(FATAL_ERROR "Error: curl library and/or development files were not detected.")
+else()
+	message("== Ok. Found libcurl")
+endif()
+
 set(sourcefiles curlrequests.cpp jsonproc.cpp session.cpp)
 
 add_library(coyote SHARED ${sourcefiles})

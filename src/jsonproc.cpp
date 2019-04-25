@@ -86,10 +86,6 @@ static const std::map<std::string, std::map<std::string, Json::ValueType> > Comm
 };
 
 //Static function declarationsmms
-static struct Coyote::Output *JSONToCoyoteOutput(const Json::Value &Ref);
-static Json::Value CoyoteAssetToJSON(const struct Coyote::Asset &Ref);
-static struct Coyote::Asset *JSONToCoyoteAsset(const Json::Value &Val);
-static inline Coyote::StatusCode GetStatusCode(const Json::Value &JsonObject);
 static inline bool HasValidHeaders(const Json::Value &JsonObject);
 static inline bool HasValidDataField(const Json::Value &JsonObject);
 
@@ -141,10 +137,10 @@ Json::Value CoyotePresetToJSON(const Coyote::Preset &Ref)
 	Set["Output2"] = CoyoteOutputToJSON(Ref.Output2);
 	Set["Output3"] = CoyoteOutputToJSON(Ref.Output3);
 	Set["Output4"] = CoyoteOutputToJSON(Ref.Output4);
-	Set["Name"] = Ref.Name;
-	Set["Layout"] = Ref.Layout;
-	Set["Notes"] = Ref.Notes;
-	Set["Color"] = Ref.Color;
+	Set["Name"] = Ref.Name.GetStdString();
+	Set["Layout"] = Ref.Layout.GetStdString();
+	Set["Notes"] = Ref.Notes.GetStdString();
+	Set["Color"] = Ref.Color.GetStdString();
 	Set["PK"] = Ref.PK;
 	Set["Index"] = Ref.Index;
 	Set["Loop"] = Ref.Loop;
@@ -243,7 +239,7 @@ Json::Value JsonProc::CoyoteOutputToJSON(const struct Coyote::Output &Ref)
 {
 	Json::Value Set { Json::objectValue };
 	
-	Set["Filename"] = Ref.Filename;
+	Set["Filename"] = Ref.Filename.GetStdString();
 	Set["Hue"] = Ref.Hue;
 	Set["Saturation"] = Ref.Saturation;
 	Set["Contrast"] = Ref.Contrast;
@@ -261,8 +257,8 @@ Json::Value JsonProc::CoyoteAssetToJSON(const struct Coyote::Asset &Ref)
 {
 	Json::Value Set { Json::objectValue };
 	
-	Set["FileName"] = Ref.FileName;
-	Set["NewFileName"] = Ref.NewFileName;
+	Set["FileName"] = Ref.FileName.GetStdString();
+	Set["NewFileName"] = Ref.NewFileName.GetStdString();
 	Set["CopyPercentage"] = Ref.CopyPercentage;
 	Set["IsReady"] = Ref.IsReady;
 	

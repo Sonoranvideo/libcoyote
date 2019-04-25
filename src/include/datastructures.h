@@ -19,77 +19,74 @@
 
 #include <stdint.h>
 #include <string>
-
+#include <string.h>
 
 namespace Coyote
 {
+	class CoyoteString
+	{ //Keep this class as standard layout because we pass it to C.
+	private:
+		char *Buffer;
+	public:
+		inline CoyoteString(const char *String = "") : Buffer((char*)calloc(strlen(String), 1)) { strcpy(this->Buffer, String); }
+		inline CoyoteString(const std::string &String) : CoyoteString(String.c_str()) {}
+		inline ~CoyoteString(void) { free(this->Buffer); }
+		inline operator const char*(void) const { return this->Buffer; }
+		inline operator std::string(void) const { return this->Buffer; }
+		inline const char *GetCString(void) const { return this->Buffer; }
+		inline std::string GetStdString(void) const { return this->Buffer; }
+		inline CoyoteString(const CoyoteString &Ref) : Buffer(strdup(Ref.Buffer)) {}
+		inline CoyoteString(CoyoteString &&Ref) : Buffer(Ref.Buffer) { Ref.Buffer = nullptr; }
+		inline CoyoteString &operator=(const CoyoteString &Ref) { if (this == &Ref) return *this; this->Buffer = strdup(Ref.Buffer); return *this; }
+		inline CoyoteString &operator=(CoyoteString &&Ref) { if (this == &Ref) return *this; this->Buffer = Ref.Buffer; Ref.Buffer = nullptr; return *this; }
+	};
+}
+
+extern "C"
+{
+#include "datastructures_c.h"
+}
+
+namespace Coyote
+{
+	static_assert(std::is_standard_layout<CoyoteString>::value && alignof(char*) == alignof(CoyoteString), "CoyoteString is no longer a standard layout class due to some modification you made.");
+	
 	struct BaseObject
 	{
 		virtual ~BaseObject(void) = default;
 	};
 	
-	struct TimeCode : public BaseObject
-	{
-		double ScrubBar;
-		uint32_t Time;
-		uint32_t TRT;
-		
+	
+	struct TimeCode : public BaseObject, public Coyote_TimeCode
+	{		
 		inline operator uint32_t(void) const { return this->Time; }
 	};
 	
-	struct Asset : public BaseObject
-	{
-		std::string FileName; ///The part we care about most
-		std::string NewFileName; //NewFileName should only be used when renaming/moving assets. Leaving it empty the rest of the time is fine.
-		uint8_t CopyPercentage : 7; //User shouldn't need to write to this
-		bool IsReady : 1; //or this
-		
-		
-		inline Asset(const std::string &Path = "") : FileName(Path), NewFileName(), CopyPercentage(100), IsReady(true) {}
-		
-		inline operator const char*(void) const { return this->FileName.c_str(); }
+	struct Asset : public BaseObject, public Coyote_Asset
+	{				
+		inline operator const char*(void) const { return this->FileName; }
 		inline operator std::string(void) const { return this->FileName; }
 	};
 	
-	struct Output : public BaseObject
+	struct Output : public BaseObject, public Coyote_Output
 	{
-		std::string Filename;
-		int32_t Hue;
-		int32_t Saturation;
-		int32_t Contrast;
-		int32_t Brightness;
-		int32_t MediaId;
-		double FadeOut;
-		double Delay;
-		bool Active : 1;
-		bool Audio : 1;
-	
 	};
 	
-	struct Preset : public BaseObject
+	struct Preset : public BaseObject, public Coyote_Preset
 	{
 		Output Output1;
 		Output Output2;
 		Output Output3;
 		Output Output4;
-		std::string Name;
-		std::string Layout;
-		std::string Notes;
-		std::string Color;
-		int32_t PK;
-		int32_t Index;
-		int32_t Loop;
-		int32_t Link;
-		int32_t DisplayLink;
-		int32_t Fade;
-		int32_t LeftVolume;
-		int32_t RightVolume;
-		bool IsPlaying : 1;
-		bool IsPaused : 1;
-		bool Selected : 1;
 		
 		inline operator int32_t(void) const { return this->PK; }
-
+		inline Preset(void) : BaseObject(), Coyote_Preset()
+		{
+			this->Output_1 = &this->Output1;
+			this->Output_2 = &this->Output2;
+			this->Output_3 = &this->Output3;
+			this->Output_4 = &this->Output4;
+		}
 	};
 }
 #endif //__LIBCOYOTE_DATASTRUCTURES_H__
