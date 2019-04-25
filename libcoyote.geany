@@ -28,15 +28,23 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=0
-FILE_NAME_0=172;C++;0;EUTF-8;1;1;0;%2Fdh%2Flibcoyote%2Fsrc%2Fcurlrequests.cpp;0;4
-FILE_NAME_1=450;C++;0;EUTF-8;1;1;0;%2Fdh%2Flibcoyote%2Fsrc%2Fcurlrequests.h;0;4
-FILE_NAME_2=232;C++;0;EUTF-8;1;1;0;%2Fdh%2Flibcoyote%2Fsrc%2Fcommon.h;0;4
-FILE_NAME_3=1499;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fvolition%2Fsrc%2Fnode%2Fweb.cpp;0;4
-FILE_NAME_4=1130;Python;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-communicator%2Fsrc%2Fcomponents%2FCoyoteJsonServer%2F__init__.py;0;4
+current_page=3
+FILE_NAME_0=1522;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fvolition%2Fsrc%2Fnode%2Fweb.cpp;0;4
+FILE_NAME_1=3469;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fjsonproc.cpp;0;4
+FILE_NAME_2=7520;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fsession.cpp;0;4
+FILE_NAME_3=1048;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fdatastructures.h;0;4
+FILE_NAME_4=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fcommon.h;0;4
+FILE_NAME_5=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fcurlrequests.h;0;4
+FILE_NAME_6=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fjsonproc.h;0;4
+FILE_NAME_7=796;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Flibcoyote.h;0;4
+FILE_NAME_8=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fstatuscodes.h;0;4
+FILE_NAME_9=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fsession.h;0;4
+FILE_NAME_10=1120;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fcurlrequests.cpp;0;4
+FILE_NAME_11=176;C;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fdatastructures_c.h;0;4
+FILE_NAME_12=880;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2FCMakeLists.txt;0;4
 
 [VTE]
-last_dir=/home/daniel/coyoterepos/coyote-communicator
+last_dir=/home/daniel/libcoyote/src
 
 [build-menu]
 C++FT_00_LB=_Compile
