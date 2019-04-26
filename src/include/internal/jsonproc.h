@@ -31,7 +31,9 @@ namespace JsonProc
 	Json::Value CreateJsonMsg(const std::string &CommandName, const std::map<std::string, Json::Value> *Values = nullptr);
 	Coyote::StatusCode DecodeAssets(const std::string &JSON, std::vector<Coyote::Asset> &Out);
 	Json::Value ProcessJsonMsg(const std::string &Msg);
-	Json::Value GetDataField(const Json::Value &Ref);
+	Json::Value GetDataField(const Json::Value &Ref, const Json::Value &Default = {});
+	Coyote::NetworkInfo *JSONToCoyoteNetworkInfo(const Json::Value &Val);
+	Json::Value CoyoteNetworkInfoToJSON(const struct Coyote::NetworkInfo &Ref);
 	Coyote::Asset *JSONToCoyoteAsset(const Json::Value &Val);
 	Json::Value CoyoteAssetToJSON(const struct Coyote::Asset &Ref);
 	Coyote::Output *JSONToCoyoteOutput(const Json::Value &Ref);
@@ -40,7 +42,8 @@ namespace JsonProc
 	Json::Value CoyoteTimeCodeToJSON(const struct Coyote::TimeCode &Ref);
 	Coyote::Preset *JSONToCoyotePreset(const Json::Value &Ref);
 	Json::Value CoyotePresetToJSON(const struct Coyote::Preset &Ref);
-
+	Coyote::HardwareState *JSONToCoyoteHardwareState(const Json::Value &Value);
+	Json::Value CoyoteHardwareStateToJSON(const Coyote::HardwareState &Ref);
 	Coyote::StatusCode GetStatusCode(const Json::Value &JsonObject);
 
 

@@ -95,7 +95,7 @@ Json::Value InternalSession::PerformJsonAction(const std::string &CommandName, C
 
 	if (!this->CurlObj.SendJSON(this->GetURL(), Msg.toStyledString(), &Response))
 	{
-		return Coyote::STATUS_NETWORKERROR;
+		return Coyote::COYOTE_STATUS_NETWORKERROR;
 	}
 	
 	Json::Value &&IncomingMsg = JsonProc::ProcessJsonMsg((const char*)Response.data());
@@ -220,7 +220,78 @@ Coyote::StatusCode InternalSession::CreatePreset_Multi(const Coyote::Preset &Ref
 	return Status;
 }
 	
+Coyote::StatusCode Coyote::Session::BeginUpdate(void)
+{
+	DEF_SESS;
 	
+	Coyote::StatusCode Status{};
+	
+	SESS.PerformJsonAction("BeginUpdate", &Status);
+	
+	return Status;
+}
+	
+Coyote::StatusCode Coyote::Session::IsUpdateDetected(bool &ValueOut)
+{
+	DEF_SESS;
+	
+	const char *CmdName = "IsUpdateDetected";
+	
+	Coyote::StatusCode Status{};
+
+	const Json::Value &Response { SESS.PerformJsonAction(CmdName, &Status) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;	
+	
+	const Json::Value &Result = JsonProc::GetDataField(Response);
+	
+	assert(Result.isMember(CmdName) && Result[CmdName].isBool());
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::GetDisks(std::vector<std::string> &Out)
+{
+	DEF_SESS;
+	
+	const char *CmdName = "GetDisks";
+	
+	Coyote::StatusCode Status{};
+	
+	const Json::Value &Response { SESS.PerformJsonAction(CmdName, &Status) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	const Json::Value &Results = JsonProc::GetDataField(Response, Json::Value{ Json::arrayValue } );
+	
+	assert(Results.isArray());
+	
+	Out.reserve(Results.size());
+	Out.clear();
+	
+	for (const Json::Value &Object : Results)
+	{
+		assert(Object.isMember("DriveLetter"));
+		
+		Out.push_back(Object["DriveLetter"].asString());
+		
+	}
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::EjectDisk(const std::string &DriveLetter)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	const std::map<std::string, Json::Value> Values { MAPARG(DriveLetter) };
+	
+	const Json::Value &Response { SESS.PerformJsonAction("EjectDisk", &Status, &Values) };
+	
+	return Status;
+}
 
 Coyote::StatusCode Coyote::Session::ReorderPresets(const int32_t PK1, const int32_t PK2)
 {
@@ -234,6 +305,16 @@ Coyote::StatusCode Coyote::Session::ReorderPresets(const int32_t PK1, const int3
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::RestartService(void)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	SESS.PerformJsonAction("RestartService", &Status);
+	
+	return Status;
+}
 Coyote::StatusCode Coyote::Session::DeletePreset(const int32_t PK)
 {
 	DEF_SESS;
@@ -267,9 +348,9 @@ Coyote::StatusCode Coyote::Session::GetTimeCode(Coyote::TimeCode &Out)
 	
 	const Json::Value &Msg = SESS.PerformJsonAction("GetTimeCode", &Status);
 	
-	if (Status != Coyote::STATUS_OK) return Status;
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	const Json::Value &Data = JsonProc::GetDataField(Msg);
+	const Json::Value &Data = JsonProc::GetDataField(Msg, { Json::objectValue });
 	
 	assert(Data.isObject());
 	
@@ -287,7 +368,7 @@ Coyote::StatusCode Coyote::Session::GetAssets(std::vector<Coyote::Asset> &Out)
 	
 	const Json::Value &Msg = SESS.PerformJsonAction("GetAssets", &Status);
 	
-	if (Status != Coyote::STATUS_OK) return Status;
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
 	const Json::Value &Data = JsonProc::GetDataField(Msg);
 	
@@ -312,7 +393,7 @@ Coyote::StatusCode Coyote::Session::GetPresets(std::vector<Coyote::Preset> &Out)
 	
 	const Json::Value &Msg = SESS.PerformJsonAction("GetPresets", &Status);
 	
-	if (Status != Coyote::STATUS_OK) return Status;
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
 	const Json::Value &Data = JsonProc::GetDataField(Msg);
 	
@@ -329,3 +410,59 @@ Coyote::StatusCode Coyote::Session::GetPresets(std::vector<Coyote::Preset> &Out)
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::GetHardwareState(Coyote::HardwareState &Out)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	const Json::Value &Msg = SESS.PerformJsonAction("GetHardwareState", &Status);
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	const Json::Value &Data = JsonProc::GetDataField(Msg, { Json::objectValue });
+	
+	assert(Data.isObject());
+	
+	std::unique_ptr<Coyote::HardwareState> Ptr { JsonProc::JSONToCoyoteHardwareState(Data) };
+	
+	Out = std::move(*Ptr);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::GetIP(const int32_t AdapterID, Coyote::NetworkInfo &Out)
+{
+	DEF_SESS;
+	
+	const std::map<std::string, Json::Value> Values { MAPARG(AdapterID) };
+	
+	Coyote::StatusCode Status{};
+	
+	const Json::Value &Msg = SESS.PerformJsonAction("GetIP", &Status, &Values);
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	const Json::Value &Data = JsonProc::GetDataField(Msg, { Json::objectValue });
+	
+	assert(Data.isObject());
+	
+	std::unique_ptr<Coyote::NetworkInfo> Ptr { JsonProc::JSONToCoyoteNetworkInfo(Data) };
+	
+	Out = std::move(*Ptr);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::SetIP(const Coyote::NetworkInfo &Input)
+{
+	DEF_SESS;
+	
+	const std::map<std::string, Json::Value> Values { { "AdapterID", Input.AdapterID }, { "Subnet", Input.Subnet.GetStdString() }, { "IP", Input.IP.GetStdString() } };
+	
+	Coyote::StatusCode Status{};
+	
+	SESS.PerformJsonAction("SetIP", &Status, &Values);
+	
+	return Status;
+}

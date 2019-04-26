@@ -58,6 +58,14 @@ namespace Coyote
 		StatusCode CreatePreset(const Coyote::Preset &Ref);
 		StatusCode UpdatePreset(const Coyote::Preset &Ref);
 		StatusCode LoadPreset(const Coyote::Preset &Ref);
+		StatusCode BeginUpdate(void);
+		StatusCode IsUpdateDetected(bool &ValueOut);
+		StatusCode GetDisks(std::vector<std::string> &Out);
+		StatusCode EjectDisk(const std::string &DriveLetter);
+		StatusCode GetHardwareState(Coyote::HardwareState &Out);
+		StatusCode RestartService(void);
+		StatusCode GetIP(const int32_t AdapterID, Coyote::NetworkInfo &Out);
+		StatusCode SetIP(const Coyote::NetworkInfo &Input);
 		virtual ~Session(void);
 	};
 	

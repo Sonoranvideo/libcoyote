@@ -19,19 +19,44 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
 namespace Coyote
 {
-	enum StatusCode : int8_t
+	enum StatusCode
+#else
+	enum CoyoteStatusCode
+#endif //__cplusplus
 	{
-		STATUS_INVALID 				= -1,
-		STATUS_OK 					= 0,
-		STATUS_FAILED 				= 1,
-		STATUS_UNIMPLEMENTED 		= 2,
-		STATUS_INTERNALERROR 		= 3,
-		STATUS_MISUSED 				= 4,
-		STATUS_NETWORKERROR 		= 5,
-		STATUS_MAX
+		COYOTE_STATUS_INVALID 				= -1,
+		COYOTE_STATUS_OK 					= 0,
+		COYOTE_STATUS_FAILED 				= 1,
+		COYOTE_STATUS_UNIMPLEMENTED 		= 2,
+		COYOTE_STATUS_INTERNALERROR 		= 3,
+		COYOTE_STATUS_MISUSED 				= 4,
+		COYOTE_STATUS_NETWORKERROR 			= 5,
+		COYOTE_STATUS_MAX
 	};
+#ifdef __cplusplus
 }
+#endif //__cplusplus
+
+
+#ifdef __cplusplus
+namespace Coyote
+{
+	enum HardwareMode
+#else
+	enum Coyote_HardwareMode
+#endif //__cplusplus
+	{
+		COYOTE_MODE_INVALID = -1,
+		COYOTE_MODE_Q3G 	= 0,
+		COYOTE_MODE_S12G	= 1,
+		COYOTE_MODE_MAX
+	};
+
+#ifdef __cplusplus
+}
+#endif //__cplusplus
 
 #endif //__LIBCOYOTE_STATUSCODES_H__

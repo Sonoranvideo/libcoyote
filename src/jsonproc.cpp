@@ -129,7 +129,7 @@ const std::string JsonProc::MkGetHardwareState(void)
 	Json::Value Message { CreateJsonMsg("GetHardwareState") };
 	return Message.toStyledString();
 }
-Json::Value CoyotePresetToJSON(const Coyote::Preset &Ref)
+Json::Value JsonProc::CoyotePresetToJSON(const Coyote::Preset &Ref)
 {
 	Json::Value Set { Json::objectValue };
 	
@@ -253,6 +253,27 @@ Json::Value JsonProc::CoyoteOutputToJSON(const struct Coyote::Output &Ref)
 	return Set;
 }
 
+Json::Value JsonProc::CoyoteNetworkInfoToJSON(const struct Coyote::NetworkInfo &Ref)
+{
+	Json::Value Set { Json::objectValue };
+	
+	Set["IP"] = Ref.IP.GetStdString();
+	Set["Subnet"] = Ref.Subnet.GetStdString();
+	Set["AdapterID"] = Ref.AdapterID;
+	
+	return Set;
+}
+
+Coyote::NetworkInfo *JsonProc::JSONToCoyoteNetworkInfo(const Json::Value &Val)
+{
+	auto RetVal = new Coyote::NetworkInfo{};
+	
+	RetVal->IP = Val["IP"].asString();
+	RetVal->Subnet = Val["Subnet"].asString();
+	RetVal->AdapterID = Val["AdapterID"].asInt();
+	
+	return RetVal;
+}
 Json::Value JsonProc::CoyoteAssetToJSON(const struct Coyote::Asset &Ref)
 {
 	Json::Value Set { Json::objectValue };
@@ -275,6 +296,29 @@ Coyote::Asset *JsonProc::JSONToCoyoteAsset(const Json::Value &Val)
 	RetVal->IsReady = Val["IsReady"].asBool();
 	
 	return RetVal;
+}
+
+Coyote::HardwareState *JsonProc::JSONToCoyoteHardwareState(const Json::Value &Value)
+{
+	auto RetVal = new Coyote::HardwareState{};
+	
+	RetVal->SupportsS12G = Value["SupportsS12G"].asBool();
+	RetVal->Resolution = Value["Resolution"].asString();
+	RetVal->RefreshRate = Value["RefreshRate"].asString();
+	RetVal->CurrentMode = static_cast<Coyote::HardwareMode>(Value["CurrentMode"].asInt());
+	return RetVal;
+}
+
+Json::Value JsonProc::CoyoteHardwareStateToJSON(const Coyote::HardwareState &Ref)
+{
+	Json::Value Set { Json::objectValue };
+	
+	Set["SupportsS12G"] = Ref.SupportsS12G;
+	Set["Resolution"] = Ref.Resolution.GetStdString();
+	Set["RefreshRate"] = Ref.RefreshRate.GetStdString();
+	Set["CurrentMode"] = Ref.CurrentMode;
+	
+	return Set;
 }
 
 static inline bool HasValidHeaders(const Json::Value &JsonObject)
@@ -301,7 +345,7 @@ static inline bool HasValidHeaders(const Json::Value &JsonObject)
 }
 static inline bool HasValidDataField(const Json::Value &JsonObject)
 {
-	return JsonObject.isMember("Data") && JsonObject["Data"].isArray();
+	return JsonObject.isMember("Data") && (JsonObject["Data"].isArray() || JsonObject["Data"].isObject());
 }
 
 Coyote::StatusCode JsonProc::GetStatusCode(const Json::Value &JsonObject)
@@ -323,9 +367,9 @@ Json::Value JsonProc::ProcessJsonMsg(const std::string &Msg)
 	return Parsed;
 }
 
-Json::Value JsonProc::GetDataField(const Json::Value &Ref)
+Json::Value JsonProc::GetDataField(const Json::Value &Ref, const Json::Value &Default)
 {
-	assert(HasValidDataField(Ref));
+	if (!HasValidDataField(Ref)) return Default;
 	
 	return Ref["Data"];
 }

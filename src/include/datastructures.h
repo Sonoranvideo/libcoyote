@@ -28,7 +28,7 @@ namespace Coyote
 	private:
 		char *Buffer;
 	public:
-		inline CoyoteString(const char *String = "") : Buffer((char*)calloc(strlen(String), 1)) { strcpy(this->Buffer, String); }
+		inline CoyoteString(const char *String = "") : Buffer((char*)calloc(strlen(String) + 1, 1)) { strcpy(this->Buffer, String); }
 		inline CoyoteString(const std::string &String) : CoyoteString(String.c_str()) {}
 		inline ~CoyoteString(void) { free(this->Buffer); }
 		inline operator const char*(void) const { return this->Buffer; }
@@ -42,7 +42,7 @@ namespace Coyote
 	};
 }
 
-extern "C"
+extern "C" //Not actually necessary at the moment but good practice anyways.
 {
 #include "datastructures_c.h"
 }
@@ -87,6 +87,14 @@ namespace Coyote
 			this->Output_3 = &this->Output3;
 			this->Output_4 = &this->Output4;
 		}
+	};
+	
+	struct HardwareState : public BaseObject, public Coyote_HardwareState
+	{
+	};
+	
+	struct NetworkInfo : public BaseObject, public Coyote_NetworkInfo
+	{
 	};
 }
 #endif //__LIBCOYOTE_DATASTRUCTURES_H__
