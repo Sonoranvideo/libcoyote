@@ -66,6 +66,8 @@ namespace Coyote
 		StatusCode RestartService(void);
 		StatusCode GetIP(const int32_t AdapterID, Coyote::NetworkInfo &Out);
 		StatusCode SetIP(const Coyote::NetworkInfo &Input);
+		StatusCode InitializeCoyote(const Coyote::ResolutionMode Resolution, const Coyote::RefreshMode RefreshRate);
+		StatusCode SetHardwareMode(const Coyote::ResolutionMode Resolution, const Coyote::RefreshMode RefreshRate);
 		virtual ~Session(void);
 	};
 	

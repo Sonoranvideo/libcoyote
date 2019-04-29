@@ -83,6 +83,8 @@ static const std::map<std::string, std::map<std::string, Json::ValueType> > Comm
 	{ "DeletePreset", { { "PK", Json::intValue } } },
 	{ "ReorderPresets", { { "PK1", Json::intValue }, { "PK2", Json::intValue } } },
 	{ "EjectDisk", { { "DriveLetter", Json::stringValue } } },
+	{ "InitializeCoyote", { { "Resolution", Json::stringValue }, { "Refresh", Json::stringValue } } },
+	{ "SetHardwareMode", { { "Resolution", Json::stringValue }, { "Refresh", Json::stringValue } } },
 };
 
 //Static function declarationsmms

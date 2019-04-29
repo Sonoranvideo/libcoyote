@@ -38,6 +38,25 @@ struct InternalSession
 
 };
 
+
+static const std::map<Coyote::RefreshMode, std::string> RefreshMap
+{
+	{ Coyote::COYOTE_REFRESH_23_98, "23.98" },
+	{ Coyote::COYOTE_REFRESH_24, "24" },
+	{ Coyote::COYOTE_REFRESH_25, "25" },
+	{ Coyote::COYOTE_REFRESH_29_97, "29.97" },
+	{ Coyote::COYOTE_REFRESH_30, "30" },
+	{ Coyote::COYOTE_REFRESH_50, "50" },
+	{ Coyote::COYOTE_REFRESH_59_94, "59.94" },
+	{ Coyote::COYOTE_REFRESH_60, "60" }
+};
+
+static const std::map<Coyote::ResolutionMode, std::string> ResolutionMap
+{
+	{ Coyote::COYOTE_RES_1080P, "1080p" },
+	{ Coyote::COYOTE_RES_2160P, "2160p" },
+};
+
 const std::string InternalSession::GetURL(void) const
 {
 	const char Http[] = "http://";
@@ -463,6 +482,23 @@ Coyote::StatusCode Coyote::Session::SetIP(const Coyote::NetworkInfo &Input)
 	Coyote::StatusCode Status{};
 	
 	SESS.PerformJsonAction("SetIP", &Status, &Values);
+	
+	return Status;
+}
+
+
+Coyote::StatusCode Coyote::Session::SetHardwareMode(const Coyote::ResolutionMode Resolution, const Coyote::RefreshMode RefreshRate)
+{
+	DEF_SESS;
+	
+	assert(RefreshMap.count(RefreshRate));
+	assert(ResolutionMap.count(Resolution));
+	
+	StatusCode Status{};
+	
+	const std::map<std::string, Json::Value> Values { { "Resolution", ResolutionMap.at(Resolution) }, { "Refresh", RefreshMap.at(RefreshRate) } };
+	
+	SESS.PerformJsonAction("SetHardwareMode", &Status, &Values);
 	
 	return Status;
 }
