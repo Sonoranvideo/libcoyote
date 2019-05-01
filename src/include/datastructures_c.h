@@ -65,10 +65,10 @@ struct Coyote_Preset
 	COYOTESTRING Layout;
 	COYOTESTRING Notes;
 	COYOTESTRING Color;
-	struct Coyote_Output *Output_1;
-	struct Coyote_Output *Output_2;
-	struct Coyote_Output *Output_3;
-	struct Coyote_Output *Output_4;
+	struct Coyote_Output *Output1;
+	struct Coyote_Output *Output2;
+	struct Coyote_Output *Output3;
+	struct Coyote_Output *Output4;
 	int32_t PK;
 	int32_t Index;
 	int32_t Loop;
@@ -95,6 +95,14 @@ struct Coyote_NetworkInfo
 	COYOTESTRING IP;
 	COYOTESTRING Subnet;
 	int32_t AdapterID;
+};
+
+struct Coyote_MediaState
+{
+	struct Coyote_TimeCode *Time;
+	int32_t *PlayingPresets;
+	int32_t *PausedPresets;
+	int32_t NumPresets;
 };
 
 #endif //__LIBCOYOTE_DATASTRUCTURES_C_H__

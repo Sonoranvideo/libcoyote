@@ -45,7 +45,8 @@ namespace JsonProc
 	Coyote::HardwareState *JSONToCoyoteHardwareState(const Json::Value &Value);
 	Json::Value CoyoteHardwareStateToJSON(const Coyote::HardwareState &Ref);
 	Coyote::StatusCode GetStatusCode(const Json::Value &JsonObject);
-
+	Json::Value CoyoteMediaStateToJSON(const struct Coyote::MediaState &Ref);
+	Coyote::MediaState *JSONToCoyoteMediaState(const Json::Value &Val);
 
 
 }

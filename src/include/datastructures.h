@@ -20,7 +20,7 @@
 #include <stdint.h>
 #include <string>
 #include <string.h>
-
+#include <array>
 namespace Coyote
 {
 	class CoyoteString
@@ -82,10 +82,10 @@ namespace Coyote
 		inline operator int32_t(void) const { return this->PK; }
 		inline Preset(void) : BaseObject(), Coyote_Preset()
 		{
-			this->Output_1 = &this->Output1;
-			this->Output_2 = &this->Output2;
-			this->Output_3 = &this->Output3;
-			this->Output_4 = &this->Output4;
+			this->Coyote_Preset::Output1 = &this->Output1;
+			this->Coyote_Preset::Output2 = &this->Output2;
+			this->Coyote_Preset::Output3 = &this->Output3;
+			this->Coyote_Preset::Output4 = &this->Output4;
 		}
 	};
 	
@@ -95,6 +95,21 @@ namespace Coyote
 	
 	struct NetworkInfo : public BaseObject, public Coyote_NetworkInfo
 	{
+	};
+
+	struct MediaState : public BaseObject, public Coyote_MediaState
+	{
+		std::array<int32_t, 4> PlayingPresets;
+		std::array<int32_t, 4> PausedPresets;
+		TimeCode Time;
+		
+		inline MediaState(void) : BaseObject(), Coyote_MediaState(), PlayingPresets(), PausedPresets()
+		{
+			this->Coyote_MediaState::PlayingPresets = this->PlayingPresets.data();
+			this->Coyote_MediaState::PausedPresets = this->PausedPresets.data();
+			this->Coyote_MediaState::Time = &this->Time;
+		}
+		
 	};
 }
 #endif //__LIBCOYOTE_DATASTRUCTURES_H__

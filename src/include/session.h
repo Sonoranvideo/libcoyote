@@ -68,6 +68,9 @@ namespace Coyote
 		StatusCode SetIP(const Coyote::NetworkInfo &Input);
 		StatusCode InitializeCoyote(const Coyote::ResolutionMode Resolution, const Coyote::RefreshMode RefreshRate);
 		StatusCode SetHardwareMode(const Coyote::ResolutionMode Resolution, const Coyote::RefreshMode RefreshRate);
+		StatusCode SelectPreset(const int32_t PK);
+		StatusCode GetMediaState(Coyote::MediaState &Out);
+
 		virtual ~Session(void);
 	};
 	

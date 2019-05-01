@@ -486,7 +486,38 @@ Coyote::StatusCode Coyote::Session::SetIP(const Coyote::NetworkInfo &Input)
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::SelectPreset(const int32_t PK)
+{
+	DEF_SESS;
+	
+	StatusCode Status{};
+	
+	const std::map<std::string, Json::Value> Values { MAPARG(PK) };
+	
+	SESS.PerformJsonAction("SelectPreset", &Status, &Values);
+	
+	return Status;
+}
 
+Coyote::StatusCode Coyote::Session::GetMediaState(Coyote::MediaState &Out)
+{
+	DEF_SESS;
+	
+	StatusCode Status{};
+	
+	const Json::Value &Msg { SESS.PerformJsonAction("GetMediaState", &Status) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	const Json::Value &Data { JsonProc::GetDataField(Msg) };
+	
+	std::unique_ptr<Coyote::MediaState> Ptr { JsonProc::JSONToCoyoteMediaState(Data) };
+	
+	Out = *Ptr;
+	
+	return Status;
+}
+	
 Coyote::StatusCode Coyote::Session::SetHardwareMode(const Coyote::ResolutionMode Resolution, const Coyote::RefreshMode RefreshRate)
 {
 	DEF_SESS;

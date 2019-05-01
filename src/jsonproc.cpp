@@ -276,6 +276,73 @@ Coyote::NetworkInfo *JsonProc::JSONToCoyoteNetworkInfo(const Json::Value &Val)
 	
 	return RetVal;
 }
+Json::Value JsonProc::CoyoteMediaStateToJSON(const struct Coyote::MediaState &Ref)
+{
+	Json::Value Set { Json::objectValue };
+	
+	Set["NumPresets"] = Ref.NumPresets;
+	
+	Json::Value Playing { Json::arrayValue }, Paused { Json::arrayValue };
+	
+	for (size_t Inc = 0; Inc < Ref.PlayingPresets.size(); ++Inc)
+	{
+		if (!Ref.PlayingPresets.at(Inc)) continue;
+		Playing.append(Ref.PlayingPresets.at(Inc));
+	}
+	Set["PlayingPresets"] = Playing;
+	
+	for (size_t Inc = 0; Inc < Ref.PausedPresets.size(); ++Inc)
+	{
+		if (!Ref.PausedPresets.at(Inc)) continue;
+		Paused.append(Ref.PausedPresets.at(Inc));
+	}
+	
+	Set["PausedPresets"] = Paused;
+	
+	Json::Value Time { Json::objectValue };
+	
+	Time["TRT"] = Ref.Time.TRT;
+	Time["Time"] = Ref.Time.Time;
+	Time["ScrubBar"] = Ref.Time.ScrubBar;
+	
+	Set["TimeCode"] = Time;
+	
+	return Set;
+}
+
+Coyote::MediaState *JsonProc::JSONToCoyoteMediaState(const Json::Value &Val)
+{
+	auto RetVal = new Coyote::MediaState{};
+	
+	assert(Val["PlayingPresets"].size() <= 4);
+	assert(Val["PausedPresets"].size() <= 4);
+	
+	const Json::Value &Playing { Val["PlayingPresets"] };
+	const Json::Value &Paused { Val["PausedPresets"] };
+	
+	//These should really be the same size.
+	const size_t PlayingSize = Playing.size();
+	const size_t PausedSize = Paused.size();
+	
+	for (size_t Inc = 0u; Inc < PlayingSize; ++Inc)
+	{
+		RetVal->PlayingPresets[Inc] = Playing[(Json::ArrayIndex)Inc].asUInt();
+	}
+	
+	for (size_t Inc = 0u; Inc < PausedSize; ++Inc)
+	{
+		RetVal->PausedPresets[Inc] = Paused[(Json::ArrayIndex)Inc].asUInt();
+	}
+	
+	RetVal->NumPresets = Val["NumPresets"].asInt();
+	const Json::Value &Time { Val["TimeCode"] };
+	
+	RetVal->Time.Time = Time["Time"].asUInt();
+	RetVal->Time.TRT = Time["TRT"].asUInt();
+	RetVal->Time.ScrubBar = Time["ScrubBar"].asDouble();
+	
+	return RetVal;
+}
 Json::Value JsonProc::CoyoteAssetToJSON(const struct Coyote::Asset &Ref)
 {
 	Json::Value Set { Json::objectValue };
