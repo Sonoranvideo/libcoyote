@@ -281,6 +281,7 @@ Json::Value JsonProc::CoyoteMediaStateToJSON(const struct Coyote::MediaState &Re
 	Json::Value Set { Json::objectValue };
 	
 	Set["NumPresets"] = Ref.NumPresets;
+	Set["Selected"] = Ref.Selected;
 	
 	Json::Value Playing { Json::arrayValue }, Paused { Json::arrayValue };
 	
@@ -335,6 +336,8 @@ Coyote::MediaState *JsonProc::JSONToCoyoteMediaState(const Json::Value &Val)
 	}
 	
 	RetVal->NumPresets = Val["NumPresets"].asInt();
+	RetVal->Selected = Val["Selected"].asInt();
+	
 	const Json::Value &Time { Val["TimeCode"] };
 	
 	RetVal->Time.Time = Time["Time"].asUInt();

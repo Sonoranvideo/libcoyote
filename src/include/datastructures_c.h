@@ -103,6 +103,7 @@ struct Coyote_MediaState
 	int32_t *PlayingPresets;
 	int32_t *PausedPresets;
 	int32_t NumPresets;
+	int32_t Selected;
 };
 
 #endif //__LIBCOYOTE_DATASTRUCTURES_C_H__
