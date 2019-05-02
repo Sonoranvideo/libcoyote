@@ -17,8 +17,11 @@
 #include "include/internal/common.h"
 #include "include/internal/curlrequests.h"
 #include <curl/curl.h>
+#include <mutex>
 
 typedef std::unique_ptr<curl_slist, std::function<decltype(curl_slist_free_all)> > CurlHeaderPtr;
+
+static std::mutex InitLock;
 
 bool CurlRequests::CurlSession::InitPerformed;
 
@@ -36,11 +39,18 @@ size_t CurlRequests::CurlSession::CurlWriteFunc(const char *Ptr, size_t UnitSize
 	
 CurlRequests::CurlSession::CurlSession(void)
 {
-	if (!this->InitPerformed)
+	/**We need to prevent libcurl from tripping over itself in case someone
+	 * wants to spawn many sessions at once, which is a very real possibility.
+	 **/
+	InitLock.lock(); 
+	
+	if (!CurlSession::InitPerformed)
 	{
 		curl_global_init(CURL_GLOBAL_ALL);
 		this->InitPerformed = true;
 	}
+	
+	InitLock.unlock();
 	
 	this->CurlDescriptor = curl_easy_init();
 	
