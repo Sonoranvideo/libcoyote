@@ -114,7 +114,9 @@ Json::Value InternalSession::PerformJsonAction(const std::string &CommandName, C
 
 	if (!this->CurlObj.SendJSON(this->GetURL(), Msg.toStyledString(), &Response))
 	{
-		return Coyote::COYOTE_STATUS_NETWORKERROR;
+		if (StatusOut) *StatusOut = Coyote::COYOTE_STATUS_NETWORKERROR;
+		
+		return {};
 	}
 	
 	Json::Value &&IncomingMsg = JsonProc::ProcessJsonMsg((const char*)Response.data());
