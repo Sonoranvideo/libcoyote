@@ -417,7 +417,7 @@ static inline bool HasValidHeaders(const Json::Value &JsonObject)
 }
 static inline bool HasValidDataField(const Json::Value &JsonObject)
 {
-	return JsonObject.isMember("Data") && (JsonObject["Data"].isArray() || JsonObject["Data"].isObject());
+	return JsonObject.isObject() && JsonObject.isMember("Data") && (JsonObject["Data"].isArray() || JsonObject["Data"].isObject());
 }
 
 Coyote::StatusCode JsonProc::GetStatusCode(const Json::Value &JsonObject)
