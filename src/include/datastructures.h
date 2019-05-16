@@ -99,8 +99,8 @@ namespace Coyote
 
 	struct MediaState : public BaseObject, public Coyote_MediaState
 	{
-		std::array<int32_t, 4> PlayingPresets;
-		std::array<int32_t, 4> PausedPresets;
+		std::array<int32_t, COYOTE_MAX_OUTPUTS> PlayingPresets;
+		std::array<int32_t, COYOTE_MAX_OUTPUTS> PausedPresets;
 		TimeCode Time;
 		
 		inline MediaState(void) : BaseObject(), Coyote_MediaState(), PlayingPresets(), PausedPresets()

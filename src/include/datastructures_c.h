@@ -17,6 +17,8 @@
 #ifndef __LIBCOYOTE_DATASTRUCTURES_C_H__
 #define __LIBCOYOTE_DATASTRUCTURES_C_H__
 
+#define COYOTE_MAX_OUTPUTS 4
+
 #include <stdint.h>
 #include <stdbool.h>
 #include "statuscodes.h"
