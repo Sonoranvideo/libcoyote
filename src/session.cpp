@@ -535,3 +535,22 @@ Coyote::StatusCode Coyote::Session::SetHardwareMode(const Coyote::ResolutionMode
 	
 	return Status;
 }
+
+Coyote::StatusCode Coyote::Session::GetServerVersion(std::string &Out)
+{
+	DEF_SESS;
+	
+	StatusCode Status{};
+	
+	const Json::Value &Msg { SESS.PerformJsonAction("GetServerVersion", &Status) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	const Json::Value &Data { JsonProc::GetDataField(Msg) };
+	
+	assert(Data.isString());
+	
+	Out = Data.asString();
+	
+	return Status;
+}

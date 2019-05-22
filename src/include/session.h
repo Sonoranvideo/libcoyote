@@ -70,6 +70,7 @@ namespace Coyote
 		StatusCode SetHardwareMode(const Coyote::ResolutionMode Resolution, const Coyote::RefreshMode RefreshRate);
 		StatusCode SelectPreset(const int32_t PK);
 		StatusCode GetMediaState(Coyote::MediaState &Out);
+		StatusCode GetServerVersion(std::string &Out);
 
 		virtual ~Session(void);
 	};
