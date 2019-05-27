@@ -41,9 +41,9 @@ namespace Coyote
 		Session(const Session &) = delete;
 		Session &operator=(const Session &) = delete;
 		
-		StatusCode GetAssets(std::vector<Coyote::Asset> &Out);
-		StatusCode GetPresets(std::vector<Coyote::Preset> &Out);
-		StatusCode GetTimeCode(Coyote::TimeCode &Out);
+		StatusCode GetAssets(std::vector<Coyote::Asset> &Out, const int32_t TimeoutMS = -1);
+		StatusCode GetPresets(std::vector<Coyote::Preset> &Out, const int32_t TimeoutMS = -1);
+		StatusCode GetTimeCode(Coyote::TimeCode &Out, const int32_t TimeoutMS = -1);
 		
 		//Input parameter names must match the expected JSON names
 		StatusCode Take(const int32_t PK);

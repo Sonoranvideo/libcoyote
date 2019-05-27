@@ -361,13 +361,15 @@ Coyote::StatusCode Coyote::Session::SeekTo(const int32_t PK, const uint32_t Time
 	return Status;
 }
 
-Coyote::StatusCode Coyote::Session::GetTimeCode(Coyote::TimeCode &Out)
+Coyote::StatusCode Coyote::Session::GetTimeCode(Coyote::TimeCode &Out, const int32_t Timeout)
 {
 	DEF_SESS;
 	
 	Coyote::StatusCode Status{};
 	
-	const Json::Value &Msg = SESS.PerformJsonAction("GetTimeCode", &Status);
+	const std::map<std::string, Json::Value> Values { MAPARG(Timeout) };
+
+	const Json::Value &Msg = SESS.PerformJsonAction("GetTimeCode", &Status, Timeout > 0 ? &Values : nullptr);
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
@@ -381,13 +383,15 @@ Coyote::StatusCode Coyote::Session::GetTimeCode(Coyote::TimeCode &Out)
 	return Status;
 }
 	
-Coyote::StatusCode Coyote::Session::GetAssets(std::vector<Coyote::Asset> &Out)
+Coyote::StatusCode Coyote::Session::GetAssets(std::vector<Coyote::Asset> &Out, const int32_t Timeout)
 {
 	DEF_SESS;
 	
 	Coyote::StatusCode Status{};
 	
-	const Json::Value &Msg = SESS.PerformJsonAction("GetAssets", &Status);
+	const std::map<std::string, Json::Value> Values { MAPARG(Timeout) };
+
+	const Json::Value &Msg = SESS.PerformJsonAction("GetAssets", &Status, Timeout > 0 ? &Values : nullptr);
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
@@ -406,13 +410,15 @@ Coyote::StatusCode Coyote::Session::GetAssets(std::vector<Coyote::Asset> &Out)
 	return Status;
 }
 
-Coyote::StatusCode Coyote::Session::GetPresets(std::vector<Coyote::Preset> &Out)
+Coyote::StatusCode Coyote::Session::GetPresets(std::vector<Coyote::Preset> &Out, const int32_t Timeout)
 {
 	DEF_SESS;
 	
 	Coyote::StatusCode Status{};
 	
-	const Json::Value &Msg = SESS.PerformJsonAction("GetPresets", &Status);
+	const std::map<std::string, Json::Value> Values { MAPARG(Timeout) };
+
+	const Json::Value &Msg = SESS.PerformJsonAction("GetPresets", &Status, Timeout > 0 ? &Values : nullptr);
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
