@@ -554,9 +554,7 @@ Coyote::StatusCode Coyote::Session::GetServerVersion(std::string &Out)
 	
 	const Json::Value &Data { JsonProc::GetDataField(Msg) };
 	
-	assert(Data.isString());
-	
-	Out = Data.asString();
+	Out = JsonProc::JSONToServerVersion(Data);
 	
 	return Status;
 }

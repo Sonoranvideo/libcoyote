@@ -393,6 +393,13 @@ Json::Value JsonProc::CoyoteHardwareStateToJSON(const Coyote::HardwareState &Ref
 	return Set;
 }
 
+const std::string JsonProc::JSONToServerVersion(const Json::Value &Value)
+{
+	assert(Value.isMember("Version"));
+	
+	return Value["Version"].asString();
+}
+
 static inline bool HasValidHeaders(const Json::Value &JsonObject)
 {
 	typedef bool (Json::Value::*MethodPtr)() const;
