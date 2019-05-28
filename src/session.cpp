@@ -268,6 +268,8 @@ Coyote::StatusCode Coyote::Session::IsUpdateDetected(bool &ValueOut)
 	
 	assert(Result.isMember(CmdName) && Result[CmdName].isBool());
 	
+	ValueOut = Result[CmdName].asBool();
+	
 	return Status;
 }
 
