@@ -251,6 +251,41 @@ Coyote::StatusCode Coyote::Session::BeginUpdate(void)
 	
 	return Status;
 }
+
+
+Coyote::StatusCode Coyote::Session::RebootCoyote(void)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	SESS.PerformJsonAction("RebootCoyote", &Status);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::SoftRebootCoyote(void)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	SESS.PerformJsonAction("SoftRebootCoyote", &Status);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::ShutdownCoyote(void)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	SESS.PerformJsonAction("ShutdownCoyote", &Status);
+	
+	return Status;
+}
+
 	
 Coyote::StatusCode Coyote::Session::IsUpdateDetected(bool &ValueOut)
 {
@@ -557,6 +592,26 @@ Coyote::StatusCode Coyote::Session::GetServerVersion(std::string &Out)
 	const Json::Value &Data { JsonProc::GetDataField(Msg) };
 	
 	Out = JsonProc::JSONToServerVersion(Data);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::DetectUpdate(bool &DetectedOut, std::string *Out)
+{
+	DEF_SESS;
+	
+	StatusCode Status{};
+	
+	const Json::Value &Msg { SESS.PerformJsonAction("DetectUpdate", &Status) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	const Json::Value &Data { JsonProc::GetDataField(Msg) };
+	
+	auto Results = JsonProc::JSONToUpdateVersion(Data);
+	
+	DetectedOut = Results.second;
+	if (Out) *Out = Results.first;
 	
 	return Status;
 }

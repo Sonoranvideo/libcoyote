@@ -48,8 +48,7 @@ namespace JsonProc
 	Json::Value CoyoteMediaStateToJSON(const struct Coyote::MediaState &Ref);
 	Coyote::MediaState *JSONToCoyoteMediaState(const Json::Value &Val);
 	const std::string JSONToServerVersion(const Json::Value &Val);
-	
-
+	const std::pair<std::string, bool> JSONToUpdateVersion(const Json::Value &Value);
 }
 
 #endif //__LIBCOYOTE_JSONPROC_H__

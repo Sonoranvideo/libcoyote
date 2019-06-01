@@ -400,6 +400,14 @@ const std::string JsonProc::JSONToServerVersion(const Json::Value &Value)
 	return Value["Version"].asString();
 }
 
+const std::pair<std::string, bool> JsonProc::JSONToUpdateVersion(const Json::Value &Value)
+{
+	assert(Value.isMember("Version"));
+	assert(Value.isMember("IsUpdateDetected"));
+	
+	return std::pair<std::string, bool> { Value["Version"].asString(), Value["IsUpdateDetected"].asBool() };
+}
+
 static inline bool HasValidHeaders(const Json::Value &JsonObject)
 {
 	typedef bool (Json::Value::*MethodPtr)() const;

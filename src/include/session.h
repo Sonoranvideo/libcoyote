@@ -59,7 +59,7 @@ namespace Coyote
 		StatusCode UpdatePreset(const Coyote::Preset &Ref);
 		StatusCode LoadPreset(const Coyote::Preset &Ref);
 		StatusCode BeginUpdate(void);
-		StatusCode IsUpdateDetected(bool &ValueOut);
+		StatusCode IsUpdateDetected(bool &ValueOut); //Deprecated
 		StatusCode GetDisks(std::vector<std::string> &Out);
 		StatusCode EjectDisk(const std::string &DriveLetter);
 		StatusCode GetHardwareState(Coyote::HardwareState &Out);
@@ -71,7 +71,11 @@ namespace Coyote
 		StatusCode SelectPreset(const int32_t PK);
 		StatusCode GetMediaState(Coyote::MediaState &Out);
 		StatusCode GetServerVersion(std::string &Out);
-
+		StatusCode DetectUpdate(bool &ValueOut, std::string *NewVersionOut = nullptr);
+		StatusCode RebootCoyote(void);
+		StatusCode ShutdownCoyote(void);
+		StatusCode SoftRebootCoyote(void);
+		
 		virtual ~Session(void);
 	};
 	
