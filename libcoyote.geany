@@ -28,23 +28,25 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=2
+current_page=1
 FILE_NAME_0=1522;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fvolition%2Fsrc%2Fnode%2Fweb.cpp;0;4
-FILE_NAME_1=4682;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fjsonproc.cpp;0;4
-FILE_NAME_2=13009;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fsession.cpp;0;4
-FILE_NAME_3=3587;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fdatastructures.h;0;4
-FILE_NAME_4=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fcommon.h;0;4
-FILE_NAME_5=914;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fcurlrequests.h;0;4
-FILE_NAME_6=2299;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fjsonproc.h;0;4
-FILE_NAME_7=863;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Flibcoyote.h;0;4
-FILE_NAME_8=711;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fstatuscodes.h;0;4
-FILE_NAME_9=2852;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fsession.h;0;4
-FILE_NAME_10=1028;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fcurlrequests.cpp;0;4
-FILE_NAME_11=2292;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fdatastructures_c.h;0;4
-FILE_NAME_12=303;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2FCMakeLists.txt;0;4
+FILE_NAME_1=1364;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fsession.cpp;0;4
+FILE_NAME_2=1383;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fdatastructures.h;0;4
+FILE_NAME_3=948;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fcommon.h;0;4
+FILE_NAME_4=796;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Flibcoyote.h;0;4
+FILE_NAME_5=1234;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fstatuscodes.h;0;4
+FILE_NAME_6=1037;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fsession.h;0;4
+FILE_NAME_7=2151;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fdatastructures_c.h;0;4
+FILE_NAME_8=303;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2FCMakeLists.txt;0;4
+FILE_NAME_9=4444;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fold%2Fjsonproc.cpp;0;4
+FILE_NAME_10=1066;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fmsgpackproc.cpp;0;4
+FILE_NAME_11=547;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fmsgpackproc.h;0;4
+FILE_NAME_12=2837;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fnative_ws.h;0;4
+FILE_NAME_13=4097;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fnative_ws.cpp;0;4
+FILE_NAME_14=2350;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-communicator%2Fsrc%2Fcomponents%2FCoyoteFastServer%2FPacker.cpp;0;4
 
 [VTE]
-last_dir=/home/ben/libcoyote
+last_dir=/home/daniel/libcoyote/src
 
 [build-menu]
 C++FT_00_LB=_Compile

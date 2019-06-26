@@ -33,7 +33,11 @@ namespace Coyote
 	private:
 		void *Internal;
 	public:
-		Session(const std::string &URL, const uint16_t PortNum = 8000);
+	
+		class BaseError {};
+		class ConnectionError : public BaseError {};
+		
+		Session(const std::string &Host);
 		Session(Session &&In);
 		Session &operator=(Session &&In);
 		

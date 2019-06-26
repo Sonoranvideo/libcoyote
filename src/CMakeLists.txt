@@ -7,25 +7,23 @@ else()
 	add_compile_options(-std=gnu++14 -pedantic -Wall -g3 -O0 -Wno-deprecated-declarations -Wno-unused-function)
 endif()
 
-message("== Searching for jsoncpp...")
+find_package(PkgConfig)
 
-find_library(json_support jsoncpp)
-if(NOT json_support)
-	message(FATAL_ERROR "Error: jsoncpp library and/or development files were not detected.")
-else()
-	message("== Ok. Found jsoncpp")
+message("== Searching for libwebsockets...")
+
+pkg_check_modules(LIBWS REQUIRED libwebsockets)
+
+message("== Ok, found libwebsockets.")
+
+INCLUDE (CheckIncludeFileCXX)
+
+CHECK_INCLUDE_FILE_CXX(msgpack.hpp MSGPACK_HEADER)
+
+if (NOT MSGPACK_HEADER)
+	message(FATAL_ERROR "msgpack-c was not detected. Only the header files are required for the C++ version, but they're missing.")
 endif()
 
-message("== Searching for libcurl...")
-
-find_library(curl_support curl)
-if(NOT curl_support)
-	message(FATAL_ERROR "Error: curl library and/or development files were not detected.")
-else()
-	message("== Ok. Found libcurl")
-endif()
-
-set(sourcefiles curlrequests.cpp jsonproc.cpp session.cpp)
+set(sourcefiles msgpackproc.cpp session.cpp asynctosync.cpp native_ws.cpp)
 
 add_library(coyote SHARED ${sourcefiles})
 add_library(coyote_static STATIC ${sourcefiles})

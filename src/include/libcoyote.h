@@ -20,7 +20,7 @@
 #error "This is the C++ set of bindings, you're looking for libcoyote_c.h"
 #endif //__cplusplus
 
-#define COYOTE_API_VERSION "0.1"
+#define COYOTE_API_VERSION "0.2"
 #include "datastructures.h"
 #include "session.h"
 #include "statuscodes.h"

@@ -15,29 +15,77 @@
 */
 
 #include "include/internal/common.h"
-#include "include/internal/curlrequests.h"
-#include "include/internal/jsonproc.h"
+#include "include/internal/native_ws.h"
+#include "include/internal/asynctosync.h"
+#include "include/internal/msgpackproc.h"
 #include "include/statuscodes.h"
 #include "include/datastructures.h"
 #include "include/session.h"
-#include <json/json.h>
+#include <mutex>
+
 #include <iostream>
 
 #define DEF_SESS InternalSession &SESS = *static_cast<InternalSession*>(this->Internal)
-#define MAPARG(x) { #x, x }
+#define MAPARG(x) { #x, msgpack::object{ x } }
+
+
+class MsgIDCounter
+{
+private:
+	std::mutex Lock;
+	uint64_t Value;
+public:
+	MsgIDCounter(void) : Value(1) {}
+	
+	uint64_t NewID(void)
+	{
+		const std::lock_guard<std::mutex> Guard { this->Lock };
+		
+		const uint64_t Value = this->Value++;
+		
+		return Value;
+	}
+};
 
 struct InternalSession
 {
-	CurlRequests::CurlSession CurlObj;
-	std::string Server;
-	uint16_t PortNum;
+	AsyncToSync::SynchronousSession SyncSess;
+	WS::WSConnection Connection;
+	MsgIDCounter MsgIDs;
 	
-	const std::string GetURL(void) const;
-	Json::Value PerformJsonAction(const std::string &CommandName, Coyote::StatusCode *StatusOut = nullptr, const std::map<std::string, Json::Value> *Values = nullptr);
+	const std::map<std::string, msgpack::object> PerformSyncedCommand(const std::string &CommandName, Coyote::StatusCode *StatusOut = nullptr, const msgpack::object *Values = nullptr);
 	Coyote::StatusCode CreatePreset_Multi(const Coyote::Preset &Ref, const std::string &Cmd);
-
+	inline InternalSession(void) : Connection(SyncSess.OnMessageReady, &SyncSess) {}
 };
 
+const std::map<std::string, msgpack::object> InternalSession::PerformSyncedCommand(const std::string &CommandName, Coyote::StatusCode *StatusOut, const msgpack::object *Values)
+{
+	msgpack::sbuffer Buffer;
+	msgpack::packer<msgpack::sbuffer> Pack { Buffer };
+	
+	//Acquire a new message ID
+	const uint64_t MsgID = this->MsgIDs.NewID();
+	
+	//Pack our values into a msgpack buffer
+	MsgpackProc::InitOutgoingMsg(Pack, CommandName, MsgID, Values);
+	
+	//Wait for the value we want (with the message ID we want) to appear in the WebSockets thread.
+	AsyncToSync::MessageTicket *Ticket = this->SyncSess.NewTicket(MsgID);
+	
+	std::unique_ptr<WS::WSMessage> Response { Ticket->WaitForRecv() };
+	
+	assert(Response != nullptr);
+
+	//Decode the messagepack "map" into a real map of other messagepack objects.
+	const std::map<std::string, msgpack::object> Results { MsgpackProc::InitIncomingMsg(Response->GetDataHead(), Response->GetSize()) };
+	
+	//Get the status code.
+	assert(Results.count("StatusInt"));
+	
+	if (StatusOut) *StatusOut = static_cast<Coyote::StatusCode>(Results.at("StatusInt").as<int>());
+	
+	return Results;
+}
 
 static const std::map<Coyote::RefreshMode, std::string> RefreshMap
 {
@@ -57,29 +105,16 @@ static const std::map<Coyote::ResolutionMode, std::string> ResolutionMap
 	{ Coyote::COYOTE_RES_2160P, "2160p" },
 };
 
-const std::string InternalSession::GetURL(void) const
-{
-	const char Http[] = "http://";
-	
-	std::string RetVal;
-	
-	if (strncmp(this->Server.c_str(), Http, sizeof Http) != 0)
-	{
-		RetVal += Http;
-	}
-	
-	RetVal += this->Server + ':' + std::to_string(this->PortNum);
-	
-	return RetVal;
-}
-
-
-Coyote::Session::Session(const std::string &Server, const uint16_t PortNum) : Internal(new InternalSession{})
+Coyote::Session::Session(const std::string &Host) : Internal(new InternalSession{})
 {
 	InternalSession &Sess = *static_cast<InternalSession*>(this->Internal);
 	
-	Sess.Server = Server;
-	Sess.PortNum = PortNum;
+	if (!Sess.Connection.Connect(Host))
+	{
+		throw ConnectionError{};
+	}
+	
+	
 }
 
 Coyote::Session::~Session(void)
@@ -105,39 +140,17 @@ Coyote::Session &Coyote::Session::operator=(Session &&In)
 	return *this;
 }
 
-Json::Value InternalSession::PerformJsonAction(const std::string &CommandName, Coyote::StatusCode *StatusOut, const std::map<std::string, Json::Value> *Values)
-{	
-	Json::Value Msg { JsonProc::CreateJsonMsg(CommandName, Values) };
-	
-	
-	std::vector<uint8_t> Response{};
-
-	if (!this->CurlObj.SendJSON(this->GetURL(), Msg.toStyledString(), &Response))
-	{
-		if (StatusOut) *StatusOut = Coyote::COYOTE_STATUS_NETWORKERROR;
-		
-		return {};
-	}
-	
-	Json::Value &&IncomingMsg = JsonProc::ProcessJsonMsg((const char*)Response.data());
-	
-	if (StatusOut)
-	{
-		*StatusOut = JsonProc::GetStatusCode(IncomingMsg);
-	}
-	
-	return IncomingMsg;
-}
-
 Coyote::StatusCode Coyote::Session::Take(const int32_t PK)
 {
 	DEF_SESS;
 	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, Json::Value> Values { MAPARG(PK) };
+	const std::map<std::string, msgpack::object> Values { MAPARG(PK) };
 	
-	SESS.PerformJsonAction("Take", &Status, &Values);
+	const msgpack::object Pass { Values };
+	
+	SESS.PerformSyncedCommand("Take", &Status, &Pass);
 	
 	return Status;
 }
@@ -148,9 +161,11 @@ Coyote::StatusCode Coyote::Session::Pause(const int32_t PK)
 	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, Json::Value> Values { MAPARG(PK) };
+	const std::map<std::string, msgpack::object> Values { MAPARG(PK) };
 	
-	SESS.PerformJsonAction("Pause", &Status, &Values);
+	const msgpack::object Pass { Values };
+	
+	SESS.PerformSyncedCommand("Pause", &Status, &Pass);
 	
 	return Status;
 }
@@ -161,9 +176,10 @@ Coyote::StatusCode Coyote::Session::End(const int32_t PK)
 	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, Json::Value> Values { MAPARG(PK) };
+	const std::map<std::string, msgpack::object> Values { MAPARG(PK) };
+	const msgpack::object Pass { Values };
 	
-	SESS.PerformJsonAction("End", &Status, &Values);
+	SESS.PerformSyncedCommand("End", &Status, &Pass);
 	
 	return Status;
 }
@@ -174,9 +190,10 @@ Coyote::StatusCode Coyote::Session::DeleteAsset(const std::string &AssetName)
 	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, Json::Value> Values { MAPARG(AssetName) };
+	const std::map<std::string, msgpack::object> Values { MAPARG(AssetName.c_str()) };
 	
-	SESS.PerformJsonAction("DeleteAsset", &Status, &Values);
+	const msgpack::object Pass { Values };
+	SESS.PerformSyncedCommand("DeleteAsset", &Status, &Pass);
 	
 	return Status;
 }
@@ -187,9 +204,10 @@ Coyote::StatusCode Coyote::Session::InstallAsset(const std::string &AssetPath)
 	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, Json::Value> Values { MAPARG(AssetPath) };
+	const std::map<std::string, msgpack::object> Values { { "AssetPath",  msgpack::object{AssetPath.c_str()} } };
+	const msgpack::object Pass { Values };
 	
-	SESS.PerformJsonAction("InstallAsset", &Status, &Values);
+	SESS.PerformSyncedCommand("InstallAsset", &Status, &Pass);
 	
 	return Status;
 }
@@ -200,9 +218,10 @@ Coyote::StatusCode Coyote::Session::RenameAsset(const std::string &CurrentName, 
 	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, Json::Value> Values { MAPARG(CurrentName), MAPARG(NewName) };
+	const std::map<std::string, msgpack::object> Values { { "CurrentName", msgpack::object{CurrentName.c_str()} }, { "NewName", msgpack::object{NewName.c_str()} } };
+	const msgpack::object Pass { Values };
 	
-	SESS.PerformJsonAction("RenameAsset", &Status, &Values);
+	SESS.PerformSyncedCommand("RenameAsset", &Status, &Pass);
 	
 	return Status;
 }
@@ -228,15 +247,9 @@ Coyote::StatusCode InternalSession::CreatePreset_Multi(const Coyote::Preset &Ref
 {
 	Coyote::StatusCode Status{};
 
-	const Json::Value &Converted = JsonProc::CoyotePresetToJSON(Ref);
-	
-	const std::vector<std::string> Keys { Converted.getMemberNames() };
-	
-	std::map<std::string, Json::Value> Values{};
-	
-	for (std::string Key : Keys) Values[Key] = Converted[Key];
-	
-	this->PerformJsonAction("CreatePreset", &Status, &Values);
+	const msgpack::object &Data = MsgpackProc::PackCoyoteObject(&Ref);
+
+	this->PerformSyncedCommand(Cmd, &Status, &Data);
 	
 	return Status;
 }
@@ -247,7 +260,7 @@ Coyote::StatusCode Coyote::Session::BeginUpdate(void)
 	
 	Coyote::StatusCode Status{};
 	
-	SESS.PerformJsonAction("BeginUpdate", &Status);
+	SESS.PerformSyncedCommand("BeginUpdate", &Status);
 	
 	return Status;
 }
@@ -259,7 +272,7 @@ Coyote::StatusCode Coyote::Session::RebootCoyote(void)
 	
 	Coyote::StatusCode Status{};
 	
-	SESS.PerformJsonAction("RebootCoyote", &Status);
+	SESS.PerformSyncedCommand("RebootCoyote", &Status);
 	
 	return Status;
 }
@@ -270,7 +283,7 @@ Coyote::StatusCode Coyote::Session::SoftRebootCoyote(void)
 	
 	Coyote::StatusCode Status{};
 	
-	SESS.PerformJsonAction("SoftRebootCoyote", &Status);
+	SESS.PerformSyncedCommand("SoftRebootCoyote", &Status);
 	
 	return Status;
 }
@@ -281,7 +294,7 @@ Coyote::StatusCode Coyote::Session::ShutdownCoyote(void)
 	
 	Coyote::StatusCode Status{};
 	
-	SESS.PerformJsonAction("ShutdownCoyote", &Status);
+	SESS.PerformSyncedCommand("ShutdownCoyote", &Status);
 	
 	return Status;
 }
@@ -295,15 +308,15 @@ Coyote::StatusCode Coyote::Session::IsUpdateDetected(bool &ValueOut)
 	
 	Coyote::StatusCode Status{};
 
-	const Json::Value &Response { SESS.PerformJsonAction(CmdName, &Status) };
+	const std::map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand(CmdName, &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;	
 	
-	const Json::Value &Result = JsonProc::GetDataField(Response);
+	std::map<std::string, msgpack::object> DataField;
 	
-	assert(Result.isMember(CmdName) && Result[CmdName].isBool());
-	
-	ValueOut = Result[CmdName].asBool();
+	Response.at("Data").convert(DataField);
+		
+	ValueOut = DataField[CmdName].as<bool>();
 	
 	return Status;
 }
@@ -316,23 +329,26 @@ Coyote::StatusCode Coyote::Session::GetDisks(std::vector<std::string> &Out)
 	
 	Coyote::StatusCode Status{};
 	
-	const Json::Value &Response { SESS.PerformJsonAction(CmdName, &Status) };
+	const std::map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand(CmdName, &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	const Json::Value &Results = JsonProc::GetDataField(Response, Json::Value{ Json::arrayValue } );
+	const msgpack::object &Results = Response.at("Data");
 	
-	assert(Results.isArray());
+	//Convert into the array they are.
+	std::vector<msgpack::object> Disks;
+	Results.convert(Disks);
 	
-	Out.reserve(Results.size());
+	//Each is a map of disk properties. Right now just drive letters.
 	Out.clear();
-	
-	for (const Json::Value &Object : Results)
+	Out.reserve(Disks.size());
+
+	for (msgpack::object &Item : Disks)
 	{
-		assert(Object.isMember("DriveLetter"));
+		std::map<std::string, std::string> Map;
+		Item.convert(Map);
 		
-		Out.push_back(Object["DriveLetter"].asString());
-		
+		Out.push_back(Map.at("DriveLetter"));
 	}
 	
 	return Status;
@@ -344,9 +360,10 @@ Coyote::StatusCode Coyote::Session::EjectDisk(const std::string &DriveLetter)
 	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, Json::Value> Values { MAPARG(DriveLetter) };
-	
-	const Json::Value &Response { SESS.PerformJsonAction("EjectDisk", &Status, &Values) };
+	const std::map<std::string, msgpack::object> Values { { "DriveLetter", msgpack::object{DriveLetter.c_str()} } };
+	const msgpack::object Pass { Values };
+
+	const std::map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand("EjectDisk", &Status, &Pass) };
 	
 	return Status;
 }
@@ -356,9 +373,10 @@ Coyote::StatusCode Coyote::Session::ReorderPresets(const int32_t PK1, const int3
 	DEF_SESS;
 	
 	Coyote::StatusCode Status{};
-	const std::map<std::string, Json::Value> Values { MAPARG(PK1), MAPARG(PK2) };
-	
-	SESS.PerformJsonAction("ReorderPresets", &Status, &Values);
+	const std::map<std::string, msgpack::object> Values { MAPARG(PK1), MAPARG(PK2) };
+	const msgpack::object Pass { Values };
+
+	SESS.PerformSyncedCommand("ReorderPresets", &Status, &Pass);
 	
 	return Status;
 }
@@ -369,7 +387,7 @@ Coyote::StatusCode Coyote::Session::RestartService(void)
 	
 	Coyote::StatusCode Status{};
 	
-	SESS.PerformJsonAction("RestartService", &Status);
+	SESS.PerformSyncedCommand("RestartService", &Status);
 	
 	return Status;
 }
@@ -378,9 +396,10 @@ Coyote::StatusCode Coyote::Session::DeletePreset(const int32_t PK)
 	DEF_SESS;
 	
 	Coyote::StatusCode Status{};
-	const std::map<std::string, Json::Value> Values { MAPARG(PK) };
-	
-	SESS.PerformJsonAction("DeletePreset", &Status, &Values);
+	const std::map<std::string, msgpack::object> Values { MAPARG(PK) };
+	const msgpack::object Pass { Values };
+
+	SESS.PerformSyncedCommand("DeletePreset", &Status, &Pass);
 	
 	return Status;
 }
@@ -389,11 +408,12 @@ Coyote::StatusCode Coyote::Session::SeekTo(const int32_t PK, const uint32_t Time
 {
 	DEF_SESS;
 	
-	const std::map<std::string, Json::Value> Values { MAPARG(PK), MAPARG(TimeIndex) };
+	const std::map<std::string, msgpack::object> Values { MAPARG(PK), MAPARG(TimeIndex) };
+	const msgpack::object Pass { Values };
 
 	Coyote::StatusCode Status{};
 
-	SESS.PerformJsonAction("SeekTo", &Status, &Values);
+	SESS.PerformSyncedCommand("SeekTo", &Status, &Pass);
 	
 	return Status;
 }
@@ -404,18 +424,16 @@ Coyote::StatusCode Coyote::Session::GetTimeCode(Coyote::TimeCode &Out, const int
 	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, Json::Value> Values { MAPARG(Timeout) };
+	const std::map<std::string, msgpack::object> Values { MAPARG(Timeout) };
+	const msgpack::object Pass { Values };
 
-	const Json::Value &Msg = SESS.PerformJsonAction("GetTimeCode", &Status, Timeout > 0 ? &Values : nullptr);
+	const std::map<std::string, msgpack::object> &Msg = SESS.PerformSyncedCommand("GetTimeCode", &Status, Timeout > 0 ? &Pass : nullptr);
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	const Json::Value &Data = JsonProc::GetDataField(Msg, { Json::objectValue });
+	std::unique_ptr<Coyote::TimeCode> NewTC { static_cast<Coyote::TimeCode*>(MsgpackProc::UnpackCoyoteObject(Msg.at("Data"), typeid(*NewTC)) ) };
 	
-	assert(Data.isObject());
-	
-	std::unique_ptr<Coyote::TimeCode> TimeCodePtr { JsonProc::JSONToCoyoteTimeCode(Data) };
-	Out = std::move(*TimeCodePtr); //Moving is not actually useful for a struct full of POD data types, but it's the thought that counts.
+	Out = std::move(*NewTC); //Moving is not actually useful for a struct full of POD data types, but it's the thought that counts.
 	
 	return Status;
 }
@@ -426,21 +444,22 @@ Coyote::StatusCode Coyote::Session::GetAssets(std::vector<Coyote::Asset> &Out, c
 	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, Json::Value> Values { MAPARG(Timeout) };
+	const std::map<std::string, msgpack::object> Values { MAPARG(Timeout) };
+	const msgpack::object Pass { Values };
 
-	const Json::Value &Msg = SESS.PerformJsonAction("GetAssets", &Status, Timeout > 0 ? &Values : nullptr);
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetAssets", &Status, Timeout > 0 ? &Pass : nullptr) };
+	
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	const Json::Value &Data = JsonProc::GetDataField(Msg);
-	
-	assert(Data.isArray());
+	std::vector<msgpack::object> Data;
+	Msg.at("Data").convert(Data);
 	
 	Out.reserve(Data.size());
 	
 	for (auto Iter = Data.begin(); Iter != Data.end(); ++Iter)
 	{
-		std::unique_ptr<Coyote::Asset> CurAsset { JsonProc::JSONToCoyoteAsset(*Iter) };
+		std::unique_ptr<Coyote::Asset> CurAsset { static_cast<Coyote::Asset*>(MsgpackProc::UnpackCoyoteObject(*Iter, typeid(Coyote::Asset)) ) };
 		Out.push_back(std::move(*CurAsset));
 	}
 
@@ -453,24 +472,25 @@ Coyote::StatusCode Coyote::Session::GetPresets(std::vector<Coyote::Preset> &Out,
 	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, Json::Value> Values { MAPARG(Timeout) };
+	const std::map<std::string, msgpack::object> Values { MAPARG(Timeout) };
+	const msgpack::object Pass { Values };
 
-	const Json::Value &Msg = SESS.PerformJsonAction("GetPresets", &Status, Timeout > 0 ? &Values : nullptr);
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetPresets", &Status, Timeout > 0 ? &Pass : nullptr) };
+	
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	const Json::Value &Data = JsonProc::GetDataField(Msg);
-	
-	assert(Data.isArray());
+	std::vector<msgpack::object> Data;
+	Msg.at("Data").convert(Data);
 	
 	Out.reserve(Data.size());
 	
 	for (auto Iter = Data.begin(); Iter != Data.end(); ++Iter)
 	{
-		std::unique_ptr<Coyote::Preset> CurPreset { JsonProc::JSONToCoyotePreset(*Iter) };
+		std::unique_ptr<Coyote::Preset> CurPreset { static_cast<Coyote::Preset*>(MsgpackProc::UnpackCoyoteObject(*Iter, typeid(Coyote::Preset)) ) };
 		Out.push_back(std::move(*CurPreset));
 	}
-	
+
 	return Status;
 }
 
@@ -480,15 +500,11 @@ Coyote::StatusCode Coyote::Session::GetHardwareState(Coyote::HardwareState &Out)
 	
 	Coyote::StatusCode Status{};
 	
-	const Json::Value &Msg = SESS.PerformJsonAction("GetHardwareState", &Status);
-	
+	const std::map<std::string, msgpack::object> Msg { SESS.PerformSyncedCommand("GetHardwareState", &Status) };
+
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	const Json::Value &Data = JsonProc::GetDataField(Msg, { Json::objectValue });
-	
-	assert(Data.isObject());
-	
-	std::unique_ptr<Coyote::HardwareState> Ptr { JsonProc::JSONToCoyoteHardwareState(Data) };
+	std::unique_ptr<Coyote::HardwareState> Ptr { static_cast<Coyote::HardwareState*>(MsgpackProc::UnpackCoyoteObject(Msg.at("Data"), typeid(Coyote::HardwareState))) };
 	
 	Out = std::move(*Ptr);
 	
@@ -499,19 +515,16 @@ Coyote::StatusCode Coyote::Session::GetIP(const int32_t AdapterID, Coyote::Netwo
 {
 	DEF_SESS;
 	
-	const std::map<std::string, Json::Value> Values { MAPARG(AdapterID) };
+	const std::map<std::string, msgpack::object> Values { MAPARG(AdapterID) };
 	
 	Coyote::StatusCode Status{};
 	
-	const Json::Value &Msg = SESS.PerformJsonAction("GetIP", &Status, &Values);
+	const msgpack::object Pass { Values };
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetIP", &Status, &Pass) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	const Json::Value &Data = JsonProc::GetDataField(Msg, { Json::objectValue });
-	
-	assert(Data.isObject());
-	
-	std::unique_ptr<Coyote::NetworkInfo> Ptr { JsonProc::JSONToCoyoteNetworkInfo(Data) };
+	std::unique_ptr<Coyote::NetworkInfo> Ptr { static_cast<Coyote::NetworkInfo*>(MsgpackProc::UnpackCoyoteObject(Msg.at("Data"), typeid(Coyote::NetworkInfo))) };
 	
 	Out = std::move(*Ptr);
 	
@@ -522,11 +535,12 @@ Coyote::StatusCode Coyote::Session::SetIP(const Coyote::NetworkInfo &Input)
 {
 	DEF_SESS;
 	
-	const std::map<std::string, Json::Value> Values { { "AdapterID", Input.AdapterID }, { "Subnet", Input.Subnet.GetStdString() }, { "IP", Input.IP.GetStdString() } };
+	const std::map<std::string, msgpack::object> Values { { "AdapterID", msgpack::object{Input.AdapterID} }, { "Subnet", msgpack::object{Input.Subnet.GetCString()} }, { "IP", msgpack::object{Input.IP.GetCString()} } };
 	
 	Coyote::StatusCode Status{};
-	
-	SESS.PerformJsonAction("SetIP", &Status, &Values);
+
+	const msgpack::object Pass { Values };
+	SESS.PerformSyncedCommand("SetIP", &Status, &Pass);
 	
 	return Status;
 }
@@ -537,9 +551,10 @@ Coyote::StatusCode Coyote::Session::SelectPreset(const int32_t PK)
 	
 	StatusCode Status{};
 	
-	const std::map<std::string, Json::Value> Values { MAPARG(PK) };
-	
-	SESS.PerformJsonAction("SelectPreset", &Status, &Values);
+	const std::map<std::string, msgpack::object> Values { MAPARG(PK) };
+
+	const msgpack::object Pass { Values };
+	SESS.PerformSyncedCommand("SelectPreset", &Status, &Pass);
 	
 	return Status;
 }
@@ -550,13 +565,12 @@ Coyote::StatusCode Coyote::Session::GetMediaState(Coyote::MediaState &Out)
 	
 	StatusCode Status{};
 	
-	const Json::Value &Msg { SESS.PerformJsonAction("GetMediaState", &Status) };
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetMediaState", &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	const Json::Value &Data { JsonProc::GetDataField(Msg) };
 	
-	std::unique_ptr<Coyote::MediaState> Ptr { JsonProc::JSONToCoyoteMediaState(Data) };
+	std::unique_ptr<Coyote::MediaState> Ptr { static_cast<Coyote::MediaState*>(MsgpackProc::UnpackCoyoteObject(Msg.at("Data"), typeid(Coyote::MediaState))) };
 	
 	Out = *Ptr;
 	
@@ -572,9 +586,10 @@ Coyote::StatusCode Coyote::Session::SetHardwareMode(const Coyote::ResolutionMode
 	
 	StatusCode Status{};
 	
-	const std::map<std::string, Json::Value> Values { { "Resolution", ResolutionMap.at(Resolution) }, { "Refresh", RefreshMap.at(RefreshRate) } };
-	
-	SESS.PerformJsonAction("SetHardwareMode", &Status, &Values);
+	const std::map<std::string, msgpack::object> Values { { "Resolution", msgpack::object{ResolutionMap.at(Resolution).c_str()} }, { "Refresh", msgpack::object{RefreshMap.at(RefreshRate).c_str()} } };
+	const msgpack::object Pass { Values };
+
+	SESS.PerformSyncedCommand("SetHardwareMode", &Status, &Pass);
 	
 	return Status;
 }
@@ -585,13 +600,16 @@ Coyote::StatusCode Coyote::Session::GetServerVersion(std::string &Out)
 	
 	StatusCode Status{};
 	
-	const Json::Value &Msg { SESS.PerformJsonAction("GetServerVersion", &Status) };
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetServerVersion", &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	const Json::Value &Data { JsonProc::GetDataField(Msg) };
+	std::map<std::string, msgpack::object> Data;
+	Msg.at("Data").convert(Data);
 	
-	Out = JsonProc::JSONToServerVersion(Data);
+	assert(Data.count("Version"));
+	
+	Out = Data.at("Version").as<std::string>();
 	
 	return Status;
 }
@@ -602,16 +620,16 @@ Coyote::StatusCode Coyote::Session::DetectUpdate(bool &DetectedOut, std::string 
 	
 	StatusCode Status{};
 	
-	const Json::Value &Msg { SESS.PerformJsonAction("DetectUpdate", &Status) };
-	
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("DetectUpdate", &Status) };
+
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	const Json::Value &Data { JsonProc::GetDataField(Msg) };
+	std::map<std::string, msgpack::object> Data;
+	Msg.at("Data").convert(Data);
 	
-	auto Results = JsonProc::JSONToUpdateVersion(Data);
+	DetectedOut = Data.at("IsUpdateDetected").as<bool>();
 	
-	DetectedOut = Results.second;
-	if (Out) *Out = Results.first;
+	if (Out) *Out = Data.at("Version").as<std::string>();
 	
 	return Status;
 }

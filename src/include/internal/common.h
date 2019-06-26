@@ -27,9 +27,11 @@
 #ifdef __cplusplus
 #include <vector>
 #include <map>
+#include <queue>
 #include <string>
 #include <memory>
 #include <functional>
+#include <typeinfo>
 #else
 #include <stdbool.h>
 #endif //__cplusplus
