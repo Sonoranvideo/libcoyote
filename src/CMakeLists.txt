@@ -28,4 +28,4 @@ set(sourcefiles msgpackproc.cpp session.cpp asynctosync.cpp native_ws.cpp)
 add_library(coyote SHARED ${sourcefiles})
 add_library(coyote_static STATIC ${sourcefiles})
 
-target_link_libraries(coyote curl jsoncpp)
+target_link_libraries(coyote websockets)

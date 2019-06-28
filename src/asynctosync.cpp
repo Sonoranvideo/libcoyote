@@ -5,12 +5,12 @@
 #include "include/internal/msgpackproc.h"
 #include "include/internal/native_ws.h"
 
-bool AsyncToSync::SynchronousSession::OnMessageReady(void *ThisPtr_, WS::WSMessage *Msg)
+bool AsyncToSync::SynchronousSession::OnMessageReady(void *ThisPtr_, WSMessage *Msg)
 {
 	SynchronousSession *ThisPtr = static_cast<SynchronousSession*>(ThisPtr_);
 	
 	//This is horrifically inefficient but not enough so to really affect our throughput in a meaningful way.
-	const std::map<std::string, msgpack::object> Values { MsgpackProc::InitIncomingMsg(Msg->GetDataHead(), Msg->GetSize()) };
+	const std::map<std::string, msgpack::object> Values { MsgpackProc::InitIncomingMsg(Msg->GetBody(), Msg->GetBodySize()) };
 	
 	if (!Values.count("MsgID")) return true; //WSConnection can keep it.
 	

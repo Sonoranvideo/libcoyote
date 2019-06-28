@@ -26,7 +26,7 @@
 #include <iostream>
 
 #define DEF_SESS InternalSession &SESS = *static_cast<InternalSession*>(this->Internal)
-#define MAPARG(x) { #x, msgpack::object{ x } }
+#define MAPARG(x) { #x, msgpack::object{ x, MsgpackProc::Zone } }
 
 
 class MsgIDCounter
@@ -69,15 +69,18 @@ const std::map<std::string, msgpack::object> InternalSession::PerformSyncedComma
 	//Pack our values into a msgpack buffer
 	MsgpackProc::InitOutgoingMsg(Pack, CommandName, MsgID, Values);
 	
+	
+	this->Connection.Send(new WSMessage(Buffer.data(), Buffer.size()));
+	
 	//Wait for the value we want (with the message ID we want) to appear in the WebSockets thread.
 	AsyncToSync::MessageTicket *Ticket = this->SyncSess.NewTicket(MsgID);
 	
-	std::unique_ptr<WS::WSMessage> Response { Ticket->WaitForRecv() };
+	std::unique_ptr<WSMessage> Response { Ticket->WaitForRecv() };
 	
 	assert(Response != nullptr);
 
 	//Decode the messagepack "map" into a real map of other messagepack objects.
-	const std::map<std::string, msgpack::object> Results { MsgpackProc::InitIncomingMsg(Response->GetDataHead(), Response->GetSize()) };
+	const std::map<std::string, msgpack::object> Results { MsgpackProc::InitIncomingMsg(Response->GetBody(), Response->GetBodySize()) };
 	
 	//Get the status code.
 	assert(Results.count("StatusInt"));
@@ -148,7 +151,7 @@ Coyote::StatusCode Coyote::Session::Take(const int32_t PK)
 	
 	const std::map<std::string, msgpack::object> Values { MAPARG(PK) };
 	
-	const msgpack::object Pass { Values };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
 	
 	SESS.PerformSyncedCommand("Take", &Status, &Pass);
 	
@@ -163,7 +166,7 @@ Coyote::StatusCode Coyote::Session::Pause(const int32_t PK)
 	
 	const std::map<std::string, msgpack::object> Values { MAPARG(PK) };
 	
-	const msgpack::object Pass { Values };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
 	
 	SESS.PerformSyncedCommand("Pause", &Status, &Pass);
 	
@@ -177,7 +180,7 @@ Coyote::StatusCode Coyote::Session::End(const int32_t PK)
 	Coyote::StatusCode Status{};
 	
 	const std::map<std::string, msgpack::object> Values { MAPARG(PK) };
-	const msgpack::object Pass { Values };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
 	
 	SESS.PerformSyncedCommand("End", &Status, &Pass);
 	
@@ -190,9 +193,9 @@ Coyote::StatusCode Coyote::Session::DeleteAsset(const std::string &AssetName)
 	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { MAPARG(AssetName.c_str()) };
+	const std::map<std::string, msgpack::object> Values { { "AssetName", msgpack::object{AssetName.c_str(), MsgpackProc::Zone } } };
 	
-	const msgpack::object Pass { Values };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
 	SESS.PerformSyncedCommand("DeleteAsset", &Status, &Pass);
 	
 	return Status;
@@ -204,8 +207,8 @@ Coyote::StatusCode Coyote::Session::InstallAsset(const std::string &AssetPath)
 	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "AssetPath",  msgpack::object{AssetPath.c_str()} } };
-	const msgpack::object Pass { Values };
+	const std::map<std::string, msgpack::object> Values { { "AssetPath",  msgpack::object{AssetPath.c_str(), MsgpackProc::Zone } } };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
 	
 	SESS.PerformSyncedCommand("InstallAsset", &Status, &Pass);
 	
@@ -218,8 +221,8 @@ Coyote::StatusCode Coyote::Session::RenameAsset(const std::string &CurrentName, 
 	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "CurrentName", msgpack::object{CurrentName.c_str()} }, { "NewName", msgpack::object{NewName.c_str()} } };
-	const msgpack::object Pass { Values };
+	const std::map<std::string, msgpack::object> Values { { "CurrentName", msgpack::object{CurrentName.c_str(), MsgpackProc::Zone } }, { "NewName", msgpack::object{NewName.c_str(), MsgpackProc::Zone} } };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
 	
 	SESS.PerformSyncedCommand("RenameAsset", &Status, &Pass);
 	
@@ -361,7 +364,7 @@ Coyote::StatusCode Coyote::Session::EjectDisk(const std::string &DriveLetter)
 	Coyote::StatusCode Status{};
 	
 	const std::map<std::string, msgpack::object> Values { { "DriveLetter", msgpack::object{DriveLetter.c_str()} } };
-	const msgpack::object Pass { Values };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
 
 	const std::map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand("EjectDisk", &Status, &Pass) };
 	
@@ -374,7 +377,7 @@ Coyote::StatusCode Coyote::Session::ReorderPresets(const int32_t PK1, const int3
 	
 	Coyote::StatusCode Status{};
 	const std::map<std::string, msgpack::object> Values { MAPARG(PK1), MAPARG(PK2) };
-	const msgpack::object Pass { Values };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
 
 	SESS.PerformSyncedCommand("ReorderPresets", &Status, &Pass);
 	
@@ -397,7 +400,7 @@ Coyote::StatusCode Coyote::Session::DeletePreset(const int32_t PK)
 	
 	Coyote::StatusCode Status{};
 	const std::map<std::string, msgpack::object> Values { MAPARG(PK) };
-	const msgpack::object Pass { Values };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
 
 	SESS.PerformSyncedCommand("DeletePreset", &Status, &Pass);
 	
@@ -409,7 +412,7 @@ Coyote::StatusCode Coyote::Session::SeekTo(const int32_t PK, const uint32_t Time
 	DEF_SESS;
 	
 	const std::map<std::string, msgpack::object> Values { MAPARG(PK), MAPARG(TimeIndex) };
-	const msgpack::object Pass { Values };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
 
 	Coyote::StatusCode Status{};
 
@@ -425,7 +428,7 @@ Coyote::StatusCode Coyote::Session::GetTimeCode(Coyote::TimeCode &Out, const int
 	Coyote::StatusCode Status{};
 	
 	const std::map<std::string, msgpack::object> Values { MAPARG(Timeout) };
-	const msgpack::object Pass { Values };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
 
 	const std::map<std::string, msgpack::object> &Msg = SESS.PerformSyncedCommand("GetTimeCode", &Status, Timeout > 0 ? &Pass : nullptr);
 	
@@ -445,7 +448,7 @@ Coyote::StatusCode Coyote::Session::GetAssets(std::vector<Coyote::Asset> &Out, c
 	Coyote::StatusCode Status{};
 	
 	const std::map<std::string, msgpack::object> Values { MAPARG(Timeout) };
-	const msgpack::object Pass { Values };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
 
 	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetAssets", &Status, Timeout > 0 ? &Pass : nullptr) };
 	
@@ -473,7 +476,7 @@ Coyote::StatusCode Coyote::Session::GetPresets(std::vector<Coyote::Preset> &Out,
 	Coyote::StatusCode Status{};
 	
 	const std::map<std::string, msgpack::object> Values { MAPARG(Timeout) };
-	const msgpack::object Pass { Values };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
 
 	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetPresets", &Status, Timeout > 0 ? &Pass : nullptr) };
 	
@@ -519,7 +522,7 @@ Coyote::StatusCode Coyote::Session::GetIP(const int32_t AdapterID, Coyote::Netwo
 	
 	Coyote::StatusCode Status{};
 	
-	const msgpack::object Pass { Values };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
 	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetIP", &Status, &Pass) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
@@ -539,7 +542,7 @@ Coyote::StatusCode Coyote::Session::SetIP(const Coyote::NetworkInfo &Input)
 	
 	Coyote::StatusCode Status{};
 
-	const msgpack::object Pass { Values };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
 	SESS.PerformSyncedCommand("SetIP", &Status, &Pass);
 	
 	return Status;
@@ -553,7 +556,7 @@ Coyote::StatusCode Coyote::Session::SelectPreset(const int32_t PK)
 	
 	const std::map<std::string, msgpack::object> Values { MAPARG(PK) };
 
-	const msgpack::object Pass { Values };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
 	SESS.PerformSyncedCommand("SelectPreset", &Status, &Pass);
 	
 	return Status;
@@ -587,7 +590,7 @@ Coyote::StatusCode Coyote::Session::SetHardwareMode(const Coyote::ResolutionMode
 	StatusCode Status{};
 	
 	const std::map<std::string, msgpack::object> Values { { "Resolution", msgpack::object{ResolutionMap.at(Resolution).c_str()} }, { "Refresh", msgpack::object{RefreshMap.at(RefreshRate).c_str()} } };
-	const msgpack::object Pass { Values };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
 
 	SESS.PerformSyncedCommand("SetHardwareMode", &Status, &Pass);
 	

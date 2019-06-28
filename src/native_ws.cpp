@@ -15,86 +15,6 @@
 const struct lws_protocols WS::WSConnection::WSProtocols[] = { { "", WS::WSConnection::WSCallback, 0, 0 }, { } };
 
 //Implementations
-void WS::WSMessage::SetContents(const void *Input, const size_t Length)
-{
-	this->Buffer.resize(PRE_WS_SIZE + Length);
-	memset(this->Buffer.data(), 0, this->Buffer.size());
-	memcpy(this->GetDataHead(), Input, Length);
-}
-
-std::vector<uint8_t> WS::WSMessage::GetCopy(void) const
-{
-	std::vector<uint8_t> RetVal;
-	
-	RetVal.resize(this->Buffer.size() - PRE_WS_SIZE);
-	
-	memcpy(RetVal.data(), this->Buffer.data() + PRE_WS_START, RetVal.size());
-	return RetVal;
-}
-
-uint8_t *WS::WSMessage::GetDataHead(void)
-{
-	return this->Buffer.data() + PRE_WS_START;
-}
-
-const uint8_t *WS::WSMessage::GetConstData(void) const
-{
-	return this->Buffer.data() + PRE_WS_START;
-}
-
-const uint8_t *WS::WSMessage::GetPackedDataHead(void) const
-{
-	return this->GetConstData() + sizeof(uint32_t);
-}
-
-uint8_t *WS::WSMessage::GetPackedDataHead(void)
-{
-	return this->GetDataHead() + sizeof(uint32_t);
-}
-
-size_t WS::WSMessage::GetSize(void) const
-{
-	return this->Buffer.size() - PRE_WS_SIZE;
-}
-
-size_t WS::WSMessage::GetPackedSize(void) const
-{
-	const size_t PackedSize = ntohl(*(uint32_t*)this->Buffer.data());
-	
-	assert(this->GetSize() == PackedSize + sizeof(uint32_t));
-	
-	return PackedSize;
-}
-
-
-void WS::WSMessage::DeleteLeadingBytes(const uint64_t Bytes)
-{
-	if (Bytes >= this->GetSize())
-	{
-		return;
-	}
-	const uint8_t *NewHead = this->GetDataHead() + Bytes;
-	
-	const size_t NewSize = (this->GetSize() + PRE_WS_SIZE) - Bytes;
-
-	this->Buffer.resize(NewSize);
-	
-	memcpy(this->GetDataHead(), NewHead, this->GetSize());
-	
-	memset(this->GetDataHead(), 0, PRE_WS_START);
-	memset(this->GetDataHead() + this->GetSize(), 0, PRE_WS_END);
-}
-
-void WS::WSMessage::PackContents(const void *Input, const size_t Length)
-{
-	this->Buffer.resize(PRE_WS_SIZE + Length + sizeof(uint32_t));
-	memset(this->Buffer.data(), 0, this->Buffer.size());
-	
-	const uint32_t PackedSize = htonl(Length);
-	
-	memcpy(this->GetDataHead(), &PackedSize, sizeof PackedSize);
-	memcpy(this->GetPackedDataHead(), Input, Length);
-}
 
 void WS::WSConnection::ThreadFunc(void)
 {
@@ -163,9 +83,7 @@ int WS::WSConnection::WSCallback(struct lws *WSDesc, const enum lws_callback_rea
 			break;
 		case LWS_CALLBACK_CLIENT_RECEIVE:
 		{
-			const uint32_t MsgLength = ThisPtr->AwaitingChunks() ? 0u : ntohl(*static_cast<const uint32_t*>(Data));
-			
-			ThisPtr->AddFragment(Data, DataLength, MsgLength);
+			ThisPtr->AddFragment(Data, DataLength);
 			break;
 		}
 		case LWS_CALLBACK_CLIENT_WRITEABLE:
@@ -176,12 +94,12 @@ int WS::WSConnection::WSCallback(struct lws *WSDesc, const enum lws_callback_rea
 			
 			WSMessage *Msg = ThisPtr->Outgoing.front();
 			
-			const int MsgSize = Msg->GetSize();
+			const int MsgSize = Msg->GetBodySize() + sizeof(uint32_t);
 			int Written = 0, TotalWritten = 0;
 			
 			do
 			{
-				Written = lws_write(WSDesc, Msg->GetDataHead(), Msg->GetSize(), LWS_WRITE_BINARY);
+				Written = lws_write(WSDesc, Msg->GetBody() - sizeof(uint32_t), MsgSize, LWS_WRITE_BINARY);
 				
 				if (Written > 0) TotalWritten += Written;
 
@@ -190,7 +108,7 @@ int WS::WSConnection::WSCallback(struct lws *WSDesc, const enum lws_callback_rea
 			
 			if (Written != -1 && TotalWritten < MsgSize)
 			{ //Only partially transmitted
-				Msg->DeleteLeadingBytes(Written);
+				Msg->SeekForward(TotalWritten);
 				break;
 			}
 			
@@ -213,26 +131,24 @@ int WS::WSConnection::WSCallback(struct lws *WSDesc, const enum lws_callback_rea
 	return 0;
 }
 
-void WS::WSConnection::AddFragment(const void *Data, const size_t DataSize, const size_t RequiredSize)
+void WS::WSConnection::AddFragment(const void *Data, const size_t DataSize)
 {
 	if (!this->RecvFragment)
 	{
-		this->RecvFragment = new WSMessageFragment(Data, DataSize, RequiredSize);
+		this->RecvFragment = new WSMessage::Fragment(Data, DataSize);
 	}
 	else
 	{
 		this->RecvFragment->Append(Data, DataSize);
 	}
 	
-	if (this->RecvFragment->Ready())
+	if (this->RecvFragment->IsComplete())
 	{
-		const auto &Lump = this->RecvFragment->Graduate();
+		WSMessage *Msg = this->RecvFragment->Graduate();
 		delete this->RecvFragment;
 		this->RecvFragment = nullptr;
 
 		std::lock_guard<std::mutex> Guard { this->IMutex };
-		
-		WSMessage *Msg = new WSMessage(Lump.data(), Lump.size());
 		
 		const bool CanKeep = this->OnReceiveCallback(this->OnReceiveCallbackUserData, Msg);
 		
@@ -290,7 +206,7 @@ void WS::WSConnection::Send(WSMessage *Msg)
 	this->Outgoing.push(Msg);
 }
 
-WS::WSMessage *WS::WSConnection::Recv(void)
+WSMessage *WS::WSConnection::Recv(void)
 {
 	std::lock_guard<std::mutex> IGuard { this->IMutex };
 	

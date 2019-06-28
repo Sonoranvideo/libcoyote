@@ -1,0 +1,3 @@
+[submodule "src/include/internal/wsmessages"]
+	path = src/include/internal/wsmessages
+	url = https://bitbucket.org/coyoteproject/wsmessages

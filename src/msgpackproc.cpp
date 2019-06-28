@@ -15,14 +15,16 @@
 //Prototypes
 static bool HasValidIncomingHeaders(const std::map<std::string, msgpack::object> &Values);
 
+thread_local msgpack::zone MsgpackProc::Zone;
+
 //Definitions
 void MsgpackProc::InitOutgoingMsg(msgpack::packer<msgpack::sbuffer> &Pack, const std::string &CommandName, const uint64_t MsgID, const msgpack::object *Values)
 {
 	std::map<std::string, msgpack::object> TotalValues
 	{
-		{ "CommandName", msgpack::object{ CommandName.c_str() } },
-		{ "CoyoteAPIVersion", msgpack::object{ COYOTE_API_VERSION } },
-		{ "MsgID", msgpack::object{ MsgID } },
+		{ "CommandName", msgpack::object{ CommandName.c_str(), Zone } },
+		{ "CoyoteAPIVersion", msgpack::object{ COYOTE_API_VERSION, Zone } },
+		{ "MsgID", msgpack::object{ MsgID, Zone } },
 	};
 
 	if (Values != nullptr) TotalValues["Data"] = *Values;
@@ -47,10 +49,8 @@ std::map<std::string, msgpack::object> MsgpackProc::InitIncomingMsg(const void *
 {
 	//Unpack binary data.
 	msgpack::unpacked Result;
-	msgpack::unpack(Result, static_cast<const char*>(Data), DataLength);
-	
-	//Get object from handle.
-	msgpack::object Object(std::move(Result.get()));
+
+	msgpack::object Object { msgpack::unpack(Zone, (const char*)Data, DataLength) };
 	
 	//Convert into a map of smaller msgpack objects
 	std::map<std::string, msgpack::object> Values;
@@ -78,9 +78,9 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 		
 		Values = new std::map<std::string, msgpack::object>
 		{
-			{ "FileName", msgpack::object{ AssetObj->FileName } },
-			{ "NewFileName", msgpack::object{ AssetObj->NewFileName } },
-			{ "CopyPercentage", msgpack::object{ AssetObj->CopyPercentage } },
+			{ "FileName", msgpack::object{ AssetObj->FileName.GetCString() } },
+			{ "NewFileName", msgpack::object{ AssetObj->NewFileName.GetCString() } },
+			{ "CopyPercentage", msgpack::object{ (int)AssetObj->CopyPercentage } },
 			{ "IsReady", msgpack::object{ AssetObj->IsReady } }
 		};
 	}
@@ -91,8 +91,8 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 		Values = new std::map<std::string, msgpack::object>
 		{
 			{ "SupportsS12G", msgpack::object{ HWStateObj->SupportsS12G } },
-			{ "Resolution", msgpack::object{ HWStateObj->Resolution } },
-			{ "RefreshRate", msgpack::object{ HWStateObj->RefreshRate } },
+			{ "Resolution", msgpack::object{ HWStateObj->Resolution.GetCString() } },
+			{ "RefreshRate", msgpack::object{ HWStateObj->RefreshRate.GetCString() } },
 			{ "CurrentMode", msgpack::object{ static_cast<int>(HWStateObj->CurrentMode) } },
 		};
 	}
@@ -115,8 +115,8 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 		{
 			{ "NumPresets", msgpack::object{ MediaStateObj->NumPresets } },
 			{ "Selected", msgpack::object{ MediaStateObj->Selected } },
-			{ "PlayingPresets", msgpack::object{ MediaStateObj->PlayingPresets } },
-			{ "PausedPresets", msgpack::object{ MediaStateObj->PausedPresets } },
+			{ "PlayingPresets", msgpack::object{ STLArrayToMsgpackArray(MediaStateObj->PlayingPresets) } },
+			{ "PausedPresets", msgpack::object{ STLArrayToMsgpackArray(MediaStateObj->PausedPresets) } },
 			{ "TimeCode", PackCoyoteObject(&MediaStateObj->Time) },
 		};			
 	}
@@ -184,7 +184,7 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 		Pack->pack(*Values);
 	}
 	
-	return msgpack::object{ *Values };
+	return STLMapToMsgpackMap(*Values);
 	
 }
 

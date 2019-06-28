@@ -8,6 +8,7 @@
 
 #include <msgpack.hpp>
 #include <mutex>
+#include <pthread.h>
 #include <condition_variable>
 
 #include "native_ws.h"
@@ -18,18 +19,25 @@ namespace AsyncToSync
 	class MTEvent
 	{
 	private:
-		std::condition_variable Var;
 		mutable std::mutex Mutex;
 		T Lump;
-		
+		sem_t Semaphore;
 	public:
-		MTEvent(void) : Lump() {}
+		MTEvent(void) : Lump(), Semaphore()
+		{
+			sem_init(&this->Semaphore, 0, 0);
+		}
+		
+		~MTEvent(void)
+		{
+			sem_destroy(&this->Semaphore);
+		}
 		
 		T Wait(void) //Return by value!
 		{
-			std::unique_lock<std::mutex> Lock { this->Mutex };
+			while (sem_wait(&this->Semaphore));
 			
-			this->Var.wait(Lock);
+			std::unique_lock<std::mutex> Lock { this->Mutex };
 			
 			return this->Lump;
 		}
@@ -40,7 +48,7 @@ namespace AsyncToSync
 		
 			this->Lump = Value;
 			
-			this->Var.notify_all();
+			sem_post(&this->Semaphore);
 		}
 		
 		const T *Peek(void) const
@@ -54,16 +62,16 @@ namespace AsyncToSync
 	class MessageTicket
 	{
 	private:
-		MTEvent<WS::WSMessage*> Event;		
+		MTEvent<WSMessage*> Event;		
 		uint64_t MsgID;
 
 	public:
-		inline WS::WSMessage *WaitForRecv(void)
+		inline WSMessage *WaitForRecv(void)
 		{
 			return this->Event.Wait();
 		}
 		
-		inline void SetReady(WS::WSMessage *Msg)
+		inline void SetReady(WSMessage *Msg)
 		{
 			this->Event.Post(Msg);
 		}
@@ -101,7 +109,7 @@ namespace AsyncToSync
 			}
 		}
 		
-		static bool OnMessageReady(void *ThisPtr_, WS::WSMessage *Msg);
+		static bool OnMessageReady(void *ThisPtr_, WSMessage *Msg);
 		MessageTicket *NewTicket(const uint64_t MsgID);
 		
 		
