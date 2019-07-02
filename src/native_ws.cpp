@@ -54,7 +54,7 @@ void WS::WSConnection::ThreadFunc(void)
 	
 	while (!this->ShouldDie)
 	{
-		lws_service(this->Ctx, 100);
+		lws_service(this->Ctx, 1);
 		
 		std::unique_lock<std::mutex> G { this->OMutex };
 		
@@ -88,8 +88,6 @@ bool WS::WSConnection::InitWebSockets(void)
 
 bool WS::WSConnection::Connect(const std::string &Host)
 {
-	this->Host = Host;
-	
 	if (this->Thread)
 	{
 		this->ShouldDie = true;
@@ -98,7 +96,8 @@ bool WS::WSConnection::Connect(const std::string &Host)
 		delete this->Thread;
 	}
 	
-	
+	this->Host = Host;
+		
 	this->Thread = new std::thread(&WS::WSConnection::ThreadFunc, this);
 	
 	return true;
