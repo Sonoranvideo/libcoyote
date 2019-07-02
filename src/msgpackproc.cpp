@@ -34,7 +34,7 @@ void MsgpackProc::InitOutgoingMsg(msgpack::packer<msgpack::sbuffer> &Pack, const
 
 static bool HasValidIncomingHeaders(const std::map<std::string, msgpack::object> &Values)
 {
-	static const char *const Required[] = { "CommandName", "CoyoteAPIVersion", "MsgID", "StatusInt", "StatusText" };
+	static const char *const Required[] = { "CoyoteAPIVersion", "MsgID", "StatusInt", "StatusText" };
 	static const size_t NumFields = sizeof Required / sizeof *Required;
 	
 	for (size_t Inc = 0u; Inc < NumFields; ++Inc)
@@ -57,6 +57,7 @@ std::map<std::string, msgpack::object> MsgpackProc::InitIncomingMsg(const void *
 	Object.convert(Values);
 	
 	//malformed message?
+	
 	assert(HasValidIncomingHeaders(Values));
 	
 	//Easy way to get the event ID
@@ -208,8 +209,8 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		OutputObj->MediaId = Fields["MediaId"].as<int32_t>();
 		OutputObj->FadeOut = Fields["FadeOut"].as<double>();
 		OutputObj->Delay = Fields["Delay"].as<double>();
-		OutputObj->Active = Fields["Active"].as<bool>();
-		OutputObj->Audio = Fields["Audio"].as<bool>();
+		OutputObj->Active = Fields["Active"].as<int>();
+		OutputObj->Audio = Fields["Audio"].as<int>();
 	}
 	else if (Expected == typeid(Coyote::Asset))
 	{
@@ -219,7 +220,7 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		AssetObj->FileName = Fields["FileName"].as<std::string>();
 		AssetObj->NewFileName = Fields["NewFileName"].as<std::string>();
 		AssetObj->CopyPercentage = Fields["CopyPercentage"].as<uint32_t>(); //Because idk if msgpack treats uint8_t like a character or a number
-		AssetObj->IsReady = Fields["CopyPercentage"].as<bool>();
+		AssetObj->IsReady = Fields["CopyPercentage"].as<int>();
 	}
 	else if (Expected == typeid(Coyote::TimeCode))
 	{
@@ -247,16 +248,16 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		PresetObj->Fade = Fields["Fade"].as<int>();
 		PresetObj->LeftVolume = Fields["LeftVolume"].as<int>();
 		PresetObj->RightVolume = Fields["RightVolume"].as<int>();
-		PresetObj->IsPlaying = Fields["IsPlaying"].as<bool>();
-		PresetObj->IsPaused = Fields["IsPaused"].as<bool>();
-		PresetObj->Selected = Fields["Selected"].as<bool>();
+		PresetObj->IsPlaying = Fields["IsPlaying"].as<int>();
+		PresetObj->IsPaused = Fields["IsPaused"].as<int>();
+		PresetObj->Selected = Fields["Selected"].as<int>();
 	}
 	else if (Expected == typeid(Coyote::HardwareState))
 	{
 		Result = new Coyote::HardwareState{};
 		Coyote::HardwareState *HWObj = static_cast<Coyote::HardwareState*>(Result);
 		
-		HWObj->SupportsS12G = Fields["SupportsS12G"].as<bool>();
+		HWObj->SupportsS12G = Fields["SupportsS12G"].as<int>();
 		HWObj->Resolution = Fields["Resolution"].as<std::string>();
 		HWObj->RefreshRate = Fields["RefreshRate"].as<std::string>();
 		HWObj->CurrentMode = static_cast<Coyote::HardwareMode>(Fields["CurrentMode"].as<int>());

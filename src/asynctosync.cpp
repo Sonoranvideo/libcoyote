@@ -10,7 +10,17 @@ bool AsyncToSync::SynchronousSession::OnMessageReady(void *ThisPtr_, WSMessage *
 	SynchronousSession *ThisPtr = static_cast<SynchronousSession*>(ThisPtr_);
 	
 	//This is horrifically inefficient but not enough so to really affect our throughput in a meaningful way.
-	const std::map<std::string, msgpack::object> Values { MsgpackProc::InitIncomingMsg(Msg->GetBody(), Msg->GetBodySize()) };
+	std::map<std::string, msgpack::object> Values;
+	
+	try
+	{
+		Values = MsgpackProc::InitIncomingMsg(Msg->GetBody(), Msg->GetBodySize());
+	}
+	catch(...)
+	{
+		std::cout << "Garbage data detected. Discarded.\n";
+		return false;
+	}
 	
 	if (!Values.count("MsgID")) return true; //WSConnection can keep it.
 	
@@ -28,8 +38,9 @@ bool AsyncToSync::SynchronousSession::OnMessageReady(void *ThisPtr_, WSMessage *
 	assert(MsgID == Ticket->GetMsgID());
 	
 	Ticket->SetReady(Msg);
+	
 	ThisPtr->Tickets.erase(MsgID); //Remove it from our queue, but don't deallocate it, because someone else might be waiting on it. That's their responsibility.
-
+	
 	return false;
 }
 

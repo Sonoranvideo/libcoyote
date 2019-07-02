@@ -25,6 +25,7 @@
 #include <assert.h>
 
 #ifdef __cplusplus
+#include <iostream>
 #include <vector>
 #include <map>
 #include <queue>

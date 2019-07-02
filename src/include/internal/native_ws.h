@@ -26,6 +26,7 @@ namespace WS
 		std::queue<WSMessage*> Outgoing;
 		
 		std::mutex IMutex, OMutex;
+		std::string Host;
 		
 		struct lws_context *Ctx;
 		struct lws *Socket;
@@ -34,6 +35,7 @@ namespace WS
 		
 		WSMessage::Fragment *RecvFragment;
 		std::atomic_bool ShouldDie;
+		std::atomic_bool ErrorDetected;
 		
 		//Private methods
 		bool InitWebSockets(void);
@@ -41,6 +43,8 @@ namespace WS
 		void AddFragment(const void *Data, const size_t DataSize);
 		
 		inline bool AwaitingChunks(void) const { return this->RecvFragment; }
+		inline bool HasError(void) const { return this->ErrorDetected; }
+		inline void ClearError(void) { this->ErrorDetected = false; }
 		
 		void ThreadFunc(void);
 		

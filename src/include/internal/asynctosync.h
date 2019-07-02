@@ -35,7 +35,7 @@ namespace AsyncToSync
 		
 		T Wait(void) //Return by value!
 		{
-			while (sem_wait(&this->Semaphore));
+			sem_wait(&this->Semaphore);
 			
 			std::unique_lock<std::mutex> Lock { this->Mutex };
 			

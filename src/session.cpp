@@ -69,7 +69,6 @@ const std::map<std::string, msgpack::object> InternalSession::PerformSyncedComma
 	//Pack our values into a msgpack buffer
 	MsgpackProc::InitOutgoingMsg(Pack, CommandName, MsgID, Values);
 	
-	
 	this->Connection.Send(new WSMessage(Buffer.data(), Buffer.size()));
 	
 	//Wait for the value we want (with the message ID we want) to appear in the WebSockets thread.
@@ -319,7 +318,7 @@ Coyote::StatusCode Coyote::Session::IsUpdateDetected(bool &ValueOut)
 	
 	Response.at("Data").convert(DataField);
 		
-	ValueOut = DataField[CmdName].as<bool>();
+	ValueOut = DataField[CmdName].as<int>();
 	
 	return Status;
 }
@@ -434,7 +433,9 @@ Coyote::StatusCode Coyote::Session::GetTimeCode(Coyote::TimeCode &Out, const int
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	std::unique_ptr<Coyote::TimeCode> NewTC { static_cast<Coyote::TimeCode*>(MsgpackProc::UnpackCoyoteObject(Msg.at("Data"), typeid(*NewTC)) ) };
+	Coyote::BaseObject *TCData = MsgpackProc::UnpackCoyoteObject(Msg.at("Data"), typeid(Coyote::TimeCode));
+	
+	std::unique_ptr<Coyote::TimeCode> NewTC { static_cast<Coyote::TimeCode*>(TCData)  };
 	
 	Out = std::move(*NewTC); //Moving is not actually useful for a struct full of POD data types, but it's the thought that counts.
 	
@@ -630,7 +631,7 @@ Coyote::StatusCode Coyote::Session::DetectUpdate(bool &DetectedOut, std::string 
 	std::map<std::string, msgpack::object> Data;
 	Msg.at("Data").convert(Data);
 	
-	DetectedOut = Data.at("IsUpdateDetected").as<bool>();
+	DetectedOut = Data.at("IsUpdateDetected").as<int>();
 	
 	if (Out) *Out = Data.at("Version").as<std::string>();
 	
