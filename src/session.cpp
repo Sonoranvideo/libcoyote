@@ -17,69 +17,115 @@
 #include "include/internal/common.h"
 #include "include/internal/native_ws.h"
 #include "include/internal/asynctosync.h"
+#include "include/internal/asyncmsgs.h"
 #include "include/internal/msgpackproc.h"
 #include "include/statuscodes.h"
 #include "include/datastructures.h"
 #include "include/session.h"
 #include <mutex>
 
-#include <iostream>
-
 #define DEF_SESS InternalSession &SESS = *static_cast<InternalSession*>(this->Internal)
 #define MAPARG(x) { #x, msgpack::object{ x, MsgpackProc::Zone } }
 
 
-class MsgIDCounter
-{
-private:
-	std::mutex Lock;
-	uint64_t Value;
-public:
-	MsgIDCounter(void) : Value(1) {}
-	
-	uint64_t NewID(void)
-	{
-		const std::lock_guard<std::mutex> Guard { this->Lock };
-		
-		const uint64_t Value = this->Value++;
-		
-		return Value;
-	}
-};
-
 struct InternalSession
 {
 	AsyncToSync::SynchronousSession SyncSess;
-	WS::WSConnection Connection;
-	MsgIDCounter MsgIDs;
+	AsyncMsgs::AsynchronousSession ASyncSess;
+	WS::WSConnection *Connection;
+	std::string Host;
 	
 	const std::map<std::string, msgpack::object> PerformSyncedCommand(const std::string &CommandName, Coyote::StatusCode *StatusOut = nullptr, const msgpack::object *Values = nullptr);
 	Coyote::StatusCode CreatePreset_Multi(const Coyote::Preset &Ref, const std::string &Cmd);
-	inline InternalSession(void) : Connection(SyncSess.OnMessageReady, &SyncSess) {}
+	
+	static bool OnMessageReady(void *ThisPtr, WSMessage *Msg);
+	static void OnNeedPing(WS::WSConnection *Conn);
+	inline void ConfigConnection(void)
+	{
+		delete this->Connection;
+		this->Connection = new WS::WSConnection(this->OnNeedPing, this->OnMessageReady, this);
+		
+		if (!this->Connection->Connect(this->Host))
+		{
+			throw Coyote::Session::ConnectionError{};
+		}
+	}
+	
+	inline InternalSession(const std::string &Host = "") : Connection(), Host(Host) { this->ConfigConnection(); }
+	inline ~InternalSession(void) { delete this->Connection; }
 };
 
+bool InternalSession::OnMessageReady(void *ThisPtr, WSMessage *Msg)
+{
+	InternalSession *Sess = static_cast<InternalSession*>(ThisPtr);
+	
+	std::map<std::string, msgpack::object> Values;
+	
+	try
+	{
+		Values = MsgpackProc::InitIncomingMsg(Msg->GetBody(), Msg->GetBodySize());
+	}
+	catch(...)
+	{
+		std::cout << "Garbage data detected. Discarded.\n";
+		return false;
+	}
+	
+	const bool IsSynchronousMsg = Values.count("MsgID");
+	
+	const bool Success = IsSynchronousMsg ? Sess->SyncSess.OnMessageReady(Values, Sess->Connection, Msg) : Sess->ASyncSess.OnMessageReady(Values, Sess->Connection, Msg);
+	
+	return Success;
+}
+
+void InternalSession::OnNeedPing(WS::WSConnection *Conn)
+{
+	msgpack::sbuffer Buffer;
+	msgpack::packer<msgpack::sbuffer> Pack { Buffer };
+	
+	MsgpackProc::InitOutgoingMsg(Pack, "Ping");
+	
+	Conn->Send(new WSMessage(Buffer.data(), Buffer.size()));
+	
+}
 const std::map<std::string, msgpack::object> InternalSession::PerformSyncedCommand(const std::string &CommandName, Coyote::StatusCode *StatusOut, const msgpack::object *Values)
 {
 	msgpack::sbuffer Buffer;
 	msgpack::packer<msgpack::sbuffer> Pack { Buffer };
 	
 	//Acquire a new message ID
-	const uint64_t MsgID = this->MsgIDs.NewID();
+	const uint64_t MsgID = this->SyncSess.NewMsgID();
 	
 	//Pack our values into a msgpack buffer
 	MsgpackProc::InitOutgoingMsg(Pack, CommandName, MsgID, Values);
 	
-	this->Connection.Send(new WSMessage(Buffer.data(), Buffer.size()));
+	if (this->Connection->HasError())
+	{
+		//Try to reconnect, ONCE.
+		this->ConfigConnection();
+		
+		if (StatusOut) *StatusOut = Coyote::COYOTE_STATUS_NETWORKERROR;
+		return {};
+	}
+	
+	this->Connection->Send(new WSMessage(Buffer.data(), Buffer.size()));
 	
 	//Wait for the value we want (with the message ID we want) to appear in the WebSockets thread.
 	AsyncToSync::MessageTicket *Ticket = this->SyncSess.NewTicket(MsgID);
 	
-	std::unique_ptr<WSMessage> Response { Ticket->WaitForRecv() };
 	
-	assert(Response != nullptr);
+	std::unique_ptr<WSMessage> ResponsePtr { Ticket->WaitForRecv() };
+	this->SyncSess.DestroyTicket(Ticket);
+	
+	if (!ResponsePtr)
+	{
+		if (StatusOut) *StatusOut = Coyote::COYOTE_STATUS_NETWORKERROR;
 
+		return {};
+	}
+	
 	//Decode the messagepack "map" into a real map of other messagepack objects.
-	const std::map<std::string, msgpack::object> Results { MsgpackProc::InitIncomingMsg(Response->GetBody(), Response->GetBodySize()) };
+	const std::map<std::string, msgpack::object> Results { MsgpackProc::InitIncomingMsg(ResponsePtr->GetBody(), ResponsePtr->GetBodySize()) };
 	
 	//Get the status code.
 	assert(Results.count("StatusInt"));
@@ -107,16 +153,11 @@ static const std::map<Coyote::ResolutionMode, std::string> ResolutionMap
 	{ Coyote::COYOTE_RES_2160P, "2160p" },
 };
 
-Coyote::Session::Session(const std::string &Host) : Internal(new InternalSession{})
+Coyote::Session::Session(const std::string &Host) : Internal(new InternalSession{Host})
 {
 	InternalSession &Sess = *static_cast<InternalSession*>(this->Internal);
 	
-	if (!Sess.Connection.Connect(Host))
-	{
-		throw ConnectionError{};
-	}
-	
-	
+	(void)&Sess; //stfu gcc
 }
 
 Coyote::Session::~Session(void)

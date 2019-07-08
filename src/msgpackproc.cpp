@@ -24,17 +24,18 @@ void MsgpackProc::InitOutgoingMsg(msgpack::packer<msgpack::sbuffer> &Pack, const
 	{
 		{ "CommandName", msgpack::object{ CommandName.c_str(), Zone } },
 		{ "CoyoteAPIVersion", msgpack::object{ COYOTE_API_VERSION, Zone } },
-		{ "MsgID", msgpack::object{ MsgID, Zone } },
 	};
-
-	if (Values != nullptr) TotalValues["Data"] = *Values;
 	
+	if (MsgID) TotalValues.emplace("MsgID", msgpack::object{ MsgID, Zone });
+	
+	if (Values != nullptr) TotalValues["Data"] = *Values;
+
 	Pack.pack(TotalValues);
 }
 
 static bool HasValidIncomingHeaders(const std::map<std::string, msgpack::object> &Values)
 {
-	static const char *const Required[] = { "CoyoteAPIVersion", "MsgID", "StatusInt", "StatusText" };
+	static const char *const Required[] = { "CommandName", "CoyoteAPIVersion", "StatusInt", "StatusText" };
 	static const size_t NumFields = sizeof Required / sizeof *Required;
 	
 	for (size_t Inc = 0u; Inc < NumFields; ++Inc)
@@ -57,11 +58,10 @@ std::map<std::string, msgpack::object> MsgpackProc::InitIncomingMsg(const void *
 	Object.convert(Values);
 	
 	//malformed message?
-	
 	assert(HasValidIncomingHeaders(Values));
 	
 	//Easy way to get the event ID
-	if (MsgIDOut) *MsgIDOut = Values["MsgID"].as<uint64_t>();
+	if (MsgIDOut && Values.count("MsgID")) *MsgIDOut = Values["MsgID"].as<uint64_t>();
 	
 	return Values;
 }

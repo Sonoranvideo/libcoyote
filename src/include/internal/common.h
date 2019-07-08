@@ -33,8 +33,17 @@
 #include <memory>
 #include <functional>
 #include <typeinfo>
+#include <chrono>
 #else
 #include <stdbool.h>
 #endif //__cplusplus
+
+#ifdef WIN32
+#include <windows.h>
+#define COYOTE_SLEEP(x) Sleep(x);
+#else
+#include <unistd.h>
+#define COYOTE_SLEEP(x) usleep(x * 1000);
+#endif //WIN32
 
 #endif //__LIBCOYOTE_COMMON_H__

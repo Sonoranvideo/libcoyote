@@ -3,10 +3,6 @@
 #include "include/internal/native_ws.h"
 #include "include/internal/common.h"
 
-#include <sys/syscall.h>
-#include <sys/types.h>
-
-#define GETTID() syscall(SYS_gettid)
 
 /**
  * By the time you are done with this code, you will have developed a deep, seething hatred for WebSockets, libwebsockets, and forced asynchronous network programming.
@@ -23,12 +19,11 @@ const struct lws_protocols WS::WSConnection::WSProtocols[] = { { "", WS::WSConne
 
 //Implementations
 
-void WS::WSConnection::ThreadFunc(void)
+
+bool WS::WSConnection::InitThreadClient(void)
 {
 	this->ClearError();
-	
-	this->InitWebSockets();
-	
+
 	//Bring up the socket.
 	for (uint8_t Attempts = 3; Attempts && !this->Socket; --Attempts)
 	{
@@ -45,16 +40,32 @@ void WS::WSConnection::ThreadFunc(void)
 		
 		this->Socket = lws_client_connect_via_info(&ConnectInfo);
 	}
+
+	if (!this->Socket) return false;
 	
-	if (!this->Socket)
-	{
-		this->ErrorDetected = true;
-		return;
-	}
+	this->RegisterActivity(); //Do it once so we know we're reconnected
+
+	return true;
+}
+	
+void WS::WSConnection::ThreadFunc(void)
+{
+	this->InitWebSockets();
+	
+	this->InitThreadClient();
 	
 	while (!this->ShouldDie)
 	{
 		lws_service(this->Ctx, 1);
+		
+		if (this->HasError() || this->CheckPingout())
+		{
+			std::cerr << "LibCoyote: THREAD DYING for connection " << (void*)this << ", error detected.\n";
+			this->ErrorDetected = true;
+			return;
+		}
+	
+		if (this->NeedsPing()) this->OnNeedPing(this);
 		
 		std::unique_lock<std::mutex> G { this->OMutex };
 		
@@ -64,9 +75,18 @@ void WS::WSConnection::ThreadFunc(void)
 			lws_callback_on_writable_all_protocol(this->Ctx, WSProtocols);
 		}
 
-	}
+	}	
 }
 
+bool WS::WSConnection::CheckPingout(void) const
+{ //True if we're dead
+	return EYEBLEED_NOW_MS() - this->LastPingMS > PingInterval + PingoutMS;
+}
+
+bool WS::WSConnection::NeedsPing(void) const
+{
+	return EYEBLEED_NOW_MS() - this->LastPingMS > PingInterval;
+}
 
 bool WS::WSConnection::InitWebSockets(void)
 {
@@ -78,6 +98,10 @@ bool WS::WSConnection::InitWebSockets(void)
 	CtxInfo.protocols = WSProtocols;
 	CtxInfo.gid = -1;
 	CtxInfo.uid = -1;
+	CtxInfo.ka_time = 10;
+	CtxInfo.ka_interval = 2;
+	CtxInfo.ka_probes = 2;
+	CtxInfo.timeout_secs = 2;
 	
 	this->Ctx = lws_create_context(&CtxInfo);
 	
@@ -110,11 +134,13 @@ int WS::WSConnection::WSCallback(struct lws *WSDesc, const enum lws_callback_rea
 	switch (Reason)
 	{
 		case LWS_CALLBACK_CLIENT_ESTABLISHED:
+			ThisPtr->Socket = WSDesc;
 			lws_callback_on_writable(WSDesc);
 			break;
 		case LWS_CALLBACK_RECEIVE:
 		case LWS_CALLBACK_CLIENT_RECEIVE:
 		{
+			ThisPtr->RegisterActivity();
 			ThisPtr->AddFragment(Data, DataLength);
 			
 			lws_callback_on_writable(WSDesc);
@@ -142,7 +168,9 @@ int WS::WSConnection::WSCallback(struct lws *WSDesc, const enum lws_callback_rea
 				Written = lws_write(WSDesc, DataHead, MsgSize - TotalWritten, LWS_WRITE_BINARY);
 
 				if (Written <= 0) continue;
-
+				
+				ThisPtr->RegisterActivity(); //Write call didn't fail, so we can count this as a win.
+				
 				TotalWritten += Written;
 				DataHead += Written;
 			} while (MsgSize > TotalWritten && Written != -1);
@@ -154,8 +182,12 @@ int WS::WSConnection::WSCallback(struct lws *WSDesc, const enum lws_callback_rea
 				break;
 			}
 			
-			//Try again later
-			if (Written == -1) break;
+			//Problems.
+			if (Written == -1)
+			{
+				ThisPtr->ErrorDetected = true;
+				break;
+			}
 			
 			//We made it.
 			ThisPtr->Outgoing.pop();
@@ -168,6 +200,7 @@ int WS::WSConnection::WSCallback(struct lws *WSDesc, const enum lws_callback_rea
 		}
 		case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
 		{
+			ThisPtr->ErrorDetected = true;
 			lwsl_err("CLIENT_CONNECTION_ERROR: %s\n",
 												Data ? (const char*)Data : "No info");
 			break;
@@ -196,12 +229,7 @@ void WS::WSConnection::AddFragment(const void *Data, const size_t DataSize)
 		delete this->RecvFragment;
 		this->RecvFragment = nullptr;
 
-		std::lock_guard<std::mutex> Guard { this->IMutex };
-		
-		const bool CanKeep = this->OnReceiveCallback(this->OnReceiveCallbackUserData, Msg);
-		
-		
-		if (CanKeep) this->Incoming.push(Msg); //The ticket system doesn't want this message. Probably doesn't have a MsgID.
+		this->OnReceiveCallback(this->OnReceiveCallbackUserData, Msg);
 	}
 }
 
@@ -227,15 +255,6 @@ void WS::WSConnection::Shutdown(void)
 		this->RecvFragment = nullptr;
 	}
 	
-	std::lock_guard<std::mutex> IGuard { this->IMutex };
-	
-	while (!this->Incoming.empty())
-	{
-		WSMessage *Msg = this->Incoming.front();
-		
-		delete Msg;
-		this->Incoming.pop();
-	}
 	
 	std::lock_guard<std::mutex> OGuard { this->OMutex };
 	
@@ -256,29 +275,17 @@ void WS::WSConnection::Send(WSMessage *Msg)
 	this->Outgoing.push(Msg);
 }
 
-WSMessage *WS::WSConnection::Recv(void)
-{
-	std::lock_guard<std::mutex> IGuard { this->IMutex };
-	
-	if (this->Incoming.empty()) return nullptr;
-	
-	WSMessage *RetVal = this->Incoming.front();
-	
-	this->Incoming.pop();
-	
-	return RetVal;
-}
-
 WS::WSConnection::~WSConnection(void)
 {
 	this->Shutdown();
 	lws_context_destroy(this->Ctx);
 }
 
-WS::WSConnection::WSConnection(bool (*const OnReceiveCallback)(void*, WSMessage*), void *UserData)
+WS::WSConnection::WSConnection(void (*const OnNeedPing)(WS::WSConnection *Conn), bool (*const OnReceiveCallback)(void*, WSMessage*), void *UserData)
 	:
 	OnReceiveCallback(OnReceiveCallback),
 	OnReceiveCallbackUserData(UserData),
+	OnNeedPing(OnNeedPing),
 	Ctx(),
 	Socket(),
 	Thread(),
