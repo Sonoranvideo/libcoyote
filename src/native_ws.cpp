@@ -15,7 +15,7 @@
 //Prototypes
 
 //Globals
-const struct lws_protocols WS::WSConnection::WSProtocols[] = { { "", WS::WSConnection::WSCallback, 0, 16384}, { } };
+const struct lws_protocols WS::WSConnection::WSProtocols[] = { { "", WS::WSConnection::WSCallback, 0, 0}, { } };
 
 //Implementations
 
