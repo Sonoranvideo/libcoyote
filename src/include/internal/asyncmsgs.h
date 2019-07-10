@@ -4,16 +4,18 @@
 #include "common.h"
 #include "native_ws.h"
 #include "msgpackproc.h"
+#include "subscriptions.h"
 
 namespace AsyncMsgs
 {
 	class AsynchronousSession
 	{
 	private:
-
 		
 	public:
 		bool OnMessageReady(const std::map<std::string, msgpack::object> &Values, WS::WSConnection *Conn, WSMessage *Msg);
+		
+		Subs::SubscriptionSession SubSession;
 		
 		AsynchronousSession(void) {}
 		

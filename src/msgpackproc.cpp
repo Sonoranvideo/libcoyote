@@ -14,6 +14,7 @@
 
 //Prototypes
 static bool HasValidIncomingHeaders(const std::map<std::string, msgpack::object> &Values);
+static bool IsSubscriptionEvent(const std::map<std::string, msgpack::object> &Values);
 
 thread_local msgpack::zone MsgpackProc::Zone;
 
@@ -46,6 +47,11 @@ static bool HasValidIncomingHeaders(const std::map<std::string, msgpack::object>
 	return true;
 }
 
+static bool IsSubscriptionEvent(const std::map<std::string, msgpack::object> &Values)
+{
+	return Values.count("SubscriptionEvent");
+}
+
 std::map<std::string, msgpack::object> MsgpackProc::InitIncomingMsg(const void *Data, const size_t DataLength, uint64_t *MsgIDOut)
 {
 	//Unpack binary data.
@@ -56,6 +62,9 @@ std::map<std::string, msgpack::object> MsgpackProc::InitIncomingMsg(const void *
 	//Convert into a map of smaller msgpack objects
 	std::map<std::string, msgpack::object> Values;
 	Object.convert(Values);
+	
+	//Subscription events just get converted and done.
+	if (IsSubscriptionEvent(Values)) return Values;
 	
 	//malformed message?
 	assert(HasValidIncomingHeaders(Values));

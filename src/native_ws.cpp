@@ -15,7 +15,7 @@
 //Prototypes
 
 //Globals
-const struct lws_protocols WS::WSConnection::WSProtocols[] = { { "", WS::WSConnection::WSCallback }, { } };
+const struct lws_protocols WS::WSConnection::WSProtocols[] = { { "", WS::WSConnection::WSCallback, 0, 16384}, { } };
 
 //Implementations
 
@@ -90,6 +90,14 @@ bool WS::WSConnection::NeedsPing(void) const
 
 bool WS::WSConnection::InitWebSockets(void)
 {
+	static bool LogConfigured;
+	
+	if (!LogConfigured)
+	{
+		lws_set_log_level(0, nullptr);
+		LogConfigured = true;
+	}
+	
 	if (this->Ctx) lws_context_destroy(this->Ctx);
 
 	struct lws_context_creation_info CtxInfo{};
@@ -104,8 +112,6 @@ bool WS::WSConnection::InitWebSockets(void)
 	CtxInfo.timeout_secs = 2;
 	
 	this->Ctx = lws_create_context(&CtxInfo);
-	
-	lws_set_log_level(LLL_USER | LLL_ERR | LLL_WARN | LLL_NOTICE, nullptr);
 	
 	return (bool)this->Ctx;
 }
@@ -149,7 +155,7 @@ int WS::WSConnection::WSCallback(struct lws *WSDesc, const enum lws_callback_rea
 		}
 		case LWS_CALLBACK_CLIENT_WRITEABLE:
 		{
-			std::lock_guard<std::mutex> Guard { ThisPtr->OMutex };
+			std::unique_lock<std::mutex> Guard { ThisPtr->OMutex };
 			
 			if (ThisPtr->Outgoing.empty())
 			{
@@ -157,6 +163,8 @@ int WS::WSConnection::WSCallback(struct lws *WSDesc, const enum lws_callback_rea
 			}
 			
 			WSMessage *Msg = ThisPtr->Outgoing.front();
+			
+			Guard.unlock();
 			
 			const int MsgSize = Msg->GetRemainingSize() + sizeof(uint32_t);
 			int Written = 0, TotalWritten = 0;
@@ -166,7 +174,7 @@ int WS::WSConnection::WSCallback(struct lws *WSDesc, const enum lws_callback_rea
 			do
 			{
 				Written = lws_write(WSDesc, DataHead, MsgSize - TotalWritten, LWS_WRITE_BINARY);
-
+				
 				if (Written <= 0) continue;
 				
 				ThisPtr->RegisterActivity(); //Write call didn't fail, so we can count this as a win.
@@ -189,9 +197,15 @@ int WS::WSConnection::WSCallback(struct lws *WSDesc, const enum lws_callback_rea
 				break;
 			}
 			
+			Guard.lock();
 			//We made it.
 			ThisPtr->Outgoing.pop();
 			delete Msg;
+			
+			if (!ThisPtr->Outgoing.empty() && Written > 0)
+			{
+				lws_callback_on_writable(WSDesc);
+			}
 		}
 		case LWS_CALLBACK_CLIENT_CLOSED:
 		{
@@ -230,6 +244,7 @@ void WS::WSConnection::AddFragment(const void *Data, const size_t DataSize)
 		this->RecvFragment = nullptr;
 
 		this->OnReceiveCallback(this->OnReceiveCallbackUserData, Msg);
+		
 	}
 }
 
@@ -290,6 +305,7 @@ WS::WSConnection::WSConnection(void (*const OnNeedPing)(WS::WSConnection *Conn),
 	Socket(),
 	Thread(),
 	RecvFragment(),
-	ShouldDie()
+	ShouldDie(),
+	ErrorDetected()
 {
 }

@@ -23,7 +23,7 @@ if (NOT MSGPACK_HEADER)
 	message(FATAL_ERROR "msgpack-c was not detected. Only the header files are required for the C++ version, but they're missing.")
 endif()
 
-set(sourcefiles msgpackproc.cpp session.cpp asyncmsgs.cpp asynctosync.cpp native_ws.cpp)
+set(sourcefiles msgpackproc.cpp session.cpp asyncmsgs.cpp asynctosync.cpp subscriptions.cpp native_ws.cpp)
 
 add_library(coyote SHARED ${sourcefiles})
 add_library(coyote_static STATIC ${sourcefiles})

@@ -8,6 +8,8 @@
 
 bool AsyncToSync::SynchronousSession::OnMessageReady(const std::map<std::string, msgpack::object> &Values, WS::WSConnection *Conn, WSMessage *Msg)
 {	
+	assert(Values.count("MsgID"));
+	
 	if (!Values.count("MsgID")) return false;
 	
 	const uint64_t MsgID = Values.at("MsgID").as<uint64_t>();

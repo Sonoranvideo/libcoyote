@@ -19,6 +19,7 @@
 #include "include/internal/asynctosync.h"
 #include "include/internal/asyncmsgs.h"
 #include "include/internal/msgpackproc.h"
+#include "include/internal/subscriptions.h"
 #include "include/statuscodes.h"
 #include "include/datastructures.h"
 #include "include/session.h"
@@ -49,6 +50,8 @@ struct InternalSession
 		{
 			throw Coyote::Session::ConnectionError{};
 		}
+		
+		this->PerformSyncedCommand("SubscribeTC");
 	}
 	
 	inline InternalSession(const std::string &Host = "") : Connection(), Host(Host) { this->ConfigConnection(); }
@@ -73,6 +76,7 @@ bool InternalSession::OnMessageReady(void *ThisPtr, WSMessage *Msg)
 	
 	const bool IsSynchronousMsg = Values.count("MsgID");
 	
+	//const bool Success = IsSynchronousMsg ? Sess->SyncSess.OnMessageReady(Values, Sess->Connection, Msg) : false;
 	const bool Success = IsSynchronousMsg ? Sess->SyncSess.OnMessageReady(Values, Sess->Connection, Msg) : Sess->ASyncSess.OnMessageReady(Values, Sess->Connection, Msg);
 	
 	return Success;
@@ -464,23 +468,15 @@ Coyote::StatusCode Coyote::Session::SeekTo(const int32_t PK, const uint32_t Time
 Coyote::StatusCode Coyote::Session::GetTimeCode(Coyote::TimeCode &Out, const int32_t Timeout)
 {
 	DEF_SESS;
-	
-	Coyote::StatusCode Status{};
-	
-	const std::map<std::string, msgpack::object> Values { MAPARG(Timeout) };
-	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
 
-	const std::map<std::string, msgpack::object> &Msg = SESS.PerformSyncedCommand("GetTimeCode", &Status, Timeout > 0 ? &Pass : nullptr);
+	if (Coyote::TimeCode *const TC = SESS.ASyncSess.SubSession.GetTimeCode())
+	{
+		Out = *TC;
+		delete TC;
+		return Coyote::COYOTE_STATUS_OK;
+	}
 	
-	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
-	
-	Coyote::BaseObject *TCData = MsgpackProc::UnpackCoyoteObject(Msg.at("Data"), typeid(Coyote::TimeCode));
-	
-	std::unique_ptr<Coyote::TimeCode> NewTC { static_cast<Coyote::TimeCode*>(TCData)  };
-	
-	Out = std::move(*NewTC); //Moving is not actually useful for a struct full of POD data types, but it's the thought that counts.
-	
-	return Status;
+	return Coyote::COYOTE_STATUS_FAILED;
 }
 	
 Coyote::StatusCode Coyote::Session::GetAssets(std::vector<Coyote::Asset> &Out, const int32_t Timeout)
