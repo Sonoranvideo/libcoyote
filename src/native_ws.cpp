@@ -1,5 +1,4 @@
 #include <libwebsockets.h>
-#include <arpa/inet.h>
 #include "include/internal/native_ws.h"
 #include "include/internal/common.h"
 

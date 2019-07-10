@@ -9,6 +9,7 @@
 #include <msgpack.hpp>
 #include <mutex>
 #include <pthread.h>
+#include <semaphore.h>
 #include <condition_variable>
 
 #include "native_ws.h"

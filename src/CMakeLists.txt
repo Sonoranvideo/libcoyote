@@ -28,4 +28,10 @@ set(sourcefiles msgpackproc.cpp session.cpp asyncmsgs.cpp asynctosync.cpp subscr
 add_library(coyote SHARED ${sourcefiles})
 add_library(coyote_static STATIC ${sourcefiles})
 
-target_link_libraries(coyote websockets)
+set(EXTRA_LD "")
+
+if (WIN32)
+	set(EXTRA_LD ${EXTRA_LD} -lws2_32)
+endif()
+
+target_link_libraries(coyote websockets ${EXTRA_LD})
