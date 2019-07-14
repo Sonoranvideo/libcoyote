@@ -27,9 +27,7 @@ bool AsyncToSync::SynchronousSession::OnMessageReady(const std::map<std::string,
 	assert(MsgID == Ticket->GetMsgID());
 	
 	Ticket->SetReady(Msg);
-	
-	this->Tickets.erase(MsgID); //Remove it from our queue, but don't deallocate it, because someone else might be waiting on it. That's their responsibility.
-	
+
 	return false;
 }
 

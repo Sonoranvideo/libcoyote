@@ -28,8 +28,8 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=11
-FILE_NAME_0=12562;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fsession.cpp;0;4
+current_page=1
+FILE_NAME_0=2569;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fsession.cpp;0;4
 FILE_NAME_1=1222;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fdatastructures.h;0;4
 FILE_NAME_2=1131;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fcommon.h;0;4
 FILE_NAME_3=795;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Flibcoyote.h;0;4
@@ -41,23 +41,22 @@ FILE_NAME_8=2063;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fmsgpack
 FILE_NAME_9=692;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fmsgpackproc.h;0;4
 FILE_NAME_10=1728;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fnative_ws.h;0;4
 FILE_NAME_11=6146;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fnative_ws.cpp;0;4
-FILE_NAME_12=387;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fasynctosync.cpp;0;4
+FILE_NAME_12=832;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fasynctosync.cpp;0;4
 FILE_NAME_13=797;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fasynctosync.h;0;4
 FILE_NAME_14=706;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fvolition%2Fsrc%2Flibvolition%2Fvlthreads.cpp;0;4
-FILE_NAME_15=3575;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fwsmessages%2Fwsmessages.hpp;0;4
+FILE_NAME_15=3381;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fwsmessages%2Fwsmessages.hpp;0;4
 FILE_NAME_16=1505;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-communicator%2Fsrc%2Fcomponents%2FCoyoteFastServer%2FWebSockets.h;0;4
 FILE_NAME_17=2040;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-communicator%2Fsrc%2Fcomponents%2FCoyoteFastServer%2FWebSockets.cpp;0;4
-FILE_NAME_18=1820;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fbuild%2Ftest.cpp;0;4
-FILE_NAME_19=1917;C++;0;EUTF-8;1;1;0;%2Fusr%2Finclude%2Flibwebsockets%2Flws-timeout-timer.h;0;4
-FILE_NAME_20=14635;C++;0;EUTF-8;1;1;0;%2Fusr%2Finclude%2Flibwebsockets%2Flws-context-vhost.h;0;4
-FILE_NAME_21=92;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-front-panel-ng%2Fsrc%2Fcommon.h;0;4
-FILE_NAME_22=275;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fasyncmsgs.cpp;0;4
-FILE_NAME_23=398;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fasyncmsgs.h;0;4
-FILE_NAME_24=326;C++;0;EUTF-8;1;1;0;%2Fdh%2Flibcoyote%2Fsrc%2Fsubscriptions.cpp;0;4
-FILE_NAME_25=459;C++;0;EUTF-8;1;1;0;%2Fdh%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fsubscriptions.h;0;4
+FILE_NAME_18=1917;C++;0;EUTF-8;1;1;0;%2Fusr%2Finclude%2Flibwebsockets%2Flws-timeout-timer.h;0;4
+FILE_NAME_19=14635;C++;0;EUTF-8;1;1;0;%2Fusr%2Finclude%2Flibwebsockets%2Flws-context-vhost.h;0;4
+FILE_NAME_20=92;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-front-panel-ng%2Fsrc%2Fcommon.h;0;4
+FILE_NAME_21=275;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fasyncmsgs.cpp;0;4
+FILE_NAME_22=398;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fasyncmsgs.h;0;4
+FILE_NAME_23=326;C++;0;EUTF-8;1;1;0;%2Fdh%2Flibcoyote%2Fsrc%2Fsubscriptions.cpp;0;4
+FILE_NAME_24=491;C++;0;EUTF-8;1;1;0;%2Fdh%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fsubscriptions.h;0;4
 
 [VTE]
-last_dir=/home/daniel/coyoterepos/coyote-communicator
+last_dir=/home/ben/cytrepos/coyote-communicator
 
 [build-menu]
 C++FT_00_LB=_Compile

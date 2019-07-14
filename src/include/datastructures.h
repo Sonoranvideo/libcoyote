@@ -37,8 +37,27 @@ namespace Coyote
 		inline std::string GetStdString(void) const { return this->Buffer; }
 		inline CoyoteString(const CoyoteString &Ref) : Buffer(strdup(Ref.Buffer)) {}
 		inline CoyoteString(CoyoteString &&Ref) : Buffer(Ref.Buffer) { Ref.Buffer = nullptr; }
-		inline CoyoteString &operator=(const CoyoteString &Ref) { if (this == &Ref) return *this; this->Buffer = strdup(Ref.Buffer); return *this; }
-		inline CoyoteString &operator=(CoyoteString &&Ref) { if (this == &Ref) return *this; this->Buffer = Ref.Buffer; Ref.Buffer = nullptr; return *this; }
+		inline CoyoteString &operator=(const CoyoteString &Ref)
+		{
+			if (this == &Ref) return *this;
+			
+			free(this->Buffer);
+			
+			this->Buffer = strdup(Ref.Buffer);
+			return *this;
+		}
+
+		inline CoyoteString &operator=(CoyoteString &&Ref)
+		{
+			if (this == &Ref) return *this;
+			
+			free(this->Buffer);
+			
+			this->Buffer = Ref.Buffer;
+			
+			Ref.Buffer = nullptr;
+			return *this;
+		}
 	};
 }
 
