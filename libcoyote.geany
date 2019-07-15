@@ -28,13 +28,13 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=1
-FILE_NAME_0=2569;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fsession.cpp;0;4
+current_page=0
+FILE_NAME_0=6428;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fsession.cpp;0;4
 FILE_NAME_1=1222;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fdatastructures.h;0;4
 FILE_NAME_2=1131;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fcommon.h;0;4
 FILE_NAME_3=795;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Flibcoyote.h;0;4
 FILE_NAME_4=931;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fstatuscodes.h;0;4
-FILE_NAME_5=2509;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fsession.h;0;4
+FILE_NAME_5=3245;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fsession.h;0;4
 FILE_NAME_6=1310;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fdatastructures_c.h;0;4
 FILE_NAME_7=761;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2FCMakeLists.txt;0;4
 FILE_NAME_8=2063;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fmsgpackproc.cpp;0;4

@@ -1,11 +1,15 @@
 cmake_minimum_required(VERSION 2.4)
 project("LibCoyote")
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-	add_compile_options(/std:c++14)
+
+set(EXTRA_CXXFLAGS)
+
+if (DEBUG)
+	add_compile_options(-std=gnu++14 -pedantic -Wall -g3 -O0 -Wno-deprecated-declarations -Wno-unused-function ${EXTRA_CXXFLAGS})
 else()
-	add_compile_options(-std=gnu++14 -pedantic -Wall -g3 -O0 -Wno-deprecated-declarations -Wno-unused-function)
+	add_compile_options(-std=gnu++14 -pedantic -Wall -O3 -Wno-deprecated-declarations -Wno-unused-function -fomit-frame-pointer ${EXTRA_CXXFLAGS})
 endif()
+
 
 find_package(PkgConfig)
 
