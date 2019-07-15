@@ -79,6 +79,8 @@ namespace Coyote
 		StatusCode RebootCoyote(void);
 		StatusCode ShutdownCoyote(void);
 		StatusCode SoftRebootCoyote(void);
+		StatusCode TakeNext(void);
+		StatusCode TakePrev(void);
 		
 		virtual ~Session(void);
 	};

@@ -202,6 +202,28 @@ Coyote::StatusCode Coyote::Session::Take(const int32_t PK)
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::TakeNext(void)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	SESS.PerformSyncedCommand("TakeNext", &Status);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::TakePrev(void)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	SESS.PerformSyncedCommand("TakePrev", &Status);
+	
+	return Status;
+}
+
 Coyote::StatusCode Coyote::Session::Pause(const int32_t PK)
 {
 	DEF_SESS;

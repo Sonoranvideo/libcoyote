@@ -56,7 +56,7 @@ FILE_NAME_23=326;C++;0;EUTF-8;1;1;0;%2Fdh%2Flibcoyote%2Fsrc%2Fsubscriptions.cpp;
 FILE_NAME_24=491;C++;0;EUTF-8;1;1;0;%2Fdh%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fsubscriptions.h;0;4
 
 [VTE]
-last_dir=/home/ben/cytrepos/coyote-communicator
+last_dir=/home/daniel/coyoterepos/coyote-communicator/src/components
 
 [build-menu]
 C++FT_00_LB=_Compile
