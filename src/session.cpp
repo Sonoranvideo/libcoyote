@@ -155,6 +155,7 @@ static const std::map<Coyote::ResolutionMode, std::string> ResolutionMap
 {
 	{ Coyote::COYOTE_RES_1080P, "1080p" },
 	{ Coyote::COYOTE_RES_2160P, "2160p" },
+	{ Coyote::COYOTE_RES_1080I, "1080i" },
 };
 
 Coyote::Session::Session(const std::string &Host) : Internal(new InternalSession{Host})
@@ -640,6 +641,23 @@ Coyote::StatusCode Coyote::Session::GetMediaState(Coyote::MediaState &Out)
 	return Status;
 }
 	
+Coyote::StatusCode Coyote::Session::InitializeCoyote(const Coyote::ResolutionMode Resolution, const Coyote::RefreshMode RefreshRate)
+{
+	DEF_SESS;
+	
+	assert(RefreshMap.count(RefreshRate));
+	assert(ResolutionMap.count(Resolution));
+	
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values { { "Resolution", msgpack::object{ResolutionMap.at(Resolution).c_str()} }, { "Refresh", msgpack::object{RefreshMap.at(RefreshRate).c_str()} } };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
+
+	SESS.PerformSyncedCommand("InitializeCoyote", &Status, &Pass);
+	
+	return Status;
+}
+
 Coyote::StatusCode Coyote::Session::SetHardwareMode(const Coyote::ResolutionMode Resolution, const Coyote::RefreshMode RefreshRate)
 {
 	DEF_SESS;

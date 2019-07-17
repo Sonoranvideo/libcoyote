@@ -23,12 +23,15 @@
 #include <stdbool.h>
 #include "statuscodes.h"
 
+
 #ifndef __cplusplus
 typedef const char *COYOTESTRING;
 typedef enum Coyote_HardwareMode COYOTEHARDWAREMODE;
 #else
+#include "coyotestring.h"
 typedef Coyote::CoyoteString COYOTESTRING;
 typedef Coyote::HardwareMode COYOTEHARDWAREMODE;
+extern "C" {
 #endif
 
 
@@ -107,5 +110,9 @@ struct Coyote_MediaState
 	int32_t NumPresets;
 	int32_t Selected;
 };
+
+#ifdef __cplusplus
+}
+#endif //__cplusplus
 
 #endif //__LIBCOYOTE_DATASTRUCTURES_C_H__

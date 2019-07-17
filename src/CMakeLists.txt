@@ -5,9 +5,9 @@ project("LibCoyote")
 set(EXTRA_CXXFLAGS)
 
 if (DEBUG)
-	add_compile_options(-std=gnu++14 -pedantic -Wall -g3 -O0 -Wno-deprecated-declarations -Wno-unused-function ${EXTRA_CXXFLAGS})
+	add_compile_options(-std=gnu++14 -fPIC -pedantic -Wall -g3 -O0 -Wno-deprecated-declarations -Wno-unused-function ${EXTRA_CXXFLAGS})
 else()
-	add_compile_options(-std=gnu++14 -pedantic -Wall -O3 -Wno-deprecated-declarations -Wno-unused-function -fomit-frame-pointer ${EXTRA_CXXFLAGS})
+	add_compile_options(-std=gnu++14 -fPIC -pedantic -Wall -O3 -Wno-deprecated-declarations -Wno-unused-function -fomit-frame-pointer ${EXTRA_CXXFLAGS})
 endif()
 
 

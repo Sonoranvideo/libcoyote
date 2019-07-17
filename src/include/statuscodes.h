@@ -58,6 +58,7 @@ namespace Coyote
 		COYOTE_RES_INVALID = 0,
 		COYOTE_RES_1080P = 1,
 		COYOTE_RES_2160P = 2,
+		COYOTE_RES_1080I = 3,
 		COYOTE_RES_MAX
 	};
 	

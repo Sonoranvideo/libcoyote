@@ -28,8 +28,8 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=0
-FILE_NAME_0=6428;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fsession.cpp;0;4
+current_page=17
+FILE_NAME_0=5196;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fsession.cpp;0;4
 FILE_NAME_1=1222;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fdatastructures.h;0;4
 FILE_NAME_2=1131;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fcommon.h;0;4
 FILE_NAME_3=795;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Flibcoyote.h;0;4
@@ -54,6 +54,7 @@ FILE_NAME_21=275;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fasyncms
 FILE_NAME_22=398;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fasyncmsgs.h;0;4
 FILE_NAME_23=326;C++;0;EUTF-8;1;1;0;%2Fdh%2Flibcoyote%2Fsrc%2Fsubscriptions.cpp;0;4
 FILE_NAME_24=491;C++;0;EUTF-8;1;1;0;%2Fdh%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fsubscriptions.h;0;4
+FILE_NAME_25=930;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Ftest.cpp;0;4
 
 [VTE]
 last_dir=/home/daniel/coyoterepos/coyote-communicator/src/components

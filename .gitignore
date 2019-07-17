@@ -4,10 +4,12 @@
 **/*.a
 **/*.dll
 **/*.so
+**/*.pyd
 **/*.so.*
 **/Makefile
 **/CMakeCache.txt
 **/.vs
+**/pycoyote.py
 src/build
-build
-
+**/build
+**/__pycache__
