@@ -24,7 +24,7 @@ set_property(SOURCE ${swigspec} PROPERTY CPLUSPLUS ON)
 SWIG_ADD_MODULE(pycoyote python ${swigspec})
 set_source_files_properties({swig_generated_file_fullname} PROPERTIES COMPILE_FLAGS "-I{PYTHON3_INCLUDE_DIRS}")
 
-SWIG_LINK_LIBRARIES(pycoyote ${PYTHON3_LIBRARIES} -lcoyote ${EXTRA_LD})
+SWIG_LINK_LIBRARIES(pycoyote ${PYTHON3_LIBRARIES} -lcoyote -Wl,-R -Wl,. ${EXTRA_LD})
 
 set(EXTRA_LD "")
 
