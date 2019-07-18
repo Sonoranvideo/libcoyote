@@ -3,9 +3,11 @@ project("LibCoyote")
 
 
 set(EXTRA_CXXFLAGS)
+set(EXTRA_LD "")
 
 if (DEBUG)
-	add_compile_options(-std=gnu++14 -fPIC -pedantic -Wall -g3 -O0 -Wno-deprecated-declarations -Wno-unused-function ${EXTRA_CXXFLAGS})
+	add_link_options(-fstack-protector)
+	add_compile_options(-std=gnu++14 -fPIC -pedantic -Wall -g3 -O0 -Wno-deprecated-declarations -Wno-unused-function -fstack-protector ${EXTRA_CXXFLAGS})
 else()
 	add_compile_options(-std=gnu++14 -fPIC -pedantic -Wall -O3 -Wno-deprecated-declarations -Wno-unused-function -fomit-frame-pointer ${EXTRA_CXXFLAGS})
 endif()
@@ -33,7 +35,7 @@ set(sourcefiles msgpackproc.cpp session.cpp asyncmsgs.cpp asynctosync.cpp subscr
 add_library(coyote SHARED ${sourcefiles})
 add_library(coyote_static STATIC ${sourcefiles})
 
-set(EXTRA_LD "")
+
 
 if (WIN32)
 	set(EXTRA_LD ${EXTRA_LD} -lws2_32)
