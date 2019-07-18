@@ -10,11 +10,22 @@ else()
 	add_compile_options(-std=gnu++14 -fPIC -pedantic -Wall -O3 -Wno-deprecated-declarations -Wno-unused-function -fomit-frame-pointer ${EXTRA_CXXFLAGS})
 endif()
 
+
+
 find_package(PkgConfig)
 find_package(SWIG REQUIRED)
 INCLUDE(${SWIG_USE_FILE})
 pkg_check_modules(PYTHON3 REQUIRED python3)
-include_directories(${PYTHON3_INCLUDE_DIRS} "../.." "..")
+if (WIN32)
+
+	set(PYLIBS /c/Coyote/Runtime/Python3/libs/libpython37.a)
+	set(PYHEADERS /c/Coyote/Runtime/Python3/include/)
+else()
+	set(PYLIBS ${PYTHON3_LIBRARIES})
+	set(PYHEADERS ${PYTHON3_INCLUDE_DIRS})
+endif()
+
+include_directories(${PYHEADERS} "../.." "..")
 link_directories("../../build" "../build" ".")
 
 set(swigspec pycoyote.i)
@@ -22,9 +33,9 @@ set(swigspec pycoyote.i)
 set_property(SOURCE ${swigspec} PROPERTY CPLUSPLUS ON)
 
 SWIG_ADD_MODULE(pycoyote python ${swigspec})
-set_source_files_properties({swig_generated_file_fullname} PROPERTIES COMPILE_FLAGS "-I{PYTHON3_INCLUDE_DIRS}")
+set_source_files_properties({swig_generated_file_fullname} PROPERTIES COMPILE_FLAGS "-I{PYHEADERS}")
 
-SWIG_LINK_LIBRARIES(pycoyote ${PYTHON3_LIBRARIES} -lcoyote -Wl,-R -Wl,. ${EXTRA_LD})
+SWIG_LINK_LIBRARIES(pycoyote ${PYLIBS} -lcoyote -Wl,-R -Wl,. ${EXTRA_LD})
 
 set(EXTRA_LD "")
 
