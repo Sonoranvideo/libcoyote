@@ -1,5 +1,5 @@
 //We have such sights to show you.
-
+#include "include/internal/wsmessages/wsmessages.hpp"
 #include "include/internal/common.h"
 #include "include/internal/asynctosync.h"
 #include "include/internal/msgpackproc.h"

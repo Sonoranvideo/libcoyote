@@ -5,8 +5,8 @@ project("pycoyote")
 set(EXTRA_CXXFLAGS)
 
 if (DEBUG)
-	add_link_options(-fstack-protector)
-	add_compile_options(-std=gnu++14 -fPIC -pedantic -Wall -g3 -O0 -Wno-deprecated-declarations -Wno-unused-function -fstack-protector ${EXTRA_CXXFLAGS})
+	add_link_options(-fstack-protector-all)
+	add_compile_options(-std=gnu++14 -fPIC -pedantic -Wall -Wextra -g3 -O0 -Wno-deprecated-declarations -Wno-unused-function -fno-omit-frame-pointer -fstack-protector-all ${EXTRA_CXXFLAGS})
 else()
 	add_compile_options(-std=gnu++14 -fPIC -pedantic -Wall -O3 -Wno-deprecated-declarations -Wno-unused-function -fomit-frame-pointer ${EXTRA_CXXFLAGS})
 endif()
@@ -16,27 +16,29 @@ endif()
 find_package(PkgConfig)
 find_package(SWIG REQUIRED)
 INCLUDE(${SWIG_USE_FILE})
-pkg_check_modules(PYTHON3 REQUIRED python3)
-if (WIN32)
 
-	set(PYLIBS /c/Coyote/Runtime/Python3/libs/libpython37.a)
+
+if (WIN32)
+	set(PYLIBDIR /c/Coyote/Runtime/Python3/)
 	set(PYHEADERS /c/Coyote/Runtime/Python3/include/)
 else()
-	set(PYLIBS ${PYTHON3_LIBRARIES})
+	pkg_check_modules(PYTHON3 REQUIRED python3)
+	set(PYLIBDIR ${PYTHON3_LIBRARY_DIRS})
 	set(PYHEADERS ${PYTHON3_INCLUDE_DIRS})
 endif()
 
 include_directories(${PYHEADERS} "../.." "..")
-link_directories("../../build" "../build" ".")
+link_directories("../../build" "../build" "." ${PYLIBDIR})
 
 set(swigspec pycoyote.i)
 
 set_property(SOURCE ${swigspec} PROPERTY CPLUSPLUS ON)
+set_property(SOURCE ${swigspec} PROPERTY SWIG_FLAGS "-py3;-nofastunpack;-threads;-castmode")
 
 SWIG_ADD_MODULE(pycoyote python ${swigspec})
 set_source_files_properties({swig_generated_file_fullname} PROPERTIES COMPILE_FLAGS "-I{PYHEADERS}")
 
-SWIG_LINK_LIBRARIES(pycoyote ${PYLIBS} -lcoyote -Wl,-R -Wl,. ${EXTRA_LD})
+SWIG_LINK_LIBRARIES(pycoyote -L${PYLIBDIR} -lpython37 -lcoyote -Wl,-R -Wl,. ${EXTRA_LD})
 
 set(EXTRA_LD "")
 

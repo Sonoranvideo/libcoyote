@@ -28,13 +28,13 @@
 
 %extend Coyote::CoyoteString
 {
-	const char *__str__(void)
+	PyObject *__str__(void)
 	{
-		return $self->GetCString();
+		return PyUnicode_DecodeUTF8($self->GetCString(), $self->GetStdString().length(), nullptr);
 	}
-	const char *__repr__(void)
+	PyObject *__repr__(void)
 	{
-		return $self->GetCString();
+		return PyUnicode_DecodeUTF8($self->GetCString(), $self->GetStdString().length(), nullptr);
 	}	
 };
 

@@ -28,15 +28,15 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=11
+current_page=5
 FILE_NAME_0=7118;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fsession.cpp;0;4
 FILE_NAME_1=2161;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fdatastructures.h;0;4
 FILE_NAME_2=1131;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fcommon.h;0;4
 FILE_NAME_3=795;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Flibcoyote.h;0;4
 FILE_NAME_4=969;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fstatuscodes.h;0;4
-FILE_NAME_5=1597;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fsession.h;0;4
+FILE_NAME_5=1946;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fsession.h;0;4
 FILE_NAME_6=918;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fdatastructures_c.h;0;4
-FILE_NAME_7=460;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2FCMakeLists.txt;0;4
+FILE_NAME_7=202;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2FCMakeLists.txt;0;4
 FILE_NAME_8=2063;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fmsgpackproc.cpp;0;4
 FILE_NAME_9=692;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fmsgpackproc.h;0;4
 FILE_NAME_10=1728;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fnative_ws.h;0;4
@@ -54,9 +54,9 @@ FILE_NAME_21=275;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Fasyncms
 FILE_NAME_22=398;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fasyncmsgs.h;0;4
 FILE_NAME_23=326;C++;0;EUTF-8;1;1;0;%2Fdh%2Flibcoyote%2Fsrc%2Fsubscriptions.cpp;0;4
 FILE_NAME_24=491;C++;0;EUTF-8;1;1;0;%2Fdh%2Flibcoyote%2Fsrc%2Finclude%2Finternal%2Fsubscriptions.h;0;4
-FILE_NAME_25=942;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fpycoyote%2FCMakeLists.txt;0;4
+FILE_NAME_25=240;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fpycoyote%2FCMakeLists.txt;0;4
 FILE_NAME_26=695;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Flibcoyote%2Fsrc%2Finclude%2Fcoyotestring.h;0;4
-FILE_NAME_27=886;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fpycoyote%2Fpycoyote.i;0;4
+FILE_NAME_27=766;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fpycoyote%2Fpycoyote.i;0;4
 FILE_NAME_28=1384;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-communicator%2Fsrc%2Fcomponents%2FCoyoteFastServer%2FCMakeLists.txt;0;4
 FILE_NAME_29=905;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-front-panel-ng%2Fsrc%2FCMakeLists.txt;0;4
 

@@ -1,3 +1,4 @@
+#include "include/internal/wsmessages/wsmessages.hpp"
 #include "include/internal/asyncmsgs.h"
 #include "include/internal/msgpackproc.h"
 #include "include/internal/subscriptions.h"

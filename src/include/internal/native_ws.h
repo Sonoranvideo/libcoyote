@@ -1,13 +1,14 @@
 #ifndef __LIBCOYOTE_NATIVE_WS_H__
 #define __LIBCOYOTE_NATIVE_WS_H__
 
+#include "wsmessages/wsmessages.hpp"
+
 #include "common.h"
 #include <thread>
 #include <atomic>
 #include <mutex>
 #include <libwebsockets.h>
 
-#include "wsmessages/wsmessages.hpp"
 
 #define EYEBLEED_NOW_MS() (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count())
 

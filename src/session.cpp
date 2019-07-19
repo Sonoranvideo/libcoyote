@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-
+#include "include/internal/wsmessages/wsmessages.hpp"
 #include "include/internal/common.h"
 #include "include/internal/native_ws.h"
 #include "include/internal/asynctosync.h"
@@ -41,17 +41,19 @@ struct InternalSession
 	
 	static bool OnMessageReady(void *ThisPtr, WSMessage *Msg);
 	static void OnNeedPing(WS::WSConnection *Conn);
-	inline void ConfigConnection(void)
+	inline bool ConfigConnection(void)
 	{
 		delete this->Connection;
 		this->Connection = new WS::WSConnection(this->OnNeedPing, this->OnMessageReady, this);
 		
 		if (!this->Connection->Connect(this->Host))
 		{
-			throw Coyote::Session::ConnectionError{};
+			return false;
 		}
 		
 		this->PerformSyncedCommand("SubscribeTC");
+		
+		return true;
 	}
 	
 	inline InternalSession(const std::string &Host = "") : Connection(), Host(Host) { this->ConfigConnection(); }
