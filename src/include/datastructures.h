@@ -47,6 +47,7 @@ namespace Coyote
 	
 	struct Output : public BaseObject, public Coyote_Output
 	{
+		Output(void) : Coyote_Output() { }
 	};
 	
 	struct Preset : public BaseObject, public Coyote_Preset
@@ -68,10 +69,12 @@ namespace Coyote
 	
 	struct HardwareState : public BaseObject, public Coyote_HardwareState
 	{
+		HardwareState(void) : Coyote_HardwareState() { }
 	};
 	
 	struct NetworkInfo : public BaseObject, public Coyote_NetworkInfo
 	{
+		NetworkInfo(void) : Coyote_NetworkInfo() { }
 	};
 
 	struct MediaState : public BaseObject, public Coyote_MediaState
@@ -86,7 +89,6 @@ namespace Coyote
 			this->Coyote_MediaState::PausedPresets = this->PausedPresets.data();
 			this->Coyote_MediaState::Time = &this->Time;
 		}
-		
 	};
 }
 #endif //__LIBCOYOTE_DATASTRUCTURES_H__

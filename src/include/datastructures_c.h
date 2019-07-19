@@ -40,6 +40,8 @@ struct Coyote_TimeCode
 	double ScrubBar;
 	uint32_t Time;
 	uint32_t TRT;
+	uint32_t PresetKey;
+	bool Selected : 1;
 };
 
 struct Coyote_Asset
@@ -70,6 +72,8 @@ struct Coyote_Preset
 	COYOTESTRING Layout;
 	COYOTESTRING Notes;
 	COYOTESTRING Color;
+	COYOTESTRING timeCodeUpdate;
+	COYOTESTRING tcColor;
 	struct Coyote_Output *Output1;
 	struct Coyote_Output *Output2;
 	struct Coyote_Output *Output3;
@@ -82,9 +86,13 @@ struct Coyote_Preset
 	int32_t Fade;
 	int32_t LeftVolume;
 	int32_t RightVolume;
+	int32_t ScrubberPosition;
+	int32_t InPosition;
+	int32_t OutPosition;
 	bool IsPlaying : 1;
 	bool IsPaused : 1;
 	bool Selected : 1;
+	bool VolumeLinked : 1;
 };
 
 struct Coyote_HardwareState
@@ -92,7 +100,7 @@ struct Coyote_HardwareState
 	COYOTESTRING Resolution;
 	COYOTESTRING RefreshRate;
 	COYOTEHARDWAREMODE CurrentMode;
-	bool SupportsS12G;
+	bool SupportsS12G : 1;
 };
 
 struct Coyote_NetworkInfo

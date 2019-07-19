@@ -115,6 +115,8 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			{ "TRT", msgpack::object{ TCObj->TRT } },
 			{ "Time", msgpack::object{ TCObj->Time } },
 			{ "ScrubBar", msgpack::object{ TCObj->ScrubBar } },
+			{ "Selected", msgpack::object{ TCObj->Selected } },
+			{ "PresetKey", msgpack::object{ TCObj->PresetKey } },
 		};
 	}
 	else if (OurType == typeid(Coyote::MediaState))
@@ -184,6 +186,13 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			{ "IsPlaying", msgpack::object{ PresetObj->IsPlaying } },
 			{ "IsPaused", msgpack::object{ PresetObj->IsPaused } },
 			{ "Selected", msgpack::object{ PresetObj->Selected } },
+			{ "ScrubberPosition", msgpack::object{ PresetObj->ScrubberPosition } },
+			{ "InPosition", msgpack::object{ PresetObj->InPosition } },
+			{ "OutPosition", msgpack::object{ PresetObj->OutPosition } },
+			{ "VolumeLinked", msgpack::object{ PresetObj->VolumeLinked } },
+			{ "timeCodeUpdate", msgpack::object{ PresetObj->timeCodeUpdate.GetCString() } },
+			{ "tcColor", msgpack::object{ PresetObj->tcColor.GetCString() } },
+				
 		};
 	}
 
@@ -229,7 +238,7 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		AssetObj->FileName = Fields["FileName"].as<std::string>();
 		AssetObj->NewFileName = Fields["NewFileName"].as<std::string>();
 		AssetObj->CopyPercentage = Fields["CopyPercentage"].as<uint32_t>(); //Because idk if msgpack treats uint8_t like a character or a number
-		AssetObj->IsReady = Fields["CopyPercentage"].as<int>();
+		AssetObj->IsReady = Fields["IsReady"].as<int>();
 	}
 	else if (Expected == typeid(Coyote::TimeCode))
 	{
@@ -239,6 +248,8 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		TCObj->TRT = Fields["TRT"].as<uint32_t>();
 		TCObj->Time = Fields["Time"].as<uint32_t>();
 		TCObj->ScrubBar = Fields["ScrubBar"].as<double>();
+		TCObj->Selected = Fields["Selected"].as<int>();
+		TCObj->PresetKey = Fields["PresetKey"].as<uint32_t>();
 	}
 	else if (Expected == typeid(Coyote::Preset))
 	{
@@ -260,6 +271,12 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		PresetObj->IsPlaying = Fields["IsPlaying"].as<int>();
 		PresetObj->IsPaused = Fields["IsPaused"].as<int>();
 		PresetObj->Selected = Fields["Selected"].as<int>();
+		PresetObj->ScrubberPosition = Fields["ScrubberPosition"].as<int32_t>();
+		PresetObj->InPosition = Fields["InPosition"].as<int32_t>();
+		PresetObj->OutPosition = Fields["OutPosition"].as<int32_t>();
+		PresetObj->VolumeLinked = Fields["VolumeLinked"].as<int>();
+		PresetObj->timeCodeUpdate = Fields["timeCodeUpdate"].as<std::string>();
+		PresetObj->tcColor = Fields["tcColor"].as<std::string>();
 	}
 	else if (Expected == typeid(Coyote::HardwareState))
 	{
