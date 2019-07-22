@@ -30,11 +30,11 @@
 {
 	PyObject *__str__(void)
 	{
-		return PyUnicode_DecodeUTF8($self->GetCString(), $self->GetStdString().length(), nullptr);
+		return PyUnicode_DecodeUTF8($self->GetStdString().c_str(), $self->GetStdString().length(), nullptr);
 	}
 	PyObject *__repr__(void)
 	{
-		return PyUnicode_DecodeUTF8($self->GetCString(), $self->GetStdString().length(), nullptr);
+		return PyUnicode_DecodeUTF8($self->GetStdString().c_str(), $self->GetStdString().length(), nullptr);
 	}	
 };
 

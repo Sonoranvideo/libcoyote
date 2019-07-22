@@ -23,6 +23,7 @@
 #include <string>
 #include <stdint.h>
 #include <vector>
+#include "macros.h"
 #include "statuscodes.h"
 #include "datastructures.h"
 

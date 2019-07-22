@@ -13,7 +13,12 @@ namespace Coyote
 	public:
 		inline CoyoteString(const char *String = "") : Buffer((char*)calloc(strlen(String) + 1, 1)) { strcpy(this->Buffer, String); }
 		inline CoyoteString(const std::string &String) : CoyoteString(String.c_str()) {}
-		inline ~CoyoteString(void) { free(this->Buffer); }
+		inline ~CoyoteString(void)
+		{
+			free(this->Buffer);
+			this->Buffer = nullptr; //Increases the likelihood of catching a use-after-free
+		}
+		
 		inline operator const char*(void) const { return this->Buffer; }
 		inline operator std::string(void) const { return this->Buffer; }
 		inline const char *GetCString(void) const { return this->Buffer; }
