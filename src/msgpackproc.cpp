@@ -16,7 +16,7 @@
 static bool HasValidIncomingHeaders(const std::map<std::string, msgpack::object> &Values);
 static bool IsSubscriptionEvent(const std::map<std::string, msgpack::object> &Values);
 
-thread_local msgpack::zone MsgpackProc::Zone;
+thread_local msgpack::zone &MsgpackProc::Zone = *new msgpack::zone; //I don't want this on the stack because I don't trust it.
 
 //Definitions
 void MsgpackProc::InitOutgoingMsg(msgpack::packer<msgpack::sbuffer> &Pack, const std::string &CommandName, const uint64_t MsgID, const msgpack::object *Values)
@@ -219,7 +219,6 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 	{
 		Result = new Coyote::Output{};
 		Coyote::Output *OutputObj = static_cast<Coyote::Output*>(Result);
-		
 		OutputObj->Filename = Fields["Filename"].as<std::string>();
 		OutputObj->Hue = Fields["Hue"].as<int32_t>();
 		OutputObj->Saturation = Fields["Saturation"].as<int32_t>();
@@ -277,6 +276,13 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		PresetObj->VolumeLinked = Fields["VolumeLinked"].as<int>();
 		PresetObj->timeCodeUpdate = Fields["timeCodeUpdate"].as<std::string>();
 		PresetObj->tcColor = Fields["tcColor"].as<std::string>();
+		
+		//We have such sights to show you.
+		PresetObj->Output1 = *std::unique_ptr<Coyote::Output>(static_cast<Coyote::Output*>(UnpackCoyoteObject(Fields["Output1"], typeid(Coyote::Output))));
+		PresetObj->Output2 = *std::unique_ptr<Coyote::Output>(static_cast<Coyote::Output*>(UnpackCoyoteObject(Fields["Output2"], typeid(Coyote::Output))));
+		PresetObj->Output3 = *std::unique_ptr<Coyote::Output>(static_cast<Coyote::Output*>(UnpackCoyoteObject(Fields["Output3"], typeid(Coyote::Output))));
+		PresetObj->Output4 = *std::unique_ptr<Coyote::Output>(static_cast<Coyote::Output*>(UnpackCoyoteObject(Fields["Output4"], typeid(Coyote::Output))));
+
 	}
 	else if (Expected == typeid(Coyote::HardwareState))
 	{

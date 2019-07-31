@@ -40,7 +40,7 @@ namespace Coyote
 
 	enum HardwareMode
 #else
-	enum Coyote_HardwareMode
+	enum CoyoteHardwareMode
 #endif //__cplusplus
 	{
 		COYOTE_MODE_INVALID = -1,
@@ -53,7 +53,7 @@ namespace Coyote
 	enum ResolutionMode
 #else
 	enum CoyoteResolutionMode
-#endif
+#endif //__cplusplus
 	{
 		COYOTE_RES_INVALID = 0,
 		COYOTE_RES_1080P = 1,
@@ -66,7 +66,7 @@ namespace Coyote
 	enum RefreshMode
 #else
 	enum CoyoteRefreshMode
-#endif
+#endif //__cplusplus
 	{
 		COYOTE_REFRESH_INVALID 	= 0,
 		COYOTE_REFRESH_23_98 	= 1,
@@ -79,9 +79,14 @@ namespace Coyote
 		COYOTE_REFRESH_60 		= 8,
 		COYOTE_REFRESH_MAX
 	};
-#ifdef __cplusplus
+#ifndef __cplusplus
+	typedef enum CoyoteResolutionMode CoyoteResolutionMode;
+	typedef enum CoyoteRefreshMode CoyoteRefreshMode;
+	typedef enum CoyoteHardwareMode CoyoteHardwareMode;
+	typedef enum CoyoteStatusCode CoyoteStatusCode;
+#else
 }
+#endif // !__cplusplus
 
-#endif //__cplusplus
 
 #endif //__LIBCOYOTE_STATUSCODES_H__

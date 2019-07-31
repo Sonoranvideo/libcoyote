@@ -9,7 +9,7 @@
 
 namespace MsgpackProc
 {
-	extern thread_local msgpack::zone Zone; //This should stay at the top here, or close to it
+	extern thread_local msgpack::zone &Zone; //This should stay at the top here, or close to it
 
 	msgpack::object PackCoyoteObject(const Coyote::BaseObject *Object, msgpack::packer<msgpack::sbuffer> *Pack = nullptr);
 	Coyote::BaseObject *UnpackCoyoteObject(const msgpack::object &Object, const std::type_info &Expected);

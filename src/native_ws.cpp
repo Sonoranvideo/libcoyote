@@ -1,7 +1,10 @@
-#include <libwebsockets.h>
-#include "include/internal/native_ws.h"
+#include <QtWebSockets>
+#include <QCoreApplication>
+#include <moc_native_ws.cpp>
 #include "include/internal/common.h"
-
+#include "include/internal/msgpackproc.h"
+#include <msgpack.hpp>
+#define qs2cs(s) (s.toUtf8().constData()) //Irritating enough to type without caps
 
 /**
  * By the time you are done with this code, you will have developed a deep, seething hatred for WebSockets, libwebsockets, and forced asynchronous network programming.
@@ -11,70 +14,247 @@
 #define PRE_WS_END LWS_SEND_BUFFER_POST_PADDING
 #define PRE_WS_SIZE (PRE_WS_START + PRE_WS_END)
 
+//Fake argv/argc for Qt
+static int argc = 1;
+
+static char **argv1 = new char* { (char*)"libcoyote" };
+
 //Prototypes
 
 //Globals
-const struct lws_protocols WS::WSConnection::WSProtocols[] = { { "", WS::WSConnection::WSCallback, 0, 0}, { } };
+std::atomic<WS::WSCore *> WS::WSCore::Instance;
+std::atomic<std::thread *> WS::WSCore::Thread;
+QCoreApplication *WS::WSCore::AppObject;
 
 //Implementations
 
-
-bool WS::WSConnection::InitThreadClient(void)
+WS::WSCore::WSCore(bool (*const OnReceiveCallback)(WSConnection*, WSMessage*))
+	: RecvCallback(OnReceiveCallback) //Might be null
 {
+}
+
+void WS::WSConnection::SendPing(void)
+{
+	msgpack::sbuffer Buffer;
+	msgpack::packer<msgpack::sbuffer> Pack { Buffer };
+	
+	MsgpackProc::InitOutgoingMsg(Pack, "Ping");
+	
+	this->Send(new WSMessage(Buffer.data(), Buffer.size()));
+}
+
+void WS::WSConnection::ProcessOutgoingMsgs(void)
+{
+	std::unique_lock<std::mutex> OGuard { this->OMutex };
+
+	while (!this->Outgoing.empty())
+	{
+		WSMessage *Msg = this->Outgoing.front();
+		
+		OGuard.unlock();
+		
+		const int MsgSize = Msg->GetRemainingSize() + sizeof(uint32_t);
+		int Written = 0, TotalWritten = 0;
+		
+		uint8_t *DataHead = Msg->GetSeekedBody() - sizeof(uint32_t);
+		do
+		{
+			try
+			{
+				Written = this->WebSocket->sendBinaryMessage(QByteArray((const char*)DataHead, MsgSize - TotalWritten));
+			}
+			catch(...)
+			{
+				Written = -1;
+			}
+			
+			if (Written <= 0) continue;
+			
+			this->RegisterActivity(); //Write call didn't fail, so we can count this as a win.
+			
+			TotalWritten += Written;
+			DataHead += Written;
+		} while (MsgSize > TotalWritten && Written != -1);
+		
+		
+		if (Written != -1 && TotalWritten < MsgSize)
+		{ //Only partially transmitted
+			Msg->RawSeekForward(TotalWritten);
+			break;
+		}
+		
+		//Problems.
+		if (Written == -1)
+		{
+			this->ErrorDetected = true;
+			break;
+		}
+		
+		OGuard.lock();
+		//We made it.
+		this->Outgoing.pop();
+		delete Msg;
+	}
+}
+void WS::WSCore::ProcessAllOutgoing(void)
+{
+	std::unique_lock<std::mutex> Guard { this->ConnectionsLock };
+	
+	for (WSConnection *Connection : this->Connections)
+	{
+		if (Connection->HasError()) continue;
+		
+		Connection->ProcessOutgoingMsgs();
+	}
+}
+
+void WS::WSCore::MainLoopBody(void)
+{
+	this->ProcessNewConnections();
+	this->ProcessAllOutgoing();
+	this->CheckConnections();
+}
+
+void WS::WSCore::CheckConnections(void)
+{
+	const std::lock_guard<std::mutex> Guard { this->ConnectionsLock };
+	
+Rescan:
+	for (auto Iter = this->Connections.begin(); Iter != this->Connections.end(); ++Iter)
+	{
+		WSConnection *Connection = *Iter;
+		
+		if (Connection->HasError() || Connection->CheckPingout())
+		{
+			std::cout << "LibCoyote: Detected dead connection, pruning" << std::endl;
+			this->Connections.erase(Iter);
+			goto Rescan;
+		}
+		
+		if (Connection->NeedsPing()) Connection->SendPing();
+	}
+}
+
+void WS::WSCore::ProcessNewConnections(void)
+{
+	const std::lock_guard<std::mutex> Guard { this->ConnectionQueueLock };
+	
+	while (!this->ConnectionQueue.empty())
+	{
+		MTEvent<ConnStruct> *Event = this->ConnectionQueue.front();
+		
+		const ConnStruct *Struct = Event->Peek();
+		
+		WSConnection *Conn = new WSConnection(this->RecvCallback, Struct->UserData);
+		Conn->EstablishConnection(Struct->URI);
+		
+		std::unique_lock<std::mutex> G { this->ConnectionsLock };
+		
+		this->Connections.push_back(Conn);
+
+		Event->Post(ConnStruct { Struct->URI, Struct->UserData, Conn });
+		
+		this->ConnectionQueue.pop();
+	}
+}
+
+void WS::WSCore::InitThread(bool (*const OnReceiveCallback)(WSConnection*, WSMessage*))
+{
+	WSCore::Instance = new WSCore { OnReceiveCallback };
+	WSCore *Ptr = Instance;
+	
+	Ptr->MasterThread();
+}
+
+void WS::WSCore::MasterThread(void)
+{
+	this->EventLoop = new QEventLoop;
+
+	QTimer *LoopTimer = new QTimer;
+	
+	LoopTimer->connect(LoopTimer, &QTimer::timeout, this, &WSCore::MainLoopBody);
+	LoopTimer->start(10);
+	
+	
+	this->EventLoop->exec();
+}
+
+WS::WSConnection *WS::WSCore::NewConnection(const std::string &Host, void *UserData)
+{ //Called by the user side.
+	WSCore::ConnStruct Val{ Host, UserData };
+	
+	std::unique_lock<std::mutex> Guard { this->ConnectionQueueLock };
+	
+	MTEvent<WSCore::ConnStruct> *Event { new MTEvent<WSCore::ConnStruct> { &Val } };
+	
+	this->ConnectionQueue.push(Event);
+	
+	Guard.unlock();
+	
+	while (!Event->Wait(Val, 10));
+	
+	delete Event;
+	
+	return Val.Out;
+}
+
+void WS::WSConnection::OnConnected(void)
+{
+	this->RegisterActivity();
+	this->ProcessOutgoingMsgs();
+}
+
+void WS::WSConnection::OnRecv(const QByteArray &Data)
+{
+	this->RegisterActivity();
+	
+	//Yay, an excuse to send outgoing messages.
+	this->ProcessOutgoingMsgs();
+	
+	WSMessage *Msg = this->AddFragment(Data.data(), Data.size());
+	
+	if (!Msg) return;
+	
+	this->OnReceiveCallback(this, Msg);
+}
+
+bool WS::WSConnection::EstablishConnection(const std::string &Host)
+{
+	this->Host = Host;
+	
 	this->ClearError();
 
-	//Bring up the socket.
-	for (uint8_t Attempts = 3; Attempts && !this->Socket; --Attempts)
+	this->WebSocket.reset(new QWebSocket);
+	
+	const QString URL { QString("ws://") + this->Host.c_str() + ":" + QString::number(WS::PortNum) + "/" };
+	
+	//Set the error flag if we lose our connection.
+	this->WebSocket->connect(this->WebSocket.get(), QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), [this] (QAbstractSocket::SocketError) { this->ErrorDetected = true; });
+	
+	try
 	{
-		struct lws_client_connect_info ConnectInfo{};
-		
-		ConnectInfo.context = this->Ctx;
-		ConnectInfo.address = this->Host.c_str();
-		ConnectInfo.port = WS::PortNum;
-		ConnectInfo.path = "/";
-		ConnectInfo.host = lws_canonical_hostname(this->Ctx);
-		ConnectInfo.origin = this->Host.c_str();
-		ConnectInfo.protocol = this->WSProtocols->name;
-		ConnectInfo.userdata = this;
-		
-		this->Socket = lws_client_connect_via_info(&ConnectInfo);
+		this->WebSocket->open(URL);
 	}
-
-	if (!this->Socket) return false;
-	
-	this->RegisterActivity(); //Do it once so we know we're reconnected
-
-	return true;
-}
-	
-void WS::WSConnection::ThreadFunc(void)
-{
-	this->InitWebSockets();
-	
-	this->InitThreadClient();
-	
-	while (!this->ShouldDie)
+	catch (const QAbstractSocket::SocketError &ErrType)
 	{
-		lws_service(this->Ctx, 1);
-		
-		if (this->HasError() || this->CheckPingout())
-		{
-			std::cerr << "LibCoyote: THREAD DYING for connection " << (void*)this << ", error detected.\n";
-			this->ErrorDetected = true;
-			return;
-		}
+		this->ErrorDetected = true;
+		return false;
+	}
 	
-		if (this->NeedsPing()) this->OnNeedPing(this);
-		
-		std::unique_lock<std::mutex> G { this->OMutex };
-		
-		if (!this->Outgoing.empty())
-		{
-			G.unlock();
-			lws_callback_on_writable_all_protocol(this->Ctx, WSProtocols);
-		}
+	//Bring up the socket.
+	
+	this->connect(this->WebSocket.get(), &QWebSocket::binaryMessageReceived, this, &WSConnection::OnRecv);
+	
+	QEventLoop Waiter;
+	
+	this->connect(this->WebSocket.get(), &QWebSocket::connected, this,  [this, &Waiter] { this->OnConnected(); Waiter.quit(); });
 
-	}	
+	std::cout << "LibCoyote: Attempting to establish a new connection to " << qs2cs(URL) << std::endl;
+	Waiter.exec();
+	
+	std::cout << "LibCoyote: Connection established." << std::endl;
+	
+	return true;
 }
 
 bool WS::WSConnection::CheckPingout(void) const
@@ -87,149 +267,11 @@ bool WS::WSConnection::NeedsPing(void) const
 	return EYEBLEED_NOW_MS() - this->LastPingMS > PingInterval;
 }
 
-bool WS::WSConnection::InitWebSockets(void)
-{
-	static bool LogConfigured;
-	
-	if (!LogConfigured)
-	{
-		lws_set_log_level(0, nullptr);
-		LogConfigured = true;
-	}
-	
-	if (this->Ctx) lws_context_destroy(this->Ctx);
-
-	struct lws_context_creation_info CtxInfo{};
-
-	CtxInfo.port = CONTEXT_PORT_NO_LISTEN;
-	CtxInfo.protocols = WSProtocols;
-	CtxInfo.gid = -1;
-	CtxInfo.uid = -1;
-	CtxInfo.ka_time = 10;
-	CtxInfo.ka_interval = 2;
-	CtxInfo.ka_probes = 2;
-	CtxInfo.timeout_secs = 2;
-	
-	this->Ctx = lws_create_context(&CtxInfo);
-	
-	return (bool)this->Ctx;
-}
-
-bool WS::WSConnection::Connect(const std::string &Host)
-{
-	if (this->Thread)
-	{
-		this->ShouldDie = true;
-		this->Thread->join();
-		this->ShouldDie = false;
-		delete this->Thread;
-	}
-	
-	this->Host = Host;
-		
-	this->Thread = new std::thread(&WS::WSConnection::ThreadFunc, this);
-	
-	return true;
-}
-	
-int WS::WSConnection::WSCallback(struct lws *WSDesc, const enum lws_callback_reasons Reason, void *UserData, void *Data, const size_t DataLength)
-{
-	WSConnection *ThisPtr = static_cast<WSConnection*>(UserData);
-	
-	switch (Reason)
-	{
-		case LWS_CALLBACK_CLIENT_ESTABLISHED:
-			ThisPtr->Socket = WSDesc;
-			lws_callback_on_writable(WSDesc);
-			break;
-		case LWS_CALLBACK_RECEIVE:
-		case LWS_CALLBACK_CLIENT_RECEIVE:
-		{
-			ThisPtr->RegisterActivity();
-			ThisPtr->AddFragment(Data, DataLength);
-			
-			lws_callback_on_writable(WSDesc);
-
-			break;
-		}
-		case LWS_CALLBACK_CLIENT_WRITEABLE:
-		{
-			std::unique_lock<std::mutex> Guard { ThisPtr->OMutex };
-			
-			if (ThisPtr->Outgoing.empty())
-			{
-				break; //Nothing to do.
-			}
-			
-			WSMessage *Msg = ThisPtr->Outgoing.front();
-			
-			Guard.unlock();
-			
-			const int MsgSize = Msg->GetRemainingSize() + sizeof(uint32_t);
-			int Written = 0, TotalWritten = 0;
-			
-			uint8_t *DataHead = Msg->GetSeekedBody() - sizeof(uint32_t);
-			
-			do
-			{
-				Written = lws_write(WSDesc, DataHead, MsgSize - TotalWritten, LWS_WRITE_BINARY);
-				
-				if (Written <= 0) continue;
-				
-				ThisPtr->RegisterActivity(); //Write call didn't fail, so we can count this as a win.
-				
-				TotalWritten += Written;
-				DataHead += Written;
-			} while (MsgSize > TotalWritten && Written != -1);
-			
-			
-			if (Written != -1 && TotalWritten < MsgSize)
-			{ //Only partially transmitted
-				Msg->RawSeekForward(TotalWritten);
-				break;
-			}
-			
-			//Problems.
-			if (Written == -1)
-			{
-				ThisPtr->ErrorDetected = true;
-				break;
-			}
-			
-			Guard.lock();
-			//We made it.
-			ThisPtr->Outgoing.pop();
-			delete Msg;
-			
-			if (!ThisPtr->Outgoing.empty() && Written > 0)
-			{
-				lws_callback_on_writable(WSDesc);
-			}
-		}
-		case LWS_CALLBACK_CLIENT_CLOSED:
-		{
-			ThisPtr->Socket = nullptr;
-			break;
-		}
-		case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
-		{
-			ThisPtr->ErrorDetected = true;
-			lwsl_err("CLIENT_CONNECTION_ERROR: %s\n",
-												Data ? (const char*)Data : "No info");
-			break;
-		}
-		default:
-			break;
-	}
-	
-	return 0;
-}
-
-void WS::WSConnection::AddFragment(const void *Data, const size_t DataSize)
+WSMessage *WS::WSConnection::AddFragment(const void *Data, const size_t DataSize)
 {
 	if (!this->RecvFragment)
 	{
-		this->RecvFragment = new WSMessage::Fragment(Data, DataSize);
+		this->RecvFragment.reset(new WSMessage::Fragment(Data, DataSize));
 	}
 	else
 	{
@@ -239,36 +281,20 @@ void WS::WSConnection::AddFragment(const void *Data, const size_t DataSize)
 	if (this->RecvFragment->IsComplete())
 	{
 		WSMessage *Msg = this->RecvFragment->Graduate();
-		delete this->RecvFragment;
-		this->RecvFragment = nullptr;
+		this->RecvFragment.reset();
 
-		this->OnReceiveCallback(this->OnReceiveCallbackUserData, Msg);
-		
+		return Msg;
 	}
+	
+	return nullptr;
 }
 
-void WS::WSConnection::KillThread(void)
-{
-	if (!this->Thread) return;
-	
-	this->ShouldDie = true;
-	this->Thread->join();
-	this->ShouldDie = false;
-	
-	delete this->Thread;
-	this->Thread = nullptr;
-}
-	
 void WS::WSConnection::Shutdown(void)
 {
-	this->KillThread();
-	
-	if (this->RecvFragment)
+	if (this->WebSocket)
 	{
-		delete this->RecvFragment;
-		this->RecvFragment = nullptr;
+		this->WebSocket->close();
 	}
-	
 	
 	std::lock_guard<std::mutex> OGuard { this->OMutex };
 	
@@ -279,7 +305,6 @@ void WS::WSConnection::Shutdown(void)
 		delete Msg;
 		this->Outgoing.pop();
 	}
-	
 }
 
 void WS::WSConnection::Send(WSMessage *Msg)
@@ -292,19 +317,33 @@ void WS::WSConnection::Send(WSMessage *Msg)
 WS::WSConnection::~WSConnection(void)
 {
 	this->Shutdown();
-	lws_context_destroy(this->Ctx);
+	this->WebSocket->close();
 }
 
-WS::WSConnection::WSConnection(void (*const OnNeedPing)(WS::WSConnection *Conn), bool (*const OnReceiveCallback)(void*, WSMessage*), void *UserData)
+WS::WSConnection::WSConnection(bool (*const OnReceiveCallback)(WSConnection*, WSMessage*), void *UserData)
 	:
 	OnReceiveCallback(OnReceiveCallback),
-	OnReceiveCallbackUserData(UserData),
-	OnNeedPing(OnNeedPing),
-	Ctx(),
-	Socket(),
-	Thread(),
 	RecvFragment(),
-	ShouldDie(),
-	ErrorDetected()
+	LastPingMS(),
+	ErrorDetected(),
+	UserData(UserData)
 {
+}
+
+WS::WSCore::~WSCore(void)
+{
+	assert(!"This WSCore object should never be destroyed!");
+}
+
+void WS::WSCore::Fireup(bool (*const OnReceiveCallback)(WSConnection*, WSMessage*))
+{
+	
+	WSCore::AppObject = QCoreApplication::instance() ? QCoreApplication::instance() : new QCoreApplication(argc, argv1);
+	
+	WS::WSCore::Thread = new std::thread(&WSCore::InitThread, OnReceiveCallback);
+	
+	while (!WSCore::Instance)
+	{
+		COYOTE_SLEEP(100);
+	}
 }

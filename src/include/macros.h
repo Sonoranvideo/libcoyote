@@ -2,5 +2,6 @@
 #define __LIBCOYOTE_MACROS_H__
 
 #define COYOTE_API_VERSION "0.2"
+#define COYOTE_MAX_OUTPUTS 4
 
 #endif //__LIBCOYOTE_MACROS_H__

@@ -13,3 +13,4 @@
 src/build
 **/build
 **/__pycache__
+**/winbuild

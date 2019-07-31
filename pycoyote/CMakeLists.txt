@@ -1,45 +1,40 @@
-cmake_minimum_required(VERSION 2.4)
+cmake_minimum_required(VERSION 2.6)
 project("pycoyote")
+cmake_policy(SET CMP0003 NEW)
 
+#This CMake config will only work on MinGW or POSIX. Don't bother trying to build with MSVC.
 
 set(EXTRA_CXXFLAGS)
 
-if (DEBUG)
+if(DEBUG)
 	add_link_options(-fstack-protector-all)
-	add_compile_options(-std=gnu++14 -fPIC -pedantic -Wall -Wextra -g3 -O0 -Wno-deprecated-declarations -Wno-unused-function -fno-omit-frame-pointer -fstack-protector-all ${EXTRA_CXXFLAGS})
+	add_compile_options(-std=gnu++14 -pedantic -Wall -g3 -O0 -fstack-protector-all ${EXTRA_CXXFLAGS})
 else()
-	add_compile_options(-std=gnu++14 -fPIC -pedantic -Wall -O3 -Wno-deprecated-declarations -Wno-unused-function -fomit-frame-pointer ${EXTRA_CXXFLAGS})
+	add_compile_options(-std=gnu++14 -pedantic -Wall -O3 -fomit-frame-pointer ${EXTRA_CXXFLAGS})
 endif()
 
-
-
 find_package(PkgConfig)
-find_package(SWIG REQUIRED)
-INCLUDE(${SWIG_USE_FILE})
 
+set(sourcefiles pycoyote.cpp)
 
+add_library(pycoyote SHARED ${sourcefiles})
+
+set(EXTRA_LD)
 if (WIN32)
-	set(PYLIBDIR /c/Coyote/Runtime/Python3/)
+	set(EXTRA_LD ${EXTRA_LD} -lws2_32)
+	set_target_properties(pycoyote PROPERTIES SUFFIX ".pyd")
+	set(PYLIBS /c/Coyote/Runtime/Python3/libs/libpython37.a)
 	set(PYHEADERS /c/Coyote/Runtime/Python3/include/)
 else()
 	pkg_check_modules(PYTHON3 REQUIRED python3)
-	set(PYLIBDIR ${PYTHON3_LIBRARY_DIRS})
+	
+	set(PYLIBS ${PYTHON3_LIBRARIES})
 	set(PYHEADERS ${PYTHON3_INCLUDE_DIRS})
 endif()
 
-include_directories(${PYHEADERS} "../.." "..")
-link_directories("../../build" "../build" "." ${PYLIBDIR})
+set_target_properties(pycoyote PROPERTIES PREFIX "")
+target_link_directories(pycoyote PUBLIC "../build/" "../winbuild")
+target_link_libraries(pycoyote ${PYLIBS} -lcoyote ${EXTRA_LD} -Wl,-R -Wl,. -Wl,-R -Wl,../build -Wl,-R -Wl,../winbuild)
+target_include_directories(pycoyote PUBLIC ${PYHEADERS})
 
-set(swigspec pycoyote.i)
-
-set_property(SOURCE ${swigspec} PROPERTY CPLUSPLUS ON)
-set_property(SOURCE ${swigspec} PROPERTY SWIG_FLAGS "-py3;-nofastunpack;-threads;-castmode")
-
-SWIG_ADD_MODULE(pycoyote python ${swigspec})
-set_source_files_properties({swig_generated_file_fullname} PROPERTIES COMPILE_FLAGS "-I{PYHEADERS}")
-
-SWIG_LINK_LIBRARIES(pycoyote -L${PYLIBDIR} -lpython37 -lcoyote -Wl,-R -Wl,. ${EXTRA_LD})
-
-set(EXTRA_LD "")
-
-#target_link_libraries(coyote coyote ${EXTRA_LD})
+#target_compile_options(pycoyote PUBLIC ${PYTHON3_CFLAGS_OTHER})

@@ -17,7 +17,7 @@
 #define __LIBCOYOTE_H__
 
 #ifndef __cplusplus
-#error "This is the C++ set of bindings, you're looking for libcoyote_c.h"
+#error "This is the C++ set of bindings, you're looking for c/libcoyote_c.h"
 #endif //__cplusplus
 
 #include "macros.h"
@@ -26,8 +26,8 @@
 #include "statuscodes.h"
 
 namespace Coyote
-{
-	
+{ //Empty cuz everything else is in different headers
+
 }
 
 #endif //__LIBCOYOTE_H__

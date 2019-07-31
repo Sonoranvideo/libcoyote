@@ -47,7 +47,7 @@ namespace Coyote
 	
 	struct Output : public BaseObject, public Coyote_Output
 	{
-		Output(void) : Coyote_Output() { }
+		Output(void) : BaseObject(), Coyote_Output() { }
 	};
 	
 	struct Preset : public BaseObject, public Coyote_Preset
@@ -79,8 +79,8 @@ namespace Coyote
 
 	struct MediaState : public BaseObject, public Coyote_MediaState
 	{
-		std::array<int32_t, COYOTE_MAX_OUTPUTS> PlayingPresets;
-		std::array<int32_t, COYOTE_MAX_OUTPUTS> PausedPresets;
+		std::array<int32_t, COYOTE_MAX_OUTPUTS + 1> PlayingPresets; //One extra for a null terminator
+		std::array<int32_t, COYOTE_MAX_OUTPUTS + 1> PausedPresets;
 		TimeCode Time;
 		
 		inline MediaState(void) : BaseObject(), Coyote_MediaState(), PlayingPresets(), PausedPresets()

@@ -17,16 +17,16 @@
 #ifndef __LIBCOYOTE_DATASTRUCTURES_C_H__
 #define __LIBCOYOTE_DATASTRUCTURES_C_H__
 
-#define COYOTE_MAX_OUTPUTS 4
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "macros.h"
 #include "statuscodes.h"
 
 
 #ifndef __cplusplus
 typedef const char *COYOTESTRING;
-typedef enum Coyote_HardwareMode COYOTEHARDWAREMODE;
+typedef enum CoyoteHardwareMode COYOTEHARDWAREMODE;
 #else
 #include "coyotestring.h"
 typedef Coyote::CoyoteString COYOTESTRING;
@@ -41,15 +41,15 @@ struct Coyote_TimeCode
 	uint32_t Time;
 	uint32_t TRT;
 	uint32_t PresetKey;
-	bool Selected : 1;
+	bool Selected;
 };
 
 struct Coyote_Asset
 {
 	COYOTESTRING FileName; ///The part we care about most
 	COYOTESTRING NewFileName; //NewFileName should only be used when renaming/moving assets. Leaving it empty the rest of the time is fine.
-	uint8_t CopyPercentage : 7; //User shouldn't need to write to this
-	bool IsReady : 1; //or this
+	uint8_t CopyPercentage; //User shouldn't need to write to this
+	bool IsReady; //or this
 };
 
 struct Coyote_Output
@@ -62,8 +62,8 @@ struct Coyote_Output
 	int32_t MediaId;
 	double FadeOut;
 	double Delay;
-	bool Active : 1;
-	bool Audio : 1;
+	bool Active;
+	bool Audio;
 };
 
 struct Coyote_Preset
@@ -89,10 +89,10 @@ struct Coyote_Preset
 	int32_t ScrubberPosition;
 	int32_t InPosition;
 	int32_t OutPosition;
-	bool IsPlaying : 1;
-	bool IsPaused : 1;
-	bool Selected : 1;
-	bool VolumeLinked : 1;
+	bool IsPlaying;
+	bool IsPaused;
+	bool Selected;
+	bool VolumeLinked;
 };
 
 struct Coyote_HardwareState
@@ -100,7 +100,7 @@ struct Coyote_HardwareState
 	COYOTESTRING Resolution;
 	COYOTESTRING RefreshRate;
 	COYOTEHARDWAREMODE CurrentMode;
-	bool SupportsS12G : 1;
+	bool SupportsS12G;
 };
 
 struct Coyote_NetworkInfo
@@ -119,8 +119,31 @@ struct Coyote_MediaState
 	int32_t Selected;
 };
 
+struct CoyoteSession
+{ //Assumed to be exactly the size of a naked pointer
+	void *Internal;
+};
+
+struct Coyote_PresetArray
+{
+	void *_Handle; //Used internally
+	size_t Length;
+	Coyote_Preset **Data;
+};
+
+struct Coyote_AssetArray
+{
+	void *_Handle; //Used internally
+	size_t Length;
+	Coyote_Asset **Data;
+};
+
 #ifdef __cplusplus
 }
+#else
+void Coyote_AssetArray_Destroy(Coyote_AssetArray *Arr);
+void Coyote_PresetArray_Destroy(Coyote_PresetArray *Arr);
+void CoyoteSession_Destroy(CoyoteSession *Sess);
 #endif //__cplusplus
 
 #endif //__LIBCOYOTE_DATASTRUCTURES_C_H__

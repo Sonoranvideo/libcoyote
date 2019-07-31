@@ -4,6 +4,11 @@
 #include <string>
 #include <stdlib.h>
 #include <string.h>
+
+#ifndef __cplusplus
+#error "Included CoyoteString class in a C project!"
+#endif //__cplusplus
+
 namespace Coyote
 {
 	class CoyoteString
@@ -11,7 +16,10 @@ namespace Coyote
 	private:
 		char *Buffer;
 	public:
-		inline CoyoteString(const char *String = "") : Buffer((char*)calloc(strlen(String) + 1, 1)) { strcpy(this->Buffer, String); }
+		inline CoyoteString(const char *String = "") : Buffer((char*)calloc(strlen(String) + 1, 1))
+		{
+			strcpy(this->Buffer, String);
+		}
 		inline CoyoteString(const std::string &String) : CoyoteString(String.c_str()) {}
 		inline ~CoyoteString(void)
 		{
@@ -23,6 +31,7 @@ namespace Coyote
 		inline operator std::string(void) const { return this->Buffer; }
 		inline const char *GetCString(void) const { return this->Buffer; }
 		inline std::string GetStdString(void) const { return this->Buffer; }
+		inline size_t GetLength(void) const { return strlen(this->Buffer); }
 		inline CoyoteString(const CoyoteString &Ref) : Buffer(strdup(Ref.Buffer)) {}
 		inline CoyoteString(CoyoteString &&Ref) : Buffer(Ref.Buffer) { Ref.Buffer = nullptr; }
 		inline CoyoteString &operator=(const CoyoteString &Ref)
@@ -48,4 +57,5 @@ namespace Coyote
 		}
 	};
 }
+
 #endif //__LIBCOYOTE_COYOTESTRING_H__

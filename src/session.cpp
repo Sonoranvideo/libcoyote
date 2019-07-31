@@ -39,17 +39,15 @@ struct InternalSession
 	const std::map<std::string, msgpack::object> PerformSyncedCommand(const std::string &CommandName, Coyote::StatusCode *StatusOut = nullptr, const msgpack::object *Values = nullptr);
 	Coyote::StatusCode CreatePreset_Multi(const Coyote::Preset &Ref, const std::string &Cmd);
 	
-	static bool OnMessageReady(void *ThisPtr, WSMessage *Msg);
-	static void OnNeedPing(WS::WSConnection *Conn);
+	static bool OnMessageReady(WS::WSConnection *Conn, WSMessage *Msg);
+	bool CheckWSInit(void);
+	
 	inline bool ConfigConnection(void)
 	{
+		this->CheckWSInit();
 		delete this->Connection;
-		this->Connection = new WS::WSConnection(this->OnNeedPing, this->OnMessageReady, this);
 		
-		if (!this->Connection->Connect(this->Host))
-		{
-			return false;
-		}
+		this->Connection = WS::WSCore::GetInstance()->NewConnection(this->Host, this);
 		
 		this->PerformSyncedCommand("SubscribeTC");
 		
@@ -60,9 +58,25 @@ struct InternalSession
 	inline ~InternalSession(void) { delete this->Connection; }
 };
 
-bool InternalSession::OnMessageReady(void *ThisPtr, WSMessage *Msg)
+
+
+bool InternalSession::CheckWSInit(void)
 {
-	InternalSession *Sess = static_cast<InternalSession*>(ThisPtr);
+	static std::atomic_bool Entered;
+
+	if (!Entered)
+	{
+		WS::WSCore::Fireup(&InternalSession::OnMessageReady);
+		Entered = true;
+		return false;
+	}
+	return true;
+}
+
+bool InternalSession::OnMessageReady(WS::WSConnection *Conn, WSMessage *Msg)
+{
+	InternalSession *Sess = static_cast<InternalSession*>(Conn->UserData);
+	
 	
 	std::map<std::string, msgpack::object> Values;
 	
@@ -72,7 +86,6 @@ bool InternalSession::OnMessageReady(void *ThisPtr, WSMessage *Msg)
 	}
 	catch(...)
 	{
-		std::cout << "Garbage data detected. Discarded.\n";
 		return false;
 	}
 	
@@ -84,16 +97,7 @@ bool InternalSession::OnMessageReady(void *ThisPtr, WSMessage *Msg)
 	return Success;
 }
 
-void InternalSession::OnNeedPing(WS::WSConnection *Conn)
-{
-	msgpack::sbuffer Buffer;
-	msgpack::packer<msgpack::sbuffer> Pack { Buffer };
-	
-	MsgpackProc::InitOutgoingMsg(Pack, "Ping");
-	
-	Conn->Send(new WSMessage(Buffer.data(), Buffer.size()));
-	
-}
+
 const std::map<std::string, msgpack::object> InternalSession::PerformSyncedCommand(const std::string &CommandName, Coyote::StatusCode *StatusOut, const msgpack::object *Values)
 {
 	msgpack::sbuffer Buffer;
@@ -107,11 +111,10 @@ const std::map<std::string, msgpack::object> InternalSession::PerformSyncedComma
 	
 	if (this->Connection->HasError())
 	{
-		//Try to reconnect, ONCE.
+		//Try to reconnect
 		this->ConfigConnection();
 		
-		if (StatusOut) *StatusOut = Coyote::COYOTE_STATUS_NETWORKERROR;
-		return {};
+		return PerformSyncedCommand(CommandName, StatusOut, Values);
 	}
 	
 	this->Connection->Send(new WSMessage(Buffer.data(), Buffer.size()));

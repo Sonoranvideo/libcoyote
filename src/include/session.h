@@ -34,10 +34,6 @@ namespace Coyote
 	private:
 		void *Internal;
 	public:
-	
-		class BaseError {};
-		class ConnectionError : public BaseError {};
-		
 		Session(const std::string &Host);
 		Session(Session &&In);
 		Session &operator=(Session &&In);
