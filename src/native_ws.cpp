@@ -1,8 +1,8 @@
 #include <QtWebSockets>
 #include <QCoreApplication>
 #include <moc_native_ws.cpp>
-#include "include/internal/common.h"
-#include "include/internal/msgpackproc.h"
+#include "common.h"
+#include "msgpackproc.h"
 #include <msgpack.hpp>
 #define qs2cs(s) (s.toUtf8().constData()) //Irritating enough to type without caps
 

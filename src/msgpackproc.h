@@ -4,7 +4,7 @@
 #define MSGPACK_DEFAULT_API_VERSION 2
 
 #include "common.h"
-#include "../datastructures.h"
+#include "include/datastructures.h"
 #include <msgpack.hpp>
 
 namespace MsgpackProc

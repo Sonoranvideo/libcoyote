@@ -1,7 +1,7 @@
 #ifndef __LIBCOYOTE_NATIVE_WS_H__
 #define __LIBCOYOTE_NATIVE_WS_H__
 
-#include "wsmessages/wsmessages.hpp"
+#include "../wsmessages/wsmessages.hpp"
 
 #include "common.h"
 #include "mtevent.h"

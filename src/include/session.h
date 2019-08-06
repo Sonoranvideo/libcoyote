@@ -80,6 +80,9 @@ namespace Coyote
 		StatusCode TakePrev(void);
 		
 		virtual ~Session(void);
+		
+		void SetCommandTimeoutMS(const time_t TimeoutMS = 10000);
+		time_t GetCommandTimeoutMS(void) const;
 	};
 	
 }

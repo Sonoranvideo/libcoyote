@@ -13,13 +13,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#include "include/internal/wsmessages/wsmessages.hpp"
-#include "include/internal/common.h"
-#include "include/internal/native_ws.h"
-#include "include/internal/asynctosync.h"
-#include "include/internal/asyncmsgs.h"
-#include "include/internal/msgpackproc.h"
-#include "include/internal/subscriptions.h"
+#include "../wsmessages/wsmessages.hpp"
+#include "common.h"
+#include "native_ws.h"
+#include "asynctosync.h"
+#include "asyncmsgs.h"
+#include "msgpackproc.h"
+#include "subscriptions.h"
 #include "include/statuscodes.h"
 #include "include/datastructures.h"
 #include "include/session.h"
@@ -35,6 +35,7 @@ struct InternalSession
 	AsyncMsgs::AsynchronousSession ASyncSess;
 	WS::WSConnection *Connection;
 	std::string Host;
+	time_t TimeoutMS;
 	
 	const std::map<std::string, msgpack::object> PerformSyncedCommand(const std::string &CommandName, Coyote::StatusCode *StatusOut = nullptr, const msgpack::object *Values = nullptr);
 	Coyote::StatusCode CreatePreset_Multi(const Coyote::Preset &Ref, const std::string &Cmd);
@@ -54,7 +55,13 @@ struct InternalSession
 		return true;
 	}
 	
-	inline InternalSession(const std::string &Host = "") : Connection(), Host(Host) { this->ConfigConnection(); }
+	inline InternalSession(const std::string &Host = "")
+		: Connection(),
+		Host(Host),
+		TimeoutMS(10000) //10 second default operation timeout
+	{
+		this->ConfigConnection();
+	}
 	inline ~InternalSession(void) { delete this->Connection; }
 };
 
@@ -123,7 +130,7 @@ const std::map<std::string, msgpack::object> InternalSession::PerformSyncedComma
 	AsyncToSync::MessageTicket *Ticket = this->SyncSess.NewTicket(MsgID);
 	
 	
-	std::unique_ptr<WSMessage> ResponsePtr { Ticket->WaitForRecv() };
+	std::unique_ptr<WSMessage> ResponsePtr { Ticket->WaitForRecv(this->TimeoutMS) };
 	this->SyncSess.DestroyTicket(Ticket);
 	
 	if (!ResponsePtr)
@@ -719,3 +726,18 @@ Coyote::StatusCode Coyote::Session::DetectUpdate(bool &DetectedOut, std::string 
 	
 	return Status;
 }
+
+time_t Coyote::Session::GetCommandTimeoutMS(void) const
+{
+	DEF_SESS;
+	
+	return SESS.TimeoutMS;
+}
+
+void Coyote::Session::SetCommandTimeoutMS(const time_t TimeoutMS)
+{
+	DEF_SESS;
+	
+	SESS.TimeoutMS = TimeoutMS;
+}
+

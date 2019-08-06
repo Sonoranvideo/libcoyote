@@ -1,5 +1,5 @@
 #include "include/macros.h"
-#include "include/internal/common.h"
+#include "common.h"
 #include "include/datastructures.h"
 #include "include/session.h"
 

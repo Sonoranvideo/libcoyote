@@ -2,7 +2,7 @@
 #define __LIBCOYOTE_SUBSCRIPTIONS_H__
 
 #include "common.h"
-#include "../datastructures.h"
+#include "include/datastructures.h"
 #define MSGPACK_DEFAULT_API_VERSION 2
 #include <msgpack.hpp>
 #include <mutex>

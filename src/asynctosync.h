@@ -26,11 +26,11 @@ namespace AsyncToSync
 		uint64_t MsgID;
 
 	public:
-		inline WSMessage *WaitForRecv(void)
+		inline WSMessage *WaitForRecv(const time_t TimeoutMS = 0)
 		{
 			WSMessage *RetVal = nullptr;
 			
-			if (!this->Event.Wait(RetVal)) return nullptr;
+			if (!this->Event.Wait(RetVal, TimeoutMS)) return nullptr;
 			
 			return RetVal;
 		}
@@ -87,6 +87,7 @@ namespace AsyncToSync
 			
 			for (auto Iter = this->Tickets.begin(); Iter != this->Tickets.end(); ++Iter)
 			{
+				Iter->second->SetReady(nullptr);
 				delete Iter->second;
 			}
 		}

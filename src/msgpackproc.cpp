@@ -1,5 +1,5 @@
-#include "include/internal/common.h"
-#include "include/internal/msgpackproc.h"
+#include "common.h"
+#include "msgpackproc.h"
 #include "include/libcoyote.h"
 
 #ifdef MSGPACK_DEFAULT_API_VERSION

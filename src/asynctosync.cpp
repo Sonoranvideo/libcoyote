@@ -1,10 +1,10 @@
 //We have such sights to show you.
-#include "include/internal/wsmessages/wsmessages.hpp"
-#include "include/internal/common.h"
-#include "include/internal/asynctosync.h"
-#include "include/internal/msgpackproc.h"
-#include "include/internal/native_ws.h"
-#include "include/internal/asyncmsgs.h"
+#include "../wsmessages/wsmessages.hpp"
+#include "common.h"
+#include "asynctosync.h"
+#include "msgpackproc.h"
+#include "native_ws.h"
+#include "asyncmsgs.h"
 
 bool AsyncToSync::SynchronousSession::OnMessageReady(const std::map<std::string, msgpack::object> &Values, WS::WSConnection *Conn, WSMessage *Msg)
 {	

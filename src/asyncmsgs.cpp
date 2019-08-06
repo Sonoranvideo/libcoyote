@@ -1,7 +1,7 @@
-#include "include/internal/wsmessages/wsmessages.hpp"
-#include "include/internal/asyncmsgs.h"
-#include "include/internal/msgpackproc.h"
-#include "include/internal/subscriptions.h"
+#include "../wsmessages/wsmessages.hpp"
+#include "asyncmsgs.h"
+#include "msgpackproc.h"
+#include "subscriptions.h"
 
 bool AsyncMsgs::AsynchronousSession::OnMessageReady(const std::map<std::string, msgpack::object> &Values, WS::WSConnection *Conn, WSMessage *Msg)
 {
