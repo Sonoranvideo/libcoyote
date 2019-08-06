@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
+#define WSMESSAGES_NOLWS
 #include "../wsmessages/wsmessages.hpp"
 #include "asyncmsgs.h"
 #include "msgpackproc.h"

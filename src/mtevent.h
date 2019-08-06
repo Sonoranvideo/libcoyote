@@ -22,6 +22,7 @@
 #include <semaphore.h>
 #include <pthread.h>
 #include <chrono>
+#include <atomic>
 
 template <typename T = void*>
 class MTEvent
@@ -30,14 +31,18 @@ private:
 	mutable std::mutex Mutex;
 	T Lump;
 	sem_t Semaphore;
+	std::atomic<bool*> DropDeadPtr;
+	
 public:
-	MTEvent(const T *InitialValue = nullptr) : Lump(InitialValue ? std::move(*InitialValue) : T()), Semaphore()
+	MTEvent(const T *InitialValue = nullptr) : Lump(InitialValue ? std::move(*InitialValue) : T()), Semaphore(), DropDeadPtr()
 	{
 		sem_init(&this->Semaphore, 0, 0);
 	}
 
 	~MTEvent(void)
 	{
+		if (this->DropDeadPtr) *this->DropDeadPtr = true;
+		
 		sem_destroy(&this->Semaphore);
 	}
 	
@@ -45,14 +50,19 @@ public:
 	{
 		bool Success = false;
 		
-		for (uint32_t Inc = 0; Inc < Timeout * 3000 && !Success; ++Inc)
+		std::unique_ptr<bool> DropDeadPtr { new bool(false) };
+		this->DropDeadPtr = DropDeadPtr.get();
+		
+		for (uint32_t Inc = 0; Inc < Timeout * 3000 && !Success && !*DropDeadPtr; ++Inc)
 		{
 			Success = sem_trywait(&this->Semaphore) == 0;
 			
 			if (!Success) std::this_thread::sleep_for(std::chrono::duration<long double, std::ratio<1, 1000> >((long double)Timeout / 30));
 		}
-			
+
+		this->DropDeadPtr = nullptr; //So we aren't holding onto it after we're done with the ticket, like we are.
 		
+
 		if (!Success)
 		{ //We timed out.
 			return false;

@@ -112,7 +112,7 @@ namespace AsyncToSync
 		MessageTicket *NewTicket(const uint64_t MsgID);
 		bool DestroyTicket(MessageTicket *Ticket);
 		uint64_t NewMsgID(void) { return this->MsgIDs.NewID(); }
-		
+		void DestroyAllTickets(void);
 		//No copying/*
 		SynchronousSession(const SynchronousSession &) = delete;
 		SynchronousSession &operator=(const SynchronousSession &) = delete;

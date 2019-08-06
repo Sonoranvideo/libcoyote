@@ -35,6 +35,7 @@ static int argc = 1;
 static char **argv1 = new char* { (char*)"libcoyote" };
 
 //Prototypes
+void SessionSneak_DeactivateConnection(void *Ptr); //So we don't need to include session.h
 
 //Globals
 std::atomic<WS::WSCore *> WS::WSCore::Instance;
@@ -130,6 +131,7 @@ void WS::WSCore::MainLoopBody(void)
 	this->CheckConnections();
 }
 
+
 void WS::WSCore::CheckConnections(void)
 {
 	const std::lock_guard<std::mutex> Guard { this->ConnectionsLock };
@@ -142,6 +144,9 @@ Rescan:
 		if (Connection->HasError() || Connection->CheckPingout())
 		{
 			std::cout << "LibCoyote: Detected dead connection, pruning" << std::endl;
+			
+			SessionSneak_DeactivateConnection(Connection->UserData);
+			
 			this->Connections.erase(Iter);
 			goto Rescan;
 		}

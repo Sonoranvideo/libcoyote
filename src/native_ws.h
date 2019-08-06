@@ -16,6 +16,7 @@
 #ifndef __LIBCOYOTE_NATIVE_WS_H__
 #define __LIBCOYOTE_NATIVE_WS_H__
 
+#define WSMESSAGES_NOLWS
 #include "../wsmessages/wsmessages.hpp"
 
 #include "common.h"

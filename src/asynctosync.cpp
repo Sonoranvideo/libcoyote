@@ -15,6 +15,7 @@
 */
 
 //We have such sights to show you.
+#define WSMESSAGES_NOLWS
 #include "../wsmessages/wsmessages.hpp"
 #include "common.h"
 #include "asynctosync.h"
@@ -76,4 +77,15 @@ bool AsyncToSync::SynchronousSession::DestroyTicket(MessageTicket *Ticket)
 }
 	
 	
+void AsyncToSync::SynchronousSession::DestroyAllTickets(void)
+{
+	std::lock_guard<std::mutex> G { this->TicketsLock };
 	
+	for (auto &Ref : this->Tickets)
+	{
+		delete Ref.second;
+	}
+	this->Tickets.clear();
+
+}
+

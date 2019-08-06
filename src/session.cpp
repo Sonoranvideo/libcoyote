@@ -13,6 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+#define WSMESSAGES_NOLWS
 #include "../wsmessages/wsmessages.hpp"
 #include "common.h"
 #include "native_ws.h"
@@ -47,6 +48,8 @@ struct InternalSession
 	{
 		this->CheckWSInit();
 		delete this->Connection;
+		
+		this->SyncSess.DestroyAllTickets();
 		
 		this->Connection = WS::WSCore::GetInstance()->NewConnection(this->Host, this);
 		
@@ -744,3 +747,9 @@ void Coyote::Session::SetCommandTimeoutSecs(const time_t TimeoutSecs)
 	SESS.TimeoutSecs = TimeoutSecs;
 }
 
+void SessionSneak_DeactivateConnection(void *Ptr)
+{
+	InternalSession &SESS = *static_cast<InternalSession*>(Ptr);
+	
+	SESS.SyncSess.DestroyAllTickets();
+}
