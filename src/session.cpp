@@ -35,7 +35,7 @@ struct InternalSession
 	AsyncMsgs::AsynchronousSession ASyncSess;
 	WS::WSConnection *Connection;
 	std::string Host;
-	time_t TimeoutMS;
+	time_t TimeoutSecs;
 	
 	const std::map<std::string, msgpack::object> PerformSyncedCommand(const std::string &CommandName, Coyote::StatusCode *StatusOut = nullptr, const msgpack::object *Values = nullptr);
 	Coyote::StatusCode CreatePreset_Multi(const Coyote::Preset &Ref, const std::string &Cmd);
@@ -58,7 +58,7 @@ struct InternalSession
 	inline InternalSession(const std::string &Host = "")
 		: Connection(),
 		Host(Host),
-		TimeoutMS(10000) //10 second default operation timeout
+		TimeoutSecs(Coyote::Session::DefaultCommandTimeoutSecs) //10 second default operation timeout
 	{
 		this->ConfigConnection();
 	}
@@ -130,7 +130,7 @@ const std::map<std::string, msgpack::object> InternalSession::PerformSyncedComma
 	AsyncToSync::MessageTicket *Ticket = this->SyncSess.NewTicket(MsgID);
 	
 	
-	std::unique_ptr<WSMessage> ResponsePtr { Ticket->WaitForRecv(this->TimeoutMS) };
+	std::unique_ptr<WSMessage> ResponsePtr { Ticket->WaitForRecv(this->TimeoutSecs) };
 	this->SyncSess.DestroyTicket(Ticket);
 	
 	if (!ResponsePtr)
@@ -727,17 +727,17 @@ Coyote::StatusCode Coyote::Session::DetectUpdate(bool &DetectedOut, std::string 
 	return Status;
 }
 
-time_t Coyote::Session::GetCommandTimeoutMS(void) const
+time_t Coyote::Session::GetCommandTimeoutSecs(void) const
 {
 	DEF_SESS;
 	
-	return SESS.TimeoutMS;
+	return SESS.TimeoutSecs;
 }
 
-void Coyote::Session::SetCommandTimeoutMS(const time_t TimeoutMS)
+void Coyote::Session::SetCommandTimeoutSecs(const time_t TimeoutSecs)
 {
 	DEF_SESS;
 	
-	SESS.TimeoutMS = TimeoutMS;
+	SESS.TimeoutSecs = TimeoutSecs;
 }
 

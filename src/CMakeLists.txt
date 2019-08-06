@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.1.0)
 project("LibCoyote")
 
 
@@ -13,7 +13,7 @@ else()
 endif()
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-R  -Wl,.")
-
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 message("== Searching for Qt5WebSockets...")
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -21,10 +21,6 @@ set(CMAKE_AUTORCC ON)
 find_package(Qt5 COMPONENTS WebSockets Core)
 
 message("== Ok, found Qt5WebSockets")
-
-file(GLOB HEADERS "*.h")
-
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
 INCLUDE (CheckIncludeFileCXX)
 
 CHECK_INCLUDE_FILE_CXX(msgpack.hpp MSGPACK_HEADER)
@@ -41,13 +37,9 @@ endif()
 add_library(coyote SHARED ${sourcefiles})
 add_library(coyote_static STATIC ${sourcefiles})
 
-set(CMAKE_AUTOMOC_MOC_OPTIONS "-I${CMAKE_SOURCE_DIR}/include/internal;-p;${CMAKE_SOURCE_DIR}/include/internal")
-target_include_directories(coyote PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
-target_include_directories(coyote_static PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
-
 qt5_use_modules(coyote Core WebSockets)
 qt5_use_modules(coyote_static Core WebSockets)
-qt5_wrap_cpp(sourcefiles "${CMAKE_SOURCE_DIR}/include/internal/native_ws.h")
+#qt5_wrap_cpp(sourcefiles "${CMAKE_SOURCE_DIR}/include/internal/native_ws.h")
 
 
 if (WIN32)

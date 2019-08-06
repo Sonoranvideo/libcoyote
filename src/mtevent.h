@@ -21,6 +21,7 @@
 #include <mutex>
 #include <semaphore.h>
 #include <pthread.h>
+#include <chrono>
 
 template <typename T = void*>
 class MTEvent
@@ -40,7 +41,7 @@ public:
 		sem_destroy(&this->Semaphore);
 	}
 	
-	bool Wait(T &ValueOut, const time_t Timeout = 1) //Return by value!
+	bool Wait(T &ValueOut, const time_t Timeout = 5) //Return by value!
 	{
 		bool Success = false;
 		
@@ -48,7 +49,7 @@ public:
 		{
 			Success = sem_trywait(&this->Semaphore) == 0;
 			
-			COYOTE_SLEEP(Timeout);
+			if (!Success) std::this_thread::sleep_for(std::chrono::duration<double, std::ratio<1, 1000> >((double)Timeout / 10));
 		}
 			
 		

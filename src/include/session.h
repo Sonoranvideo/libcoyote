@@ -34,6 +34,8 @@ namespace Coyote
 	private:
 		void *Internal;
 	public:
+		static constexpr size_t DefaultCommandTimeoutSecs = 10;
+		
 		Session(const std::string &Host);
 		Session(Session &&In);
 		Session &operator=(Session &&In);
@@ -81,8 +83,8 @@ namespace Coyote
 		
 		virtual ~Session(void);
 		
-		void SetCommandTimeoutMS(const time_t TimeoutMS = 10000);
-		time_t GetCommandTimeoutMS(void) const;
+		void SetCommandTimeoutSecs(const time_t TimeoutSecs = DefaultCommandTimeoutSecs);
+		time_t GetCommandTimeoutSecs(void) const;
 	};
 	
 }

@@ -42,11 +42,11 @@ namespace AsyncToSync
 		uint64_t MsgID;
 
 	public:
-		inline WSMessage *WaitForRecv(const time_t TimeoutMS = 0)
+		inline WSMessage *WaitForRecv(const time_t TimeoutSecs = 1)
 		{
 			WSMessage *RetVal = nullptr;
 			
-			if (!this->Event.Wait(RetVal, TimeoutMS)) return nullptr;
+			if (!this->Event.Wait(RetVal, TimeoutSecs)) return nullptr;
 			
 			return RetVal;
 		}

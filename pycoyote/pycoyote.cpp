@@ -115,7 +115,9 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, TakePrev)
 	ACLASSF(Session, GetAssets)
 	ACLASSF(Session, GetPresets)
-	ACLASSF(Session, GetTimeCode);
+	ACLASSF(Session, GetTimeCode)
+	ACLASSF(Session, SetCommandTimeoutSecs)
+	ACLASSF(Session, GetCommandTimeoutSecs);
 	
 
 	py::class_<Coyote_Output>(ModObj, "Coyote_Output")
