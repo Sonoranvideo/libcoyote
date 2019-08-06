@@ -69,8 +69,11 @@ struct InternalSession
 
 bool InternalSession::CheckWSInit(void)
 {
+	static std::mutex EnterLock;
 	static std::atomic_bool Entered;
-
+	
+	const std::lock_guard<std::mutex> G { EnterLock };
+	
 	if (!Entered)
 	{
 		WS::WSCore::Fireup(&InternalSession::OnMessageReady);

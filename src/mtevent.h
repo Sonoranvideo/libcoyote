@@ -45,11 +45,11 @@ public:
 	{
 		bool Success = false;
 		
-		for (uint32_t Inc = 0; Inc < Timeout * 1000 && !Success; ++Inc)
+		for (uint32_t Inc = 0; Inc < Timeout * 3000 && !Success; ++Inc)
 		{
 			Success = sem_trywait(&this->Semaphore) == 0;
 			
-			if (!Success) std::this_thread::sleep_for(std::chrono::duration<double, std::ratio<1, 1000> >((double)Timeout / 10));
+			if (!Success) std::this_thread::sleep_for(std::chrono::duration<long double, std::ratio<1, 1000> >((long double)Timeout / 30));
 		}
 			
 		
