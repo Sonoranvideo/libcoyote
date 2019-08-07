@@ -130,12 +130,14 @@ const std::map<std::string, msgpack::object> InternalSession::PerformSyncedComma
 		return PerformSyncedCommand(CommandName, StatusOut, Values);
 	}
 	
+
+	//Create the ticket BEFORE we send it.
+	AsyncToSync::MessageTicket *Ticket = this->SyncSess.NewTicket(MsgID);
+
 	this->Connection->Send(new WSMessage(Buffer.data(), Buffer.size()));
 	
 	//Wait for the value we want (with the message ID we want) to appear in the WebSockets thread.
-	AsyncToSync::MessageTicket *Ticket = this->SyncSess.NewTicket(MsgID);
-	
-	
+		
 	std::unique_ptr<WSMessage> ResponsePtr { Ticket->WaitForRecv(this->TimeoutSecs) };
 	this->SyncSess.DestroyTicket(Ticket);
 	

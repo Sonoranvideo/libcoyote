@@ -105,9 +105,10 @@ namespace AsyncToSync
 			
 			for (auto Iter = this->Tickets.begin(); Iter != this->Tickets.end(); ++Iter)
 			{
-				Iter->second->SetReady(nullptr);
-				delete Iter->second;
+				Iter->second->TriggerDeath();
 			}
+			
+			this->Tickets.clear();
 		}
 		
 		bool OnMessageReady(const std::map<std::string, msgpack::object> &Values, WS::WSConnection *Conn, WSMessage *Msg);
