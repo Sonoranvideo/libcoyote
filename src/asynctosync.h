@@ -64,6 +64,8 @@ namespace AsyncToSync
 		{
 		}
 		
+		inline void TriggerDeath(void) { this->Event.TriggerDeath(); }
+		
 		inline uint64_t GetMsgID(void) const { return this->MsgID; }
 		
 		//No copying

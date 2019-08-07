@@ -61,8 +61,30 @@ AsyncToSync::MessageTicket *AsyncToSync::SynchronousSession::NewTicket(const uin
 
 bool AsyncToSync::SynchronousSession::DestroyTicket(MessageTicket *Ticket)
 {
+	if (!Ticket) return false;
+	
 	std::lock_guard<std::mutex> G { this->TicketsLock };
 
+	//Check that we have such a ticket pointer at all before we dereference it. This is costly and mostly just paranoia.
+	//We're so deep in the semaphore/mutex crap that I can't keep it straight in my own head, so I'll just be paranoid.
+	bool Found = false;
+	
+	for (auto &Ref : this->Tickets)
+	{
+		 if (Ref.second == Ticket)
+		 {
+			 Found = true;
+			 break;
+		 }
+	}
+		 
+	
+	if (!Found)
+	{ //Probably orphan
+		delete Ticket;
+		return false;
+	}
+	
 	const uint64_t MsgID = Ticket->GetMsgID();
 	
 	if (!this->Tickets.count(MsgID)) return false;
@@ -79,13 +101,13 @@ bool AsyncToSync::SynchronousSession::DestroyTicket(MessageTicket *Ticket)
 	
 void AsyncToSync::SynchronousSession::DestroyAllTickets(void)
 {
-	std::lock_guard<std::mutex> G { this->TicketsLock };
-	
+	const std::lock_guard<std::mutex> G { this->TicketsLock };
+
 	for (auto &Ref : this->Tickets)
 	{
-		delete Ref.second;
+		Ref.second->TriggerDeath();
 	}
+	
 	this->Tickets.clear();
-
 }
 

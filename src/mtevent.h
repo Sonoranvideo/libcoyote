@@ -21,17 +21,16 @@
 #include <mutex>
 #include <semaphore.h>
 #include <pthread.h>
-#include <chrono>
 #include <atomic>
 
 template <typename T = void*>
 class MTEvent
 {
 private:
-	mutable std::mutex Mutex;
+	mutable std::mutex Mutex, DropDeadMutex;
 	T Lump;
 	sem_t Semaphore;
-	std::atomic<bool*> DropDeadPtr;
+	std::atomic<sem_t*> DropDeadPtr;
 	
 public:
 	MTEvent(const T *InitialValue = nullptr) : Lump(InitialValue ? std::move(*InitialValue) : T()), Semaphore(), DropDeadPtr()
@@ -41,28 +40,45 @@ public:
 
 	~MTEvent(void)
 	{
-		if (this->DropDeadPtr) *this->DropDeadPtr = true;
-		
+		this->TriggerDeath();
 		sem_destroy(&this->Semaphore);
+	}
+	
+	inline void TriggerDeath(void)
+	{
+		const std::lock_guard<std::mutex> G2 { this->DropDeadMutex };
+
+		if (this->DropDeadPtr) sem_post(this->DropDeadPtr);
 	}
 	
 	bool Wait(T &ValueOut, const time_t Timeout = 5) //Return by value!
 	{
 		bool Success = false;
 		
-		std::unique_ptr<bool> DropDeadPtr { new bool(false) };
-		this->DropDeadPtr = DropDeadPtr.get();
+		std::unique_ptr<sem_t> DropDeadSemaphore { new sem_t{} };
+
+		sem_init(DropDeadSemaphore.get(), 0, 0);
 		
-		for (uint32_t Inc = 0; Inc < Timeout * 3000 && !Success && !*DropDeadPtr; ++Inc)
+		
+		std::unique_lock<std::mutex> G2 { this->DropDeadMutex };
+		
+		this->DropDeadPtr = DropDeadSemaphore.get();
+		
+		G2.unlock();
+		
+		for (uint32_t Inc = 0; Inc < Timeout * 1000 && !Success && sem_trywait(DropDeadSemaphore.get()) != 0; ++Inc)
 		{
 			Success = sem_trywait(&this->Semaphore) == 0;
 			
-			if (!Success) std::this_thread::sleep_for(std::chrono::duration<long double, std::ratio<1, 1000> >((long double)Timeout / 30));
+			if (!Success) COYOTE_SLEEP(1);
 		}
 
+		G2.lock();
 		this->DropDeadPtr = nullptr; //So we aren't holding onto it after we're done with the ticket, like we are.
+		sem_destroy(DropDeadSemaphore.get());
 		
-
+		G2.unlock();
+		
 		if (!Success)
 		{ //We timed out.
 			return false;
