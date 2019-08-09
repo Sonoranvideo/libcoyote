@@ -34,13 +34,20 @@ typedef Coyote::HardwareMode COYOTEHARDWAREMODE;
 extern "C" {
 #endif
 
+struct Coyote_PresetMark
+{
+	COYOTESTRING MarkNumber;
+	COYOTESTRING MarkName;
+	COYOTESTRING MarkDisplayTime;
+	int32_t MarkTime;
+};
 
 struct Coyote_TimeCode
 {
 	double ScrubBar;
-	uint32_t Time;
-	uint32_t TRT;
-	uint32_t PresetKey;
+	int32_t Time;
+	int32_t TRT;
+	int32_t PresetKey;
 	bool Selected;
 };
 
@@ -55,13 +62,17 @@ struct Coyote_Asset
 struct Coyote_Output
 {
 	COYOTESTRING Filename;
+	double FadeOut;
+	double Delay;
 	int32_t Hue;
 	int32_t Saturation;
 	int32_t Contrast;
 	int32_t Brightness;
 	int32_t MediaId;
-	double FadeOut;
-	double Delay;
+	int32_t AudioChannel1;
+	int32_t AudioChannel2;
+	int32_t AudioChannel3;
+	int32_t AudioChannel4;
 	bool Active;
 	bool Audio;
 };
@@ -136,6 +147,13 @@ struct Coyote_AssetArray
 	void *_Handle; //Used internally
 	size_t Length;
 	Coyote_Asset **Data;
+};
+
+struct Coyote_PresetMarkArray
+{
+	void *_Handle; //Used internally
+	size_t Length;
+	Coyote_PresetMark **Data;
 };
 
 #ifdef __cplusplus

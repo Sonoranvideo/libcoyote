@@ -44,6 +44,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	py::bind_vector<std::vector<Coyote::Preset> >(ModObj, "PresetList");
 	py::bind_vector<std::vector<Coyote::Asset> >(ModObj, "AssetList");
 	py::bind_vector<std::vector<std::string> >(ModObj, "StringList");
+	py::bind_vector<std::vector<Coyote::PresetMark> >(ModObj, "MarkList");
 	
 	py::enum_<Coyote::RefreshMode>(ModObj, "RefreshMode")
 	EMEMDEF(COYOTE_REFRESH_INVALID)
@@ -111,6 +112,8 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, RebootCoyote)
 	ACLASSF(Session, ShutdownCoyote)
 	ACLASSF(Session, SoftRebootCoyote)
+	ACLASSF(Session, SelectNext)
+	ACLASSF(Session, SelectPrev)
 	ACLASSF(Session, TakeNext)
 	ACLASSF(Session, TakePrev)
 	ACLASSF(Session, GetAssets)
@@ -131,7 +134,11 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSBD(Coyote_Output,	FadeOut)
 	ACLASSBD(Coyote_Output,	Delay)
 	ACLASSBD(Coyote_Output, Active)
-	ACLASSBD(Coyote_Output, Audio);
+	ACLASSBD(Coyote_Output, Audio)
+	ACLASSBD(Coyote_Output, AudioChannel1)
+	ACLASSBD(Coyote_Output, AudioChannel2)
+	ACLASSBD(Coyote_Output, AudioChannel3)
+	ACLASSBD(Coyote_Output, AudioChannel4);
 	
 	py::class_<Coyote::Output, Coyote::BaseObject, Coyote_Output>(ModObj, "Output")
 	.def(py::init<>());
@@ -159,13 +166,26 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSBD(Coyote_Preset, Color)
 	ACLASSBD(Coyote_Preset, timeCodeUpdate)
 	ACLASSBD(Coyote_Preset, tcColor);
+
 	
 	py::class_<Coyote::Preset, Coyote::BaseObject, Coyote_Preset>(ModObj, "Preset")
 	.def(py::init<>())
 	ACLASSD(Preset, Output1)
 	ACLASSD(Preset, Output2)
 	ACLASSD(Preset, Output3)
-	ACLASSD(Preset, Output4);
+	ACLASSD(Preset, Output4)
+	ACLASSD(Preset, gotoMarks)
+	ACLASSD(Preset, countDowns);
+	
+	py::class_<Coyote_PresetMark>(ModObj, "Coyote_PresetMark")
+	.def(py::init<>())
+	ACLASSBD(Coyote_PresetMark, MarkNumber)
+	ACLASSBD(Coyote_PresetMark,	MarkName)
+	ACLASSBD(Coyote_PresetMark, MarkDisplayTime)
+	ACLASSBD(Coyote_PresetMark, MarkTime);
+
+	py::class_<Coyote::PresetMark, Coyote::BaseObject, Coyote_PresetMark>(ModObj, "PresetMark")
+	.def(py::init<>());
 	
 	py::class_<Coyote_TimeCode>(ModObj, "Coyote_TimeCode")
 	.def(py::init<>())

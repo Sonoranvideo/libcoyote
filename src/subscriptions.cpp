@@ -16,9 +16,14 @@ bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::str
 		
 		if (!TC) return false;
 		
-		std::lock_guard<std::mutex> G { this->CurTimeCodeLock };
+		std::lock_guard<std::mutex> G { this->TimeCodesLock };
 		
-		this->CurTimeCode = *TC;
+		this->TimeCodes[TC->PresetKey] = *TC;
+
+		if (TC->Selected)
+		{
+			this->TimeCodes[0] = *TC;
+		}
 		
 		return true;
 	}
@@ -26,9 +31,11 @@ bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::str
 	return false;
 }
 
-Coyote::TimeCode *Subs::SubscriptionSession::GetTimeCode(void)
+Coyote::TimeCode *Subs::SubscriptionSession::GetTimeCode(const int32_t PK)
 {
-	std::lock_guard<std::mutex> G { this->CurTimeCodeLock };
+	std::lock_guard<std::mutex> G { this->TimeCodesLock };
 
-	return new Coyote::TimeCode{ this->CurTimeCode };
+	if (!this->TimeCodes.count(PK)) return nullptr;
+	
+	return new Coyote::TimeCode{ this->TimeCodes[PK] };
 }

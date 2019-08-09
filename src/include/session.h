@@ -46,7 +46,7 @@ namespace Coyote
 		
 		StatusCode GetAssets(std::vector<Coyote::Asset> &Out, const int32_t TimeoutMS = -1);
 		StatusCode GetPresets(std::vector<Coyote::Preset> &Out, const int32_t TimeoutMS = -1);
-		StatusCode GetTimeCode(Coyote::TimeCode &Out, const int32_t TimeoutMS = -1);
+		StatusCode GetTimeCode(Coyote::TimeCode &Out, const int32_t PK = 0);
 		
 		//Input parameter names must match the expected JSON names
 		StatusCode Take(const int32_t PK);
@@ -78,6 +78,8 @@ namespace Coyote
 		StatusCode RebootCoyote(void);
 		StatusCode ShutdownCoyote(void);
 		StatusCode SoftRebootCoyote(void);
+		StatusCode SelectNext(void);
+		StatusCode SelectPrev(void);
 		StatusCode TakeNext(void);
 		StatusCode TakePrev(void);
 		

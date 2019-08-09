@@ -134,6 +134,19 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			{ "PresetKey", msgpack::object{ TCObj->PresetKey } },
 		};
 	}
+	else if (OurType == typeid(Coyote::PresetMark))
+	{
+		const Coyote::PresetMark *MarkObj = static_cast<const Coyote::PresetMark*>(Object);
+		
+		Values = new std::map<std::string, msgpack::object>
+		{
+			{ "MarkNumber", msgpack::object { MarkObj->MarkNumber.GetCString() } },
+			{ "MarkName", msgpack::object { MarkObj->MarkName.GetCString() } },
+			{ "MarkDisplayTime", msgpack::object { MarkObj->MarkDisplayTime.GetCString() } },
+			{ "MarkTime", msgpack::object { MarkObj->MarkTime } },
+			
+		};
+	}
 	else if (OurType == typeid(Coyote::MediaState))
 	{
 		const Coyote::MediaState *MediaStateObj = static_cast<const Coyote::MediaState*>(Object);
@@ -174,11 +187,33 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			{ "Delay", msgpack::object{ OutputObj->Delay } },
 			{ "Active", msgpack::object{ OutputObj->Active } },
 			{ "Audio", msgpack::object{ OutputObj->Audio } },
+			{ "AudioChannel1", msgpack::object{ OutputObj->AudioChannel1 } },
+			{ "AudioChannel2", msgpack::object{ OutputObj->AudioChannel2 } },
+			{ "AudioChannel3", msgpack::object{ OutputObj->AudioChannel3 } },
+			{ "AudioChannel4", msgpack::object{ OutputObj->AudioChannel4 } },
+			
 		};
 	}
 	else if (OurType == typeid(Coyote::Preset))
 	{
 		const Coyote::Preset *PresetObj = static_cast<const Coyote::Preset*>(Object);
+		
+		std::vector<msgpack::object> GotoArray;
+		GotoArray.reserve(PresetObj->gotoMarks.size());
+		
+		for (const Coyote::PresetMark &Mark : PresetObj->gotoMarks)
+		{
+			GotoArray.emplace_back(PackCoyoteObject(&Mark));
+		}
+		
+		std::vector<msgpack::object> CountdownArray;
+		CountdownArray.reserve(PresetObj->countDowns.size());
+		
+		for (const Coyote::PresetMark &Mark : PresetObj->countDowns)
+		{
+			GotoArray.emplace_back(PackCoyoteObject(&Mark));
+		}
+		
 		
 		Values = new std::map<std::string, msgpack::object>
 		{
@@ -207,7 +242,8 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			{ "VolumeLinked", msgpack::object{ PresetObj->VolumeLinked } },
 			{ "timeCodeUpdate", msgpack::object{ PresetObj->timeCodeUpdate.GetCString() } },
 			{ "tcColor", msgpack::object{ PresetObj->tcColor.GetCString() } },
-				
+			{ "gotoMarks", STLArrayToMsgpackArray(GotoArray) },
+			{ "countDowns", STLArrayToMsgpackArray(CountdownArray) },
 		};
 	}
 
@@ -226,12 +262,16 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 {
 	Coyote::BaseObject *Result = nullptr;
 	
+	LDEBUG;
+	
 	std::map<std::string, msgpack::object> Fields;
 	
 	Object.convert(Fields);
 	
 	if 		(Expected == typeid(Coyote::Output))
 	{
+		LDEBUG_MSG("Debugging Output");
+		
 		Result = new Coyote::Output{};
 		Coyote::Output *OutputObj = static_cast<Coyote::Output*>(Result);
 		OutputObj->Filename = Fields["Filename"].as<std::string>();
@@ -243,9 +283,14 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		OutputObj->Delay = Fields["Delay"].as<double>();
 		OutputObj->Active = Fields["Active"].as<int>();
 		OutputObj->Audio = Fields["Audio"].as<int>();
+		OutputObj->AudioChannel1 = Fields["AudioChannel1"].as<int32_t>();
+		OutputObj->AudioChannel2 = Fields["AudioChannel2"].as<int32_t>();
+		OutputObj->AudioChannel3 = Fields["AudioChannel3"].as<int32_t>();
+		OutputObj->AudioChannel4 = Fields["AudioChannel4"].as<int32_t>();
 	}
 	else if (Expected == typeid(Coyote::Asset))
 	{
+		LDEBUG_MSG("Debugging Asset");
 		Result = new Coyote::Asset{};
 		Coyote::Asset *AssetObj = static_cast<Coyote::Asset*>(Result);
 		
@@ -256,17 +301,32 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 	}
 	else if (Expected == typeid(Coyote::TimeCode))
 	{
+		LDEBUG_MSG("Debugging TimeCode");
+		
 		Result = new Coyote::TimeCode{};
 		Coyote::TimeCode *TCObj = static_cast<Coyote::TimeCode*>(Result);
 		
-		TCObj->TRT = Fields["TRT"].as<uint32_t>();
-		TCObj->Time = Fields["Time"].as<uint32_t>();
+		TCObj->TRT = Fields["TRT"].as<int32_t>();
+		TCObj->Time = Fields["Time"].as<int32_t>();
 		TCObj->ScrubBar = Fields["ScrubBar"].as<double>();
 		TCObj->Selected = Fields["Selected"].as<int>();
-		TCObj->PresetKey = Fields["PresetKey"].as<uint32_t>();
+		TCObj->PresetKey = Fields["PresetKey"].as<int32_t>();
 	}
+	else if (Expected == typeid(Coyote::PresetMark))
+	{
+		LDEBUG_MSG("Debugging PresetMark");
+		Result = new Coyote::PresetMark{};
+		Coyote::PresetMark *MarkObj = static_cast<Coyote::PresetMark*>(Result);
+		
+		MarkObj->MarkNumber = Fields["MarkNumber"].as<std::string>();
+		MarkObj->MarkName = Fields["MarkName"].as<std::string>();
+		MarkObj->MarkDisplayTime = Fields["MarkDisplayTime"].as<std::string>();
+		MarkObj->MarkTime = Fields["MarkTime"].as<int32_t>();
+	}
+		
 	else if (Expected == typeid(Coyote::Preset))
 	{
+		LDEBUG_MSG("Debugging Preset");
 		Result = new Coyote::Preset{};
 		Coyote::Preset *PresetObj = static_cast<Coyote::Preset*>(Result);
 		
@@ -297,10 +357,39 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		PresetObj->Output2 = *std::unique_ptr<Coyote::Output>(static_cast<Coyote::Output*>(UnpackCoyoteObject(Fields["Output2"], typeid(Coyote::Output))));
 		PresetObj->Output3 = *std::unique_ptr<Coyote::Output>(static_cast<Coyote::Output*>(UnpackCoyoteObject(Fields["Output3"], typeid(Coyote::Output))));
 		PresetObj->Output4 = *std::unique_ptr<Coyote::Output>(static_cast<Coyote::Output*>(UnpackCoyoteObject(Fields["Output4"], typeid(Coyote::Output))));
+		
+		std::vector<msgpack::object> Gotos;
+		std::vector<msgpack::object> Countdowns;
+		
+		Fields["gotoMarks"].convert(Gotos);
+		Fields["countDowns"].convert(Countdowns);
+		
+		
+		PresetObj->gotoMarks.reserve(Gotos.size());
+		PresetObj->countDowns.reserve(Countdowns.size());
 
+		LDEBUG_MSG("Decoding Gotos");
+		
+		for (msgpack::object &Obj : Gotos)
+		{
+			const std::unique_ptr<Coyote::BaseObject> Temp { UnpackCoyoteObject(Obj, typeid(Coyote::PresetMark)) };
+			
+			PresetObj->gotoMarks.emplace_back(std::move(*static_cast<Coyote::PresetMark*>(Temp.get())));
+		}
+
+		LDEBUG_MSG("Decoding Countdowns");
+		for (msgpack::object &Obj : Countdowns)
+		{
+			const std::unique_ptr<Coyote::BaseObject> Temp { UnpackCoyoteObject(Obj, typeid(Coyote::PresetMark)) };
+			
+			PresetObj->countDowns.emplace_back(std::move(*static_cast<Coyote::PresetMark*>(Temp.get())));
+		}
+		
 	}
 	else if (Expected == typeid(Coyote::HardwareState))
 	{
+		LDEBUG_MSG("Debugging HardwareState");
+		
 		Result = new Coyote::HardwareState{};
 		Coyote::HardwareState *HWObj = static_cast<Coyote::HardwareState*>(Result);
 		
@@ -311,21 +400,24 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 	}
 	else if (Expected == typeid(Coyote::MediaState))
 	{
+		LDEBUG_MSG("Debugging MediaState");
+		
 		Result = new Coyote::MediaState{};
 		Coyote::MediaState *MSObj = static_cast<Coyote::MediaState*>(Result);
 		
-		std::vector<uint32_t> PlayingPresets;
-		std::vector<uint32_t> PausedPresets;
+		std::vector<int32_t> PlayingPresets;
+		std::vector<int32_t> PausedPresets;
 		
 		Fields["PlayingPresets"].convert(PlayingPresets);
 		Fields["PausedPresets"].convert(PausedPresets);
 		
-		assert(MSObj->PlayingPresets.size() >= PlayingPresets.size());
-		assert(MSObj->PausedPresets.size() >= PausedPresets.size());
+
+		assert(MSObj->PlayingPresets.size() > PlayingPresets.size());
+		assert(MSObj->PausedPresets.size() > PausedPresets.size());
 		
 		//Not sure msgpack.hpp can handle std::array, not gonna find out
-		memcpy(MSObj->PlayingPresets.data(), PlayingPresets.data(), PlayingPresets.size());
-		memcpy(MSObj->PausedPresets.data(), PausedPresets.data(), PausedPresets.size());
+		memcpy(MSObj->PlayingPresets.data(), PlayingPresets.data(), PlayingPresets.size() * sizeof(int32_t));
+		memcpy(MSObj->PausedPresets.data(), PausedPresets.data(), PausedPresets.size() * sizeof(int32_t));
 		
 		MSObj->NumPresets = Fields["NumPresets"].as<int>();
 		MSObj->Selected = Fields["Selected"].as<int>();
@@ -336,6 +428,8 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 	}
 	else if (Expected == typeid(Coyote::NetworkInfo))
 	{
+		LDEBUG_MSG("Debugging NetworkInfo");
+		
 		Result = new Coyote::NetworkInfo{};
 		Coyote::NetworkInfo *InfoObj = static_cast<Coyote::NetworkInfo*>(Result);
 		
@@ -346,5 +440,6 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 	
 	assert(Result != nullptr);
 	
+	LDEBUG_MSG("Exiting!");
 	return Result;
 }

@@ -27,12 +27,13 @@ namespace Subs
 	class SubscriptionSession
 	{
 	private:
-		std::mutex CurTimeCodeLock;
-		Coyote::TimeCode CurTimeCode;
+		std::mutex TimeCodesLock;
+		std::map<int32_t, Coyote::TimeCode> TimeCodes;
+		
 	public:
 		bool ProcessSubscriptionEvent(const std::map<std::string, msgpack::object> &Values);
-		Coyote::TimeCode *GetTimeCode(void);
-		SubscriptionSession() : CurTimeCode() { }
+		Coyote::TimeCode *GetTimeCode(const int32_t PK = 0);
+		SubscriptionSession() : TimeCodes() { }
 	};
 }
 #endif //__LIBCOYOTE_SUBSCRIPTIONS_H__

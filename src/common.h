@@ -34,6 +34,16 @@
 #include <functional>
 #include <typeinfo>
 #include <chrono>
+#include <thread>
+
+#ifdef LCVERBOSE //Only usable for C++
+#define LDEBUG (std::cerr << "THREAD " << std::this_thread::get_id() << " Executing " << __func__ << "() line number " << __LINE__ << " in file " << __FILE__ << std::endl)
+#define LDEBUG_MSG(Msg) (std::cerr << "THREAD " << std::this_thread::get_id() << " Executing " << __func__ << "() line number " << __LINE__ << " in file " << __FILE__ << std::endl << "MESSAGE \"" << std::string(Msg) << '"' << std::endl)
+#else
+#define LDEBUG ((void)0)
+#define LDEBUG_MSG ((void)0)
+#endif //LCVERBOSE
+
 #else
 #include <stdbool.h>
 #endif //__cplusplus
@@ -45,5 +55,6 @@
 #include <unistd.h>
 #define COYOTE_SLEEP(x) usleep((x ) * 1000);
 #endif //WIN32
+
 
 #endif //__LIBCOYOTE_COMMON_H__

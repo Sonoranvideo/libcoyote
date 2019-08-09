@@ -223,6 +223,28 @@ Coyote::StatusCode Coyote::Session::Take(const int32_t PK)
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::SelectNext(void)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	SESS.PerformSyncedCommand("SelectNext", &Status);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::SelectPrev(void)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	SESS.PerformSyncedCommand("SelectPrev", &Status);
+	
+	return Status;
+}
+
 Coyote::StatusCode Coyote::Session::TakeNext(void)
 {
 	DEF_SESS;
@@ -508,11 +530,11 @@ Coyote::StatusCode Coyote::Session::SeekTo(const int32_t PK, const uint32_t Time
 	return Status;
 }
 
-Coyote::StatusCode Coyote::Session::GetTimeCode(Coyote::TimeCode &Out, const int32_t Timeout)
+Coyote::StatusCode Coyote::Session::GetTimeCode(Coyote::TimeCode &Out, const int32_t PK)
 {
 	DEF_SESS;
 
-	if (Coyote::TimeCode *const TC = SESS.ASyncSess.SubSession.GetTimeCode())
+	if (Coyote::TimeCode *const TC = SESS.ASyncSess.SubSession.GetTimeCode(PK))
 	{
 		Out = *TC;
 		delete TC;

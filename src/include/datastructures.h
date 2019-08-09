@@ -21,33 +21,40 @@
 #include <string>
 #include <string.h>
 #include <array>
+#include <vector>
 
 #include "datastructures_c.h"
 
 namespace Coyote
 {
 	static_assert(std::is_standard_layout<CoyoteString>::value && alignof(char*) == alignof(CoyoteString), "CoyoteString is no longer a standard layout class due to some modification you made.");
-	
+
 	struct BaseObject
 	{
 		virtual ~BaseObject(void) = default;
 	};
 	
+	struct PresetMark : public BaseObject, public Coyote_PresetMark
+	{
+		PresetMark(void) : BaseObject(), Coyote_PresetMark() {}
+	};
 	
 	struct TimeCode : public BaseObject, public Coyote_TimeCode
-	{		
+	{
 		inline operator uint32_t(void) const { return this->Time; }
+		TimeCode(void) : BaseObject(), Coyote_TimeCode() {}
 	};
 	
 	struct Asset : public BaseObject, public Coyote_Asset
 	{				
 		inline operator const char*(void) const { return this->FileName; }
 		inline operator std::string(void) const { return this->FileName; }
+		Asset(void) : BaseObject(), Coyote_Asset() {}
 	};
 	
 	struct Output : public BaseObject, public Coyote_Output
 	{
-		Output(void) : BaseObject(), Coyote_Output() { }
+		Output(void) : BaseObject(), Coyote_Output() {}
 	};
 	
 	struct Preset : public BaseObject, public Coyote_Preset
@@ -56,6 +63,8 @@ namespace Coyote
 		Output Output2;
 		Output Output3;
 		Output Output4;
+		std::vector<PresetMark> gotoMarks;
+		std::vector<PresetMark> countDowns;
 		
 		inline operator int32_t(void) const { return this->PK; }
 		inline Preset(void) : BaseObject(), Coyote_Preset()
