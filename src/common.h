@@ -41,7 +41,7 @@
 #define LDEBUG_MSG(Msg) (std::cerr << "THREAD " << std::this_thread::get_id() << " Executing " << __func__ << "() line number " << __LINE__ << " in file " << __FILE__ << std::endl << "MESSAGE \"" << std::string(Msg) << '"' << std::endl)
 #else
 #define LDEBUG ((void)0)
-#define LDEBUG_MSG ((void)0)
+#define LDEBUG_MSG(x) ((void)0)
 #endif //LCVERBOSE
 
 #else
