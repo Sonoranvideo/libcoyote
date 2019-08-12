@@ -127,6 +127,7 @@ void WS::WSCore::ProcessAllOutgoing(void)
 void WS::WSCore::MainLoopBody(void)
 {
 	this->ProcessNewConnections();
+	this->ProcessDeletedConnections();
 	this->ProcessAllOutgoing();
 	this->CheckConnections();
 }
@@ -144,7 +145,7 @@ Rescan:
 		if (Connection->HasError() || Connection->CheckPingout())
 		{
 			std::cout << "LibCoyote: Detected dead connection, pruning" << std::endl;
-			
+
 			SessionSneak_DeactivateConnection(Connection->UserData);
 			
 			this->Connections.erase(Iter);
@@ -157,7 +158,7 @@ Rescan:
 
 void WS::WSCore::ProcessNewConnections(void)
 {
-	const std::lock_guard<std::mutex> Guard { this->ConnectionQueueLock };
+
 	
 	while (!this->ConnectionQueue.empty())
 	{
@@ -175,6 +176,31 @@ void WS::WSCore::ProcessNewConnections(void)
 		Event->Post(ConnStruct { Struct->URI, Struct->UserData, Conn });
 		
 		this->ConnectionQueue.pop();
+	}
+}
+
+void WS::WSCore::ProcessDeletedConnections(void)
+{
+	std::unique_lock<std::mutex> Guard { this->DeletedQueueLock };
+	
+	while (!this->DeletedQueue.empty())
+	{
+		WSConnection *Dead = this->DeletedQueue.front();
+		
+		const std::lock_guard<std::mutex> Guard { this->ConnectionsLock };
+		
+		for (auto Iter = this->Connections.begin(); Iter != this->Connections.end(); ++Iter)
+		{
+			
+			if (Dead != *Iter) continue;
+			
+			this->Connections.erase(Iter);
+			
+			delete Dead;
+			break;
+		}
+		
+		this->DeletedQueue.pop();
 	}
 }
 
@@ -333,11 +359,17 @@ void WS::WSConnection::Send(WSMessage *Msg)
 	
 	this->Outgoing.push(Msg);
 }
+void WS::WSCore::ForgetConnection(WSConnection *Conn)
+{
+
+	const std::lock_guard<std::mutex> G { this->DeletedQueueLock };
+	
+	this->DeletedQueue.push(Conn);
+}
 
 WS::WSConnection::~WSConnection(void)
 {
 	this->Shutdown();
-	this->WebSocket->close();
 }
 
 WS::WSConnection::WSConnection(bool (*const OnReceiveCallback)(WSConnection*, WSMessage*), void *UserData)

@@ -65,7 +65,10 @@ struct InternalSession
 	{
 		this->ConfigConnection();
 	}
-	inline ~InternalSession(void) { delete this->Connection; }
+	inline ~InternalSession(void)
+	{
+		WS::WSCore::GetInstance()->ForgetConnection(this->Connection);
+	}
 };
 
 

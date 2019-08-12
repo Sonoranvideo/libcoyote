@@ -112,14 +112,18 @@ namespace WS
 
 		std::mutex ConnectionQueueLock;
 		std::mutex ConnectionsLock;
+		std::mutex DeletedQueueLock;
 		
 		std::queue<MTEvent<ConnStruct> *> ConnectionQueue;
+		std::queue<WSConnection*> DeletedQueue;
 		std::vector<WSConnection*> Connections;
 		
 		void MasterThread(void);		
 		void ProcessNewConnections(void);
+		void ProcessDeletedConnections(void);
 		void ProcessAllOutgoing(void);
 		void CheckConnections(void);
+
 		WSCore(WSCore &&) = delete;
 		WSCore(const WSCore &) = delete;
 		WSCore & operator=(const WSCore &) = delete;
@@ -130,6 +134,7 @@ namespace WS
 		static void Fireup(bool (*const OnReceiveCallback)(WSConnection*, WSMessage*));
 		WSCore(bool (*const OnReceiveCallback)(WSConnection*, WSMessage*));
 		virtual ~WSCore(void);
+		void ForgetConnection(WSConnection *Conn);
 
 
 		WSConnection *NewConnection(const std::string &Host, void *UserData = nullptr);
