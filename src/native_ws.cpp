@@ -158,7 +158,7 @@ Rescan:
 
 void WS::WSCore::ProcessNewConnections(void)
 {
-
+	const std::lock_guard<std::mutex> G { this->ConnectionQueueLock };
 	
 	while (!this->ConnectionQueue.empty())
 	{
