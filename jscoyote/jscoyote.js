@@ -2,16 +2,16 @@ var ref = require('ref');
 var ffi = require('ffi');
 var Struct = require('ref-struct');
 
-exports.TimeCodeStruct = Struct({'ScrubBar' : 'double',
+var TimeCodeStruct = Struct({'ScrubBar' : 'double',
 							'Time' : 'int32',
 							'TRT' : 'int32',
 							'PresetKey' : 'int32',
 							'Selected' : 'bool'});
 
-exports.TimeCodeStructPtr = ref.refType(exports.TimeCodeStruct);
+var TimeCodeStructPtr = ref.refType(TimeCodeStruct);
 
 							
-exports.jscoyote = ffi.Library('./libcoyote',
+var Decls = ffi.Library('./libcoyote',
 		{
 			'CoyoteSession_New' : ['pointer', ['string'] ],
 			'CoyoteSession_Destroy' : ['void', ['pointer'] ],
@@ -32,6 +32,7 @@ exports.jscoyote = ffi.Library('./libcoyote',
 			'Coyote_SetHardwareMode' : [ 'int', ['pointer', 'int', 'int'] ],
 			'Coyote_InitializeCoyote' : [ 'int', ['pointer', 'int', 'int'] ],
 			'Coyote_SeekTo' : [ 'int', ['pointer', 'int32', 'uint32'] ],
-			'Coyote_GetTimeCode' : [ 'int', ['pointer', 'int32', exports.TimeCodeStructPtr ] ]
+			'Coyote_GetTimeCode' : [ 'int', ['pointer', 'int32', TimeCodeStructPtr ] ]
 		});
-		
+
+Object.assign(exports, Decls, { "TimeCodeStructPtr" : TimeCodeStructPtr, "TimeCodeStruct" : TimeCodeStruct });
