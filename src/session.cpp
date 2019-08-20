@@ -547,16 +547,14 @@ Coyote::StatusCode Coyote::Session::GetTimeCode(Coyote::TimeCode &Out, const int
 	return Coyote::COYOTE_STATUS_FAILED;
 }
 	
-Coyote::StatusCode Coyote::Session::GetAssets(std::vector<Coyote::Asset> &Out, const int32_t Timeout)
+Coyote::StatusCode Coyote::Session::GetAssets(std::vector<Coyote::Asset> &Out)
 {
 	DEF_SESS;
 	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { MAPARG(Timeout) };
-	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
 
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetAssets", &Status, Timeout > 0 ? &Pass : nullptr) };
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetAssets", &Status) };
 	
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
@@ -575,16 +573,13 @@ Coyote::StatusCode Coyote::Session::GetAssets(std::vector<Coyote::Asset> &Out, c
 	return Status;
 }
 
-Coyote::StatusCode Coyote::Session::GetPresets(std::vector<Coyote::Preset> &Out, const int32_t Timeout)
+Coyote::StatusCode Coyote::Session::GetPresets(std::vector<Coyote::Preset> &Out)
 {
 	DEF_SESS;
 	
 	Coyote::StatusCode Status{};
-	
-	const std::map<std::string, msgpack::object> Values { MAPARG(Timeout) };
-	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
 
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetPresets", &Status, Timeout > 0 ? &Pass : nullptr) };
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetPresets", &Status) };
 	
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;

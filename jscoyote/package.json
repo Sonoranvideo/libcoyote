@@ -1,0 +1,16 @@
+{
+  "name": "jscoyote",
+  "version": "0.0.1",
+  "description": "Node.JS bindings for libcoyote. Pre-alpha quality.",
+  "main": "jscoyote.js",
+  "scripts": {
+    "exec": "node jscoyote.js"
+  },
+  "author": "",
+  "license": "Apache 2.0",
+  "dependencies": {
+    "ffi": "^2.3.0",
+    "gyp": "^0.5.0",
+    "node-gyp": "^5.0.3"
+  }
+}

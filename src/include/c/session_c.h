@@ -9,17 +9,25 @@
 #include "../statuscodes.h"
 
 
-CoyoteSession *CoyoteSession_New(const char *Host);
+void CoyoteSession_Destroy(struct CoyoteSession *Sess);
+struct CoyoteSession *CoyoteSession_New(const char *Host);
 
-CoyoteStatusCode Coyote_Take(CoyoteSession *Sess, const int32_t PK);
-CoyoteStatusCode Coyote_Pause(CoyoteSession *Sess, const int32_t PK);
-CoyoteStatusCode Coyote_End(CoyoteSession *Sess, const int32_t PK);
-CoyoteStatusCode Coyote_TakePrev(CoyoteSession *Sess);
-CoyoteStatusCode Coyote_TakeNext(CoyoteSession *Sess);
-CoyoteStatusCode Coyote_RebootCoyote(CoyoteSession *Sess);
-CoyoteStatusCode Coyote_SoftRebootCoyote(CoyoteSession *Sess);
-CoyoteStatusCode Coyote_ShutdownCoyote(CoyoteSession *Sess);
-CoyoteStatusCode Coyote_SeekTo(CoyoteSession *Sess, const int32_t PK, const uint32_t TimeIndex);
-CoyoteStatusCode Coyote_DetectUpdate(CoyoteSession *Sess,  bool *IsDetected, char *OutBuf, const size_t OutBufCapacity);
+void CoyoteObject_Destroy(void *Object);
 
+CoyoteStatusCode Coyote_Take(struct CoyoteSession *Sess, const int32_t PK);
+CoyoteStatusCode Coyote_Pause(struct CoyoteSession *Sess, const int32_t PK);
+CoyoteStatusCode Coyote_End(struct CoyoteSession *Sess, const int32_t PK);
+CoyoteStatusCode Coyote_SelectPrev(struct CoyoteSession *Sess);
+CoyoteStatusCode Coyote_SelectNext(struct CoyoteSession *Sess);
+CoyoteStatusCode Coyote_TakePrev(struct CoyoteSession *Sess);
+CoyoteStatusCode Coyote_TakeNext(struct CoyoteSession *Sess);
+CoyoteStatusCode Coyote_RebootCoyote(struct CoyoteSession *Sess);
+CoyoteStatusCode Coyote_SoftRebootCoyote(struct CoyoteSession *Sess);
+CoyoteStatusCode Coyote_ShutdownCoyote(struct CoyoteSession *Sess);
+CoyoteStatusCode Coyote_SeekTo(struct CoyoteSession *Sess, const int32_t PK, const uint32_t TimeIndex);
+CoyoteStatusCode Coyote_DetectUpdate(struct CoyoteSession *Sess,  bool *IsDetected, char *OutBuf, const size_t OutBufCapacity);
+CoyoteStatusCode Coyote_GetTimeCode(struct CoyoteSession *Sess, const int32_t PK, struct Coyote_TimeCode *OutTC);
+CoyoteStatusCode Coyote_SelectPreset(struct CoyoteSession *Sess, const int32_t PK);
+CoyoteStatusCode Coyote_SetHardwareMode(struct CoyoteSession *Sess, const CoyoteResolutionMode Resolution, const CoyoteRefreshMode RefreshRate);
+CoyoteStatusCode Coyote_InitializeCoyote(struct CoyoteSession *Sess, const CoyoteResolutionMode Resolution, const CoyoteRefreshMode RefreshRate);
 #endif //__LIBCOYOTE_SESSION_C_H__

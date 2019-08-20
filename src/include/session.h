@@ -23,6 +23,7 @@
 #include <string>
 #include <stdint.h>
 #include <vector>
+#include <time.h>
 #include "macros.h"
 #include "statuscodes.h"
 #include "datastructures.h"
@@ -44,8 +45,8 @@ namespace Coyote
 		Session(const Session &) = delete;
 		Session &operator=(const Session &) = delete;
 		
-		StatusCode GetAssets(std::vector<Coyote::Asset> &Out, const int32_t TimeoutMS = -1);
-		StatusCode GetPresets(std::vector<Coyote::Preset> &Out, const int32_t TimeoutMS = -1);
+		StatusCode GetAssets(std::vector<Coyote::Asset> &Out);
+		StatusCode GetPresets(std::vector<Coyote::Preset> &Out);
 		StatusCode GetTimeCode(Coyote::TimeCode &Out, const int32_t PK = 0);
 		
 		//Input parameter names must match the expected JSON names

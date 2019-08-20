@@ -20,6 +20,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include "macros.h"
 #include "statuscodes.h"
 
@@ -139,29 +140,29 @@ struct Coyote_PresetArray
 {
 	void *_Handle; //Used internally
 	size_t Length;
-	Coyote_Preset **Data;
+	struct Coyote_Preset **Data;
 };
 
 struct Coyote_AssetArray
 {
 	void *_Handle; //Used internally
 	size_t Length;
-	Coyote_Asset **Data;
+	struct Coyote_Asset **Data;
 };
 
 struct Coyote_PresetMarkArray
 {
 	void *_Handle; //Used internally
 	size_t Length;
-	Coyote_PresetMark **Data;
+	struct Coyote_PresetMark **Data;
 };
 
 #ifdef __cplusplus
 }
 #else
-void Coyote_AssetArray_Destroy(Coyote_AssetArray *Arr);
-void Coyote_PresetArray_Destroy(Coyote_PresetArray *Arr);
-void CoyoteSession_Destroy(CoyoteSession *Sess);
+void Coyote_AssetArray_Destroy(struct Coyote_AssetArray *Arr);
+void Coyote_PresetArray_Destroy(struct Coyote_PresetArray *Arr);
+
 #endif //__cplusplus
 
 #endif //__LIBCOYOTE_DATASTRUCTURES_C_H__
