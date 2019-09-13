@@ -80,7 +80,27 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_STATUS_MISUSED)
 	EMEMDEF(COYOTE_STATUS_NETWORKERROR)
 	EMEMDEF(COYOTE_STATUS_MAX);
-
+	
+	py::class_<Coyote_NetworkInfo>(ModObj, "Coyote_NetworkInfo")
+	.def(py::init<>())
+	ACLASSBD(Coyote_NetworkInfo, IP)
+	ACLASSBD(Coyote_NetworkInfo, Subnet)
+	ACLASSBD(Coyote_NetworkInfo, AdapterID);
+	
+	py::class_<Coyote::NetworkInfo, Coyote::BaseObject, Coyote_NetworkInfo>(ModObj, "NetworkInfo")
+	.def(py::init<>());
+	
+	py::class_<Coyote_HardwareState>(ModObj, "Coyote_HardwareState")
+	.def(py::init<>())
+	ACLASSBD(Coyote_HardwareState, Resolution)
+	ACLASSBD(Coyote_HardwareState, RefreshRate)
+	ACLASSBD(Coyote_HardwareState, CurrentMode)
+	ACLASSBD(Coyote_HardwareState, SupportsS12G);
+	
+	py::class_<Coyote::HardwareState, Coyote::BaseObject, Coyote_HardwareState>(ModObj, "HardwareState")
+	.def(py::init<>());
+	
+	
 	py::class_<Coyote::Session>(ModObj, "Session")
 	.def(py::init<const std::string &>())
 	ACLASSF(Session, Take)
@@ -201,7 +221,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	py::class_<Coyote_MediaState>(ModObj, "Coyote_MediaState")
 	.def(py::init<>())
 	ACLASSBD(Coyote_MediaState, NumPresets)
-	ACLASSBD(Coyote_MediaState, Selected);
+	ACLASSBD(Coyote_MediaState, SelectedPreset);
 	
 	py::class_<Coyote::MediaState, Coyote::BaseObject, Coyote_MediaState>(ModObj, "MediaState")
 	.def(py::init<>())

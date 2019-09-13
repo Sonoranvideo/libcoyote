@@ -33,6 +33,12 @@ static bool IsSubscriptionEvent(const std::map<std::string, msgpack::object> &Va
 
 thread_local msgpack::zone &MsgpackProc::Zone = *new msgpack::zone; //I don't want this on the stack because I don't trust it.
 
+extern const std::map<Coyote::ResolutionMode, std::string> ResolutionMap;
+extern const std::map<Coyote::RefreshMode, std::string> RefreshMap;
+
+Coyote::RefreshMode ReverseRefreshMap(const std::string &Lookup);
+Coyote::ResolutionMode ReverseResolutionMap(const std::string &Lookup);
+
 //Definitions
 void MsgpackProc::InitOutgoingMsg(msgpack::packer<msgpack::sbuffer> &Pack, const std::string &CommandName, const uint64_t MsgID, const msgpack::object *Values)
 {
@@ -116,8 +122,8 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 		Values = new std::map<std::string, msgpack::object>
 		{
 			{ "SupportsS12G", msgpack::object{ HWStateObj->SupportsS12G } },
-			{ "Resolution", msgpack::object{ HWStateObj->Resolution.GetCString() } },
-			{ "RefreshRate", msgpack::object{ HWStateObj->RefreshRate.GetCString() } },
+			{ "Resolution", msgpack::object{ ResolutionMap.at(HWStateObj->Resolution).c_str() } },
+			{ "RefreshRate", msgpack::object{ RefreshMap.at(HWStateObj->RefreshRate).c_str() } },
 			{ "CurrentMode", msgpack::object{ static_cast<int>(HWStateObj->CurrentMode) } },
 		};
 	}
@@ -154,7 +160,7 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 		Values = new std::map<std::string, msgpack::object>
 		{
 			{ "NumPresets", msgpack::object{ MediaStateObj->NumPresets } },
-			{ "Selected", msgpack::object{ MediaStateObj->Selected } },
+			{ "SelectedPreset", msgpack::object{ MediaStateObj->SelectedPreset } },
 			{ "PlayingPresets", msgpack::object{ STLArrayToMsgpackArray(MediaStateObj->PlayingPresets) } },
 			{ "PausedPresets", msgpack::object{ STLArrayToMsgpackArray(MediaStateObj->PausedPresets) } },
 			{ "TimeCode", PackCoyoteObject(&MediaStateObj->Time) },
@@ -394,8 +400,8 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		Coyote::HardwareState *HWObj = static_cast<Coyote::HardwareState*>(Result);
 		
 		HWObj->SupportsS12G = Fields["SupportsS12G"].as<int>();
-		HWObj->Resolution = Fields["Resolution"].as<std::string>();
-		HWObj->RefreshRate = Fields["RefreshRate"].as<std::string>();
+		HWObj->Resolution = ReverseResolutionMap(Fields["Resolution"].as<std::string>());
+		HWObj->RefreshRate = ReverseRefreshMap(Fields["RefreshRate"].as<std::string>());
 		HWObj->CurrentMode = static_cast<Coyote::HardwareMode>(Fields["CurrentMode"].as<int>());
 	}
 	else if (Expected == typeid(Coyote::MediaState))
@@ -420,7 +426,7 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		memcpy(MSObj->PausedPresets.data(), PausedPresets.data(), PausedPresets.size() * sizeof(int32_t));
 		
 		MSObj->NumPresets = Fields["NumPresets"].as<int>();
-		MSObj->Selected = Fields["Selected"].as<int>();
+		MSObj->SelectedPreset = Fields["SelectedPreset"].as<int>();
 		
 		std::unique_ptr<Coyote::BaseObject> TC { UnpackCoyoteObject(Fields["TimeCode"], typeid(Coyote::TimeCode)) };
 		

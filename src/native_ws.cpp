@@ -15,9 +15,9 @@
 */
 #include <QtWebSockets>
 #include <QCoreApplication>
-#include <moc_native_ws.cpp>
 #include "common.h"
 #include "msgpackproc.h"
+#include "native_ws.h"
 #include <msgpack.hpp>
 #define qs2cs(s) (s.toUtf8().constData()) //Irritating enough to type without caps
 
@@ -96,13 +96,19 @@ void WS::WSConnection::ProcessOutgoingMsgs(void)
 		if (Written != -1 && TotalWritten < MsgSize)
 		{ //Only partially transmitted
 			Msg->RawSeekForward(TotalWritten);
+			
+			QTimer::singleShot(10, this, &WSConnection::ProcessOutgoingMsgs); //Retry rather quickly
 			break;
 		}
 		
 		//Problems.
 		if (Written == -1)
 		{
-			this->ErrorDetected = true;
+			this->ErrorDetectedFlag = true;
+			
+			QTimer::singleShot(250, this, &WSConnection::ProcessOutgoingMsgs); //Retry significantly later since it's unlikely to be fixed
+
+			emit ErrorDetected(this);
 			break;
 		}
 		
@@ -112,23 +118,11 @@ void WS::WSConnection::ProcessOutgoingMsgs(void)
 		delete Msg;
 	}
 }
-void WS::WSCore::ProcessAllOutgoing(void)
-{
-	std::unique_lock<std::mutex> Guard { this->ConnectionsLock };
-	
-	for (WSConnection *Connection : this->Connections)
-	{
-		if (Connection->HasError()) continue;
-		
-		Connection->ProcessOutgoingMsgs();
-	}
-}
 
 void WS::WSCore::MainLoopBody(void)
 {
 	this->ProcessNewConnections();
 	this->ProcessDeletedConnections();
-	this->ProcessAllOutgoing();
 	this->CheckConnections();
 }
 
@@ -197,6 +191,7 @@ void WS::WSCore::ProcessDeletedConnections(void)
 			this->Connections.erase(Iter);
 			
 			delete Dead;
+			Dead = nullptr;
 			break;
 		}
 		
@@ -216,11 +211,11 @@ void WS::WSCore::MasterThread(void)
 {
 	this->EventLoop = new QEventLoop;
 
-	QTimer *LoopTimer = new QTimer;
+	std::unique_ptr<QTimer> LoopTimer { new QTimer };
 	
-	LoopTimer->connect(LoopTimer, &QTimer::timeout, this, &WSCore::MainLoopBody);
+	QObject::connect(LoopTimer.get(), &QTimer::timeout, this, &WSCore::MainLoopBody);
+	
 	LoopTimer->start(10);
-	
 	
 	this->EventLoop->exec();
 }
@@ -264,6 +259,12 @@ void WS::WSConnection::OnRecv(const QByteArray &Data)
 	this->OnReceiveCallback(this, Msg);
 }
 
+void WS::WSConnection::OnError(void)
+{
+	this->ErrorDetectedFlag = true;
+	emit ErrorDetected(this);
+}
+
 bool WS::WSConnection::EstablishConnection(const std::string &Host)
 {
 	this->Host = Host;
@@ -275,7 +276,9 @@ bool WS::WSConnection::EstablishConnection(const std::string &Host)
 	const QString URL { QString("ws://") + this->Host.c_str() + ":" + QString::number(WS::PortNum) + "/" };
 	
 	//Set the error flag if we lose our connection.
-	this->WebSocket->connect(this->WebSocket.get(), QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), [this] (QAbstractSocket::SocketError) { this->ErrorDetected = true; });
+	QObject::connect(this->WebSocket.get(), QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &WSConnection::OnError);
+	
+	QObject::connect(this, &WSConnection::MessageToWrite, this, &WSConnection::ProcessOutgoingMsgs);
 	
 	try
 	{
@@ -283,17 +286,18 @@ bool WS::WSConnection::EstablishConnection(const std::string &Host)
 	}
 	catch (const QAbstractSocket::SocketError &ErrType)
 	{
-		this->ErrorDetected = true;
+		this->ErrorDetectedFlag = true;
+		emit ErrorDetected(this);
 		return false;
 	}
 	
 	//Bring up the socket.
 	
-	this->connect(this->WebSocket.get(), &QWebSocket::binaryMessageReceived, this, &WSConnection::OnRecv);
+	QObject::connect(this->WebSocket.get(), &QWebSocket::binaryMessageReceived, this, &WSConnection::OnRecv);
 	
 	QEventLoop Waiter;
 	
-	this->connect(this->WebSocket.get(), &QWebSocket::connected, this,  [this, &Waiter] { this->OnConnected(); Waiter.quit(); });
+	QObject::connect(this->WebSocket.get(), &QWebSocket::connected, this,  [this, &Waiter] { this->OnConnected(); Waiter.quit(); });
 
 	std::cout << "LibCoyote: Attempting to establish a new connection to " << qs2cs(URL) << std::endl;
 	Waiter.exec();
@@ -350,15 +354,20 @@ void WS::WSConnection::Shutdown(void)
 		
 		delete Msg;
 		this->Outgoing.pop();
-	}
+	}	
 }
 
 void WS::WSConnection::Send(WSMessage *Msg)
 {
-	std::lock_guard<std::mutex> OGuard { this->OMutex };
+	std::unique_lock<std::mutex> OGuard { this->OMutex };
 	
 	this->Outgoing.push(Msg);
+	
+	OGuard.unlock();
+	
+	emit MessageToWrite();
 }
+
 void WS::WSCore::ForgetConnection(WSConnection *Conn)
 {
 
@@ -377,7 +386,7 @@ WS::WSConnection::WSConnection(bool (*const OnReceiveCallback)(WSConnection*, WS
 	OnReceiveCallback(OnReceiveCallback),
 	RecvFragment(),
 	LastPingMS(),
-	ErrorDetected(),
+	ErrorDetectedFlag(),
 	UserData(UserData)
 {
 }
@@ -396,6 +405,6 @@ void WS::WSCore::Fireup(bool (*const OnReceiveCallback)(WSConnection*, WSMessage
 	
 	while (!WSCore::Instance)
 	{
-		COYOTE_SLEEP(100);
+		COYOTE_SLEEP(10);
 	}
 }

@@ -28,10 +28,13 @@
 #ifndef __cplusplus
 typedef const char *COYOTESTRING;
 typedef enum CoyoteHardwareMode COYOTEHARDWAREMODE;
+typedef enum CoyoteRefreshRate COYOTEREFRESHMODE;
 #else
 #include "coyotestring.h"
 typedef Coyote::CoyoteString COYOTESTRING;
 typedef Coyote::HardwareMode COYOTEHARDWAREMODE;
+typedef Coyote::ResolutionMode COYOTERESOLUTIONMODE;
+typedef Coyote::RefreshMode COYOTEREFRESHMODE;
 extern "C" {
 #endif
 
@@ -109,8 +112,8 @@ struct Coyote_Preset
 
 struct Coyote_HardwareState
 {
-	COYOTESTRING Resolution;
-	COYOTESTRING RefreshRate;
+	COYOTERESOLUTIONMODE Resolution;
+	COYOTEREFRESHMODE RefreshRate;
 	COYOTEHARDWAREMODE CurrentMode;
 	bool SupportsS12G;
 };
@@ -128,7 +131,7 @@ struct Coyote_MediaState
 	int32_t *PlayingPresets;
 	int32_t *PausedPresets;
 	int32_t NumPresets;
-	int32_t Selected;
+	int32_t SelectedPreset;
 };
 
 struct CoyoteSession

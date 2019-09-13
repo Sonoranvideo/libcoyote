@@ -31,7 +31,7 @@ bool AsyncToSync::SynchronousSession::OnMessageReady(const std::map<std::string,
 	
 	const uint64_t MsgID = Values.at("MsgID").as<uint64_t>();
 	
-	std::lock_guard<std::mutex> Guard { this->TicketsLock };
+	const std::lock_guard<std::mutex> Guard { this->TicketsLock };
 
 	if (!this->Tickets.count(MsgID)) //Unclaimed, likely asynchronous message. Let WSConnection collect it.
 	{
@@ -63,7 +63,7 @@ bool AsyncToSync::SynchronousSession::DestroyTicket(MessageTicket *Ticket)
 {
 	if (!Ticket) return false;
 	
-	std::lock_guard<std::mutex> G { this->TicketsLock };
+	const std::lock_guard<std::mutex> G { this->TicketsLock };
 
 	//Check that we have such a ticket pointer at all before we dereference it. This is costly and mostly just paranoia.
 	//We're so deep in the semaphore/mutex crap that I can't keep it straight in my own head, so I'll just be paranoid.

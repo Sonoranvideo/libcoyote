@@ -29,6 +29,42 @@
 #define DEF_SESS InternalSession &SESS = *static_cast<InternalSession*>(this->Internal)
 #define MAPARG(x) { #x, msgpack::object{ x, MsgpackProc::Zone } }
 
+extern const std::map<Coyote::RefreshMode, std::string> RefreshMap
+{
+	{ Coyote::COYOTE_REFRESH_23_98, "23.98" },
+	{ Coyote::COYOTE_REFRESH_24, "24" },
+	{ Coyote::COYOTE_REFRESH_25, "25" },
+	{ Coyote::COYOTE_REFRESH_29_97, "29.97" },
+	{ Coyote::COYOTE_REFRESH_30, "30" },
+	{ Coyote::COYOTE_REFRESH_50, "50" },
+	{ Coyote::COYOTE_REFRESH_59_94, "59.94" },
+	{ Coyote::COYOTE_REFRESH_60, "60" }
+};
+
+extern const std::map<Coyote::ResolutionMode, std::string> ResolutionMap
+{
+	{ Coyote::COYOTE_RES_1080P, "1080p" },
+	{ Coyote::COYOTE_RES_2160P, "2160p" },
+	{ Coyote::COYOTE_RES_1080I, "1080i" },
+};
+
+Coyote::RefreshMode ReverseRefreshMap(const std::string &Lookup)
+{
+	for (auto Pair : RefreshMap)
+	{
+		if (Pair.second == Lookup) return Pair.first;
+	}
+	return Coyote::COYOTE_REFRESH_INVALID;
+}
+
+Coyote::ResolutionMode ReverseResolutionMap(const std::string &Lookup)
+{
+	for (auto Pair : ResolutionMap)
+	{
+		if (Pair.second == Lookup) return Pair.first;
+	}
+	return Coyote::COYOTE_RES_INVALID;
+}
 
 struct InternalSession
 {
@@ -47,13 +83,18 @@ struct InternalSession
 	inline bool ConfigConnection(void)
 	{
 		this->CheckWSInit();
-		delete this->Connection;
+		
+		WS::WSCore *Core =  WS::WSCore::GetInstance();
+		
+		if (this->Connection) Core->ForgetConnection(this->Connection);
+		this->Connection = Core->NewConnection(this->Host, this);
 		
 		this->SyncSess.DestroyAllTickets();
-		
-		this->Connection = WS::WSCore::GetInstance()->NewConnection(this->Host, this);
-		
+
 		this->PerformSyncedCommand("SubscribeTC");
+		this->PerformSyncedCommand("SubscribeAssets");
+		this->PerformSyncedCommand("SubscribePresets");
+		this->PerformSyncedCommand("SubscribeHWState");
 		
 		return true;
 	}
@@ -107,7 +148,6 @@ bool InternalSession::OnMessageReady(WS::WSConnection *Conn, WSMessage *Msg)
 	
 	const bool IsSynchronousMsg = Values.count("MsgID");
 	
-	//const bool Success = IsSynchronousMsg ? Sess->SyncSess.OnMessageReady(Values, Sess->Connection, Msg) : false;
 	const bool Success = IsSynchronousMsg ? Sess->SyncSess.OnMessageReady(Values, Sess->Connection, Msg) : Sess->ASyncSess.OnMessageReady(Values, Sess->Connection, Msg);
 	
 	return Success;
@@ -161,25 +201,6 @@ const std::map<std::string, msgpack::object> InternalSession::PerformSyncedComma
 	
 	return Results;
 }
-
-static const std::map<Coyote::RefreshMode, std::string> RefreshMap
-{
-	{ Coyote::COYOTE_REFRESH_23_98, "23.98" },
-	{ Coyote::COYOTE_REFRESH_24, "24" },
-	{ Coyote::COYOTE_REFRESH_25, "25" },
-	{ Coyote::COYOTE_REFRESH_29_97, "29.97" },
-	{ Coyote::COYOTE_REFRESH_30, "30" },
-	{ Coyote::COYOTE_REFRESH_50, "50" },
-	{ Coyote::COYOTE_REFRESH_59_94, "59.94" },
-	{ Coyote::COYOTE_REFRESH_60, "60" }
-};
-
-static const std::map<Coyote::ResolutionMode, std::string> ResolutionMap
-{
-	{ Coyote::COYOTE_RES_1080P, "1080p" },
-	{ Coyote::COYOTE_RES_2160P, "2160p" },
-	{ Coyote::COYOTE_RES_1080I, "1080i" },
-};
 
 Coyote::Session::Session(const std::string &Host) : Internal(new InternalSession{Host})
 {
@@ -547,72 +568,55 @@ Coyote::StatusCode Coyote::Session::GetTimeCode(Coyote::TimeCode &Out, const int
 	return Coyote::COYOTE_STATUS_FAILED;
 }
 	
-Coyote::StatusCode Coyote::Session::GetAssets(std::vector<Coyote::Asset> &Out)
-{
-	DEF_SESS;
-	
-	Coyote::StatusCode Status{};
-	
-
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetAssets", &Status) };
-	
-	
-	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
-	
-	std::vector<msgpack::object> Data;
-	Msg.at("Data").convert(Data);
-	
-	Out.reserve(Data.size());
-	
-	for (auto Iter = Data.begin(); Iter != Data.end(); ++Iter)
-	{
-		std::unique_ptr<Coyote::Asset> CurAsset { static_cast<Coyote::Asset*>(MsgpackProc::UnpackCoyoteObject(*Iter, typeid(Coyote::Asset)) ) };
-		Out.push_back(std::move(*CurAsset));
-	}
-
-	return Status;
-}
-
 Coyote::StatusCode Coyote::Session::GetPresets(std::vector<Coyote::Preset> &Out)
 {
 	DEF_SESS;
-	
-	Coyote::StatusCode Status{};
 
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetPresets", &Status) };
+	std::unique_ptr<std::map<int32_t, Coyote::Preset> > Ptr { SESS.ASyncSess.SubSession.GetPresets() };
 	
+	if (!Ptr) return Coyote::COYOTE_STATUS_FAILED;
 	
-	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	Out.clear();
+	Out.reserve(Ptr->size());
 	
-	std::vector<msgpack::object> Data;
-	Msg.at("Data").convert(Data);
-	
-	Out.reserve(Data.size());
-	
-	for (auto Iter = Data.begin(); Iter != Data.end(); ++Iter)
+	for (auto Pair : *Ptr)
 	{
-		std::unique_ptr<Coyote::Preset> CurPreset { static_cast<Coyote::Preset*>(MsgpackProc::UnpackCoyoteObject(*Iter, typeid(Coyote::Preset)) ) };
-		Out.push_back(std::move(*CurPreset));
+		Out.push_back(std::move(Pair.second));
 	}
 
-	return Status;
+	return Coyote::COYOTE_STATUS_OK;
+}
+
+Coyote::StatusCode Coyote::Session::GetAssets(std::vector<Coyote::Asset> &Out)
+{
+	DEF_SESS;
+
+	std::unique_ptr<std::map<std::string, Coyote::Asset> > Ptr { SESS.ASyncSess.SubSession.GetAssets() };
+	
+	if (!Ptr) return Coyote::COYOTE_STATUS_FAILED;
+	
+	Out.clear();
+	Out.reserve(Ptr->size());
+	
+	for (auto Pair : *Ptr)
+	{
+		Out.push_back(std::move(Pair.second));
+	}
+
+	return Coyote::COYOTE_STATUS_OK;
 }
 
 Coyote::StatusCode Coyote::Session::GetHardwareState(Coyote::HardwareState &Out)
 {
 	DEF_SESS;
 	
-	Coyote::StatusCode Status{};
+	std::unique_ptr<Coyote::HardwareState> Ptr { SESS.ASyncSess.SubSession.GetHardwareState() };
 	
-	const std::map<std::string, msgpack::object> Msg { SESS.PerformSyncedCommand("GetHardwareState", &Status) };
-
-	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
-	
-	std::unique_ptr<Coyote::HardwareState> Ptr { static_cast<Coyote::HardwareState*>(MsgpackProc::UnpackCoyoteObject(Msg.at("Data"), typeid(Coyote::HardwareState))) };
+	if (!Ptr || Ptr->Resolution == Coyote::COYOTE_RES_INVALID) return Coyote::COYOTE_STATUS_FAILED;
 	
 	Out = std::move(*Ptr);
 	
-	return Status;
+	return Coyote::COYOTE_STATUS_OK;
 }
 
 Coyote::StatusCode Coyote::Session::GetIP(const int32_t AdapterID, Coyote::NetworkInfo &Out)

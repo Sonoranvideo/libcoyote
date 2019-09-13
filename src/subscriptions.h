@@ -28,12 +28,21 @@ namespace Subs
 	{
 	private:
 		std::mutex TimeCodesLock;
+		std::mutex PresetsLock;
+		std::mutex AssetsLock;
+		std::mutex HWStateLock;
 		std::map<int32_t, Coyote::TimeCode> TimeCodes;
+		std::map<int32_t, Coyote::Preset> Presets;
+		std::map<std::string, Coyote::Asset> Assets;
+		Coyote::HardwareState HWState;
 		
 	public:
 		bool ProcessSubscriptionEvent(const std::map<std::string, msgpack::object> &Values);
 		Coyote::TimeCode *GetTimeCode(const int32_t PK = 0);
-		SubscriptionSession() : TimeCodes() { }
+		std::map<int32_t, Coyote::Preset> *GetPresets(void);
+		std::map<std::string, Coyote::Asset> *GetAssets(void);
+		Coyote::HardwareState *GetHardwareState(void);
+		SubscriptionSession() : HWState() { }
 	};
 }
 #endif //__LIBCOYOTE_SUBSCRIPTIONS_H__

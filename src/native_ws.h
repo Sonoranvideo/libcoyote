@@ -51,16 +51,15 @@ namespace WS
 		bool (*OnReceiveCallback)(WSConnection*, WSMessage*);
 
 		std::unique_ptr<WSMessage::Fragment> RecvFragment;
-
 		std::unique_ptr<QWebSocket> WebSocket;		
 		std::atomic_uint64_t LastPingMS;
-		std::atomic_bool ErrorDetected;
+		std::atomic_bool ErrorDetectedFlag;
 		
 		//Private methods
 		WSMessage *AddFragment(const void *Data, const size_t DataSize);
 		
 		inline bool AwaitingChunks(void) const { return this->RecvFragment.get(); }
-		inline void ClearError(void) { this->ErrorDetected = false; }
+		inline void ClearError(void) { this->ErrorDetectedFlag = false; }
 		
 		bool EstablishConnection(const std::string &Host);
 	public:
@@ -72,8 +71,7 @@ namespace WS
 		bool CheckPingout(void) const;
 		bool NeedsPing(void) const;
 		void SendPing(void);
-		inline bool HasError(void) const { return this->ErrorDetected; }
-		void ProcessOutgoingMsgs(void);
+		inline bool HasError(void) const { return this->ErrorDetectedFlag; }
 
 		//No copying or moving
 		WSConnection(const WSConnection &) = delete;
@@ -87,6 +85,13 @@ namespace WS
 	public slots:
 		void OnRecv(const QByteArray &Data);
 		void OnConnected(void);
+		void OnError(void);
+		void ProcessOutgoingMsgs(void);
+
+	signals:
+		void ErrorDetected(WSConnection *Conn);
+		void MessageToWrite(void);
+		
 	};
 	
 	
@@ -121,7 +126,6 @@ namespace WS
 		void MasterThread(void);		
 		void ProcessNewConnections(void);
 		void ProcessDeletedConnections(void);
-		void ProcessAllOutgoing(void);
 		void CheckConnections(void);
 
 		WSCore(WSCore &&) = delete;
@@ -136,11 +140,9 @@ namespace WS
 		virtual ~WSCore(void);
 		void ForgetConnection(WSConnection *Conn);
 
-
 		WSConnection *NewConnection(const std::string &Host, void *UserData = nullptr);
 	public slots:
 		void MainLoopBody(void);
-		
 	};
 }
 
