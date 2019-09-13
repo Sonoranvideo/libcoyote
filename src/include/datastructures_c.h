@@ -29,6 +29,7 @@
 typedef const char *COYOTESTRING;
 typedef enum CoyoteHardwareMode COYOTEHARDWAREMODE;
 typedef enum CoyoteRefreshRate COYOTEREFRESHMODE;
+typedef enum CoyoteResolutionMode COYOTERESOLUTIONMODE;
 #else
 #include "coyotestring.h"
 typedef Coyote::CoyoteString COYOTESTRING;
