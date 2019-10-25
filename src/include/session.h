@@ -77,6 +77,7 @@ namespace Coyote
 		StatusCode GetServerVersion(std::string &Out);
 		StatusCode DetectUpdate(bool &ValueOut, std::string *NewVersionOut = nullptr);
 		StatusCode IsMirror(bool &ValueOut);
+		StatusCode GetCurrentRole(UnitRole &RoleOut);
 		StatusCode AddMirror(const std::string &MirrorIP);
 		StatusCode GetMirrors(std::vector<Mirror> &Out);
 		StatusCode SynchronizerBusy(bool &Out);

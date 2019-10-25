@@ -765,6 +765,26 @@ Coyote::StatusCode Coyote::Session::SetHardwareMode(const Coyote::ResolutionMode
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::GetCurrentRole(Coyote::UnitRole &CurrentRoleOut)
+{
+	DEF_SESS;
+	
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetCurrentRole", &Status) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	std::map<std::string, msgpack::object> Data;
+	Msg.at("Data").convert(Data);
+	
+	assert(Data.count("CurrentRoleInt") && Data.count("CurrentRoleText"));
+	
+	CurrentRoleOut = static_cast<UnitRole>(Data.at("CurrentRoleInt").as<int>());
+	
+	return Status;
+}
+
 Coyote::StatusCode Coyote::Session::GetUnitID(std::string &UnitIDOut, std::string &NicknameOut)
 {
 	DEF_SESS;

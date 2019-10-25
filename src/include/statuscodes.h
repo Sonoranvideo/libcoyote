@@ -63,6 +63,18 @@ namespace Coyote
 	};
 	
 #ifdef __cplusplus
+	enum UnitRole
+#else
+	enum CoyoteUnitRole
+#endif //__cplusplus
+	{
+		COYOTE_ROLE_INVALID = 0,
+		COYOTE_ROLE_SINGLE = 1,
+		COYOTE_ROLE_PRIMARY = 2,
+		COYOTE_ROLE_MIRROR = 3,
+		COYOTE_ROLE_MAX
+	};
+#ifdef __cplusplus
 	enum RefreshMode
 #else
 	enum CoyoteRefreshMode

@@ -84,6 +84,13 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_STATUS_NETWORKERROR)
 	EMEMDEF(COYOTE_STATUS_MAX);
 	
+	py::enum_<Coyote::UnitRole>(ModObj, "UnitRole")
+	EMEMDEF(COYOTE_ROLE_INVALID) 
+	EMEMDEF(COYOTE_ROLE_SINGLE)
+	EMEMDEF(COYOTE_ROLE_PRIMARY)
+	EMEMDEF(COYOTE_ROLE_MIRROR)
+	EMEMDEF(COYOTE_ROLE_MAX);
+	
 	py::class_<Coyote_NetworkInfo>(ModObj, "Coyote_NetworkInfo")
 	.def(py::init<>())
 	ACLASSBD(Coyote_NetworkInfo, IP)
@@ -143,16 +150,25 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	.def("GetHardwareState",
 	[] (Coyote::Session &Obj)
 	{
-		Coyote::HardwareState Value;
+		Coyote::HardwareState Value{};
 		
 		const Coyote::StatusCode Status = Obj.GetHardwareState(Value);
+		
+		return std::make_tuple(Status, Value);
+	})
+	.def("GetCurrentRole",
+	[] (Coyote::Session &Obj)
+	{
+		Coyote::UnitRole Value{};
+		
+		const Coyote::StatusCode Status = Obj.GetCurrentRole(Value);
 		
 		return std::make_tuple(Status, Value);
 	})
 	.def("GetTimeCode",
 	[] (Coyote::Session &Obj, int32_t PK)
 	{
-		Coyote::TimeCode Value;
+		Coyote::TimeCode Value{};
 		
 		const Coyote::StatusCode Status = Obj.GetTimeCode(Value, PK);
 		
@@ -161,7 +177,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	.def("GetIP",
 	[] (Coyote::Session &Obj, const int32_t AdapterID)
 	{
-		Coyote::NetworkInfo Value;
+		Coyote::NetworkInfo Value{};
 		
 		const Coyote::StatusCode Status = Obj.GetIP(AdapterID, Value);
 		
