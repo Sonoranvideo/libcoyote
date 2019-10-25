@@ -45,9 +45,9 @@ namespace Coyote
 		Session(const Session &) = delete;
 		Session &operator=(const Session &) = delete;
 		
-		StatusCode GetAssets(std::vector<Coyote::Asset> &Out);
-		StatusCode GetPresets(std::vector<Coyote::Preset> &Out);
-		StatusCode GetTimeCode(Coyote::TimeCode &Out, const int32_t PK = 0);
+		StatusCode GetAssets(std::vector<Asset> &Out);
+		StatusCode GetPresets(std::vector<Preset> &Out);
+		StatusCode GetTimeCode(TimeCode &Out, const int32_t PK = 0);
 		
 		//Input parameter names must match the expected JSON names
 		StatusCode Take(const int32_t PK = 0);
@@ -59,23 +59,28 @@ namespace Coyote
 		StatusCode RenameAsset(const std::string &CurrentName, const std::string &NewName);
 		StatusCode ReorderPresets(const int32_t PK1, const int32_t PK2);
 		StatusCode DeletePreset(const int32_t PK);
-		StatusCode CreatePreset(const Coyote::Preset &Ref);
-		StatusCode UpdatePreset(const Coyote::Preset &Ref);
-		StatusCode LoadPreset(const Coyote::Preset &Ref);
+		StatusCode CreatePreset(const Preset &Ref);
+		StatusCode UpdatePreset(const Preset &Ref);
+		StatusCode LoadPreset(const Preset &Ref);
 		StatusCode BeginUpdate(void);
-		StatusCode IsUpdateDetected(bool &ValueOut); //Deprecated
 		StatusCode GetDisks(std::vector<std::string> &Out);
 		StatusCode EjectDisk(const std::string &DriveLetter);
-		StatusCode GetHardwareState(Coyote::HardwareState &Out);
+		StatusCode GetUnitID(std::string &UnitIDOut, std::string &NicknameOut);
+		StatusCode GetHardwareState(HardwareState &Out);
 		StatusCode RestartService(void);
-		StatusCode GetIP(const int32_t AdapterID, Coyote::NetworkInfo &Out);
-		StatusCode SetIP(const Coyote::NetworkInfo &Input);
-		StatusCode InitializeCoyote(const Coyote::ResolutionMode Resolution, const Coyote::RefreshMode RefreshRate);
-		StatusCode SetHardwareMode(const Coyote::ResolutionMode Resolution, const Coyote::RefreshMode RefreshRate);
+		StatusCode GetIP(const int32_t AdapterID, NetworkInfo &Out);
+		StatusCode SetIP(const NetworkInfo &Input);
+		StatusCode InitializeCoyote(const ResolutionMode Resolution, const RefreshMode RefreshRate);
+		StatusCode SetHardwareMode(const ResolutionMode Resolution, const RefreshMode RefreshRate);
 		StatusCode SelectPreset(const int32_t PK);
-		StatusCode GetMediaState(Coyote::MediaState &Out);
+		StatusCode GetMediaState(MediaState &Out);
 		StatusCode GetServerVersion(std::string &Out);
 		StatusCode DetectUpdate(bool &ValueOut, std::string *NewVersionOut = nullptr);
+		StatusCode IsMirror(bool &ValueOut);
+		StatusCode AddMirror(const std::string &MirrorIP);
+		StatusCode GetMirrors(std::vector<Mirror> &Out);
+		StatusCode SynchronizerBusy(bool &Out);
+		StatusCode DeconfigureSync(void);
 		StatusCode RebootCoyote(void);
 		StatusCode ShutdownCoyote(void);
 		StatusCode SoftRebootCoyote(void);

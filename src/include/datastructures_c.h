@@ -154,6 +154,14 @@ struct Coyote_AssetArray
 	struct Coyote_Asset **Data;
 };
 
+struct Coyote_Mirror
+{
+	COYOTESTRING UnitID;
+	COYOTESTRING IP;
+	bool Busy;
+	bool SupportsS12G;
+};
+
 struct Coyote_PresetMarkArray
 {
 	void *_Handle; //Used internally

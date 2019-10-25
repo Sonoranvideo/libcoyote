@@ -36,10 +36,13 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	.def(py::init<>());
 	
 	py::class_<Coyote::CoyoteString>(ModObj, "CoyoteString")
-	.def(py::init<>())
+	.def(py::init<const std::string &>())
 	.def("__str__", &Coyote::CoyoteString::operator std::string)
-	.def("__repr__", &Coyote::CoyoteString::operator std::string);
-	
+	.def("__repr__", &Coyote::CoyoteString::operator std::string)
+	ACLASSF(CoyoteString, Set)
+	ACLASSF(CoyoteString, GetCString)
+	ACLASSF(CoyoteString, GetStdString)
+	ACLASSF(CoyoteString, GetLength);
 	
 	py::bind_vector<std::vector<Coyote::Preset> >(ModObj, "PresetList");
 	py::bind_vector<std::vector<Coyote::Asset> >(ModObj, "AssetList");
@@ -103,6 +106,103 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	
 	py::class_<Coyote::Session>(ModObj, "Session")
 	.def(py::init<const std::string &>())
+	.def("IsMirror",
+	[] (Coyote::Session &Obj)
+	{
+		bool Value{};
+		const Coyote::StatusCode Status = Obj.IsMirror(Value);
+		
+		return std::make_tuple(Status, Value);
+	})
+	.def("DetectUpdate",
+	[] (Coyote::Session &Obj)
+	{
+		bool Detected{};
+		std::string Version;
+		const Coyote::StatusCode Status = Obj.DetectUpdate(Detected, &Version);
+		
+		return std::make_tuple(Status, Detected, Version);
+	})
+	.def("GetServerVersion",
+	[] (Coyote::Session &Obj)
+	{
+		std::string Version;
+		const Coyote::StatusCode Status = Obj.GetServerVersion(Version);
+		
+		return std::make_tuple(Status, Version);
+	})
+	.def("GetUnitID",
+	[] (Coyote::Session &Obj)
+	{
+		std::map<std::string, std::string> Vals;
+		
+		const Coyote::StatusCode Status = Obj.GetUnitID(Vals["UnitID"], Vals["Nickname"]);
+		
+		return std::make_tuple(Status, Vals);
+	})
+	.def("GetHardwareState",
+	[] (Coyote::Session &Obj)
+	{
+		Coyote::HardwareState Value;
+		
+		const Coyote::StatusCode Status = Obj.GetHardwareState(Value);
+		
+		return std::make_tuple(Status, Value);
+	})
+	.def("GetTimeCode",
+	[] (Coyote::Session &Obj, int32_t PK)
+	{
+		Coyote::TimeCode Value;
+		
+		const Coyote::StatusCode Status = Obj.GetTimeCode(Value, PK);
+		
+		return std::make_tuple(Status, Value);
+	})
+	.def("GetIP",
+	[] (Coyote::Session &Obj, const int32_t AdapterID)
+	{
+		Coyote::NetworkInfo Value;
+		
+		const Coyote::StatusCode Status = Obj.GetIP(AdapterID, Value);
+		
+		return std::make_tuple(Status, Value);
+	})
+	.def("GetDisks",
+	[] (Coyote::Session &Obj)
+	{
+		std::vector<std::string> Disks;
+		
+		const Coyote::StatusCode Status = Obj.GetDisks(Disks);
+		
+		return std::make_tuple(Status, Disks);
+	})
+	.def("GetPresets",
+	[] (Coyote::Session &Obj)
+	{
+		std::vector<Coyote::Preset> Presets;
+		
+		const Coyote::StatusCode Status = Obj.GetPresets(Presets);
+		
+		return std::make_tuple(Status, Presets);
+	})
+	.def("GetAssets",
+	[] (Coyote::Session &Obj)
+	{
+		std::vector<Coyote::Asset> Assets;
+		
+		const Coyote::StatusCode Status = Obj.GetAssets(Assets);
+		
+		return std::make_tuple(Status, Assets);
+	})
+	.def("GetMirrors",
+	[] (Coyote::Session &Obj)
+	{
+		std::vector<Coyote::Mirror> Mirrors;
+		
+		const Coyote::StatusCode Status = Obj.GetMirrors(Mirrors);
+		
+		return std::make_tuple(Status, Mirrors);
+	})
 	ACLASSF(Session, Take)
 	ACLASSF(Session, End)
 	ACLASSF(Session, Pause)
@@ -116,19 +216,17 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, UpdatePreset)
 	ACLASSF(Session, LoadPreset)
 	ACLASSF(Session, BeginUpdate)
-	ACLASSF(Session, IsUpdateDetected)
-	ACLASSF(Session, GetDisks)
+	ACLASSF(Session, DetectUpdate)
 	ACLASSF(Session, EjectDisk)
-	ACLASSF(Session, GetHardwareState)
 	ACLASSF(Session, RestartService)
 	ACLASSF(Session, GetIP)
 	ACLASSF(Session, SetIP)
 	ACLASSF(Session, InitializeCoyote)
 	ACLASSF(Session, SetHardwareMode)
 	ACLASSF(Session, SelectPreset)
-	ACLASSF(Session, GetMediaState)
-	ACLASSF(Session, GetServerVersion)
-	ACLASSF(Session, DetectUpdate)
+	ACLASSF(Session, SynchronizerBusy)
+	ACLASSF(Session, AddMirror)
+	ACLASSF(Session, DeconfigureSync)
 	ACLASSF(Session, RebootCoyote)
 	ACLASSF(Session, ShutdownCoyote)
 	ACLASSF(Session, SoftRebootCoyote)
@@ -136,9 +234,6 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, SelectPrev)
 	ACLASSF(Session, TakeNext)
 	ACLASSF(Session, TakePrev)
-	ACLASSF(Session, GetAssets)
-	ACLASSF(Session, GetPresets)
-	ACLASSF(Session, GetTimeCode)
 	ACLASSF(Session, SetCommandTimeoutSecs)
 	ACLASSF(Session, GetCommandTimeoutSecs);
 	
@@ -218,6 +313,16 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	py::class_<Coyote::TimeCode, Coyote::BaseObject, Coyote_TimeCode>(ModObj, "TimeCode")
 	.def(py::init<>());
 
+	py::class_<Coyote_Mirror>(ModObj, "Coyote_Mirror")
+	.def(py::init<>())
+	ACLASSBD(Coyote_Mirror, UnitID)
+	ACLASSBD(Coyote_Mirror, IP)
+	ACLASSBD(Coyote_Mirror, Busy)
+	ACLASSBD(Coyote_Mirror, SupportsS12G);
+	
+	py::class_<Coyote::Mirror, Coyote::BaseObject, Coyote_Mirror>(ModObj, "Mirror")
+	.def(py::init<>());
+	
 	py::class_<Coyote_MediaState>(ModObj, "Coyote_MediaState")
 	.def(py::init<>())
 	ACLASSBD(Coyote_MediaState, NumPresets)
@@ -228,7 +333,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSD(MediaState, PlayingPresets)
 	ACLASSD(MediaState, PausedPresets)
 	ACLASSD(MediaState, Time);
-
+	
 	py::class_<Coyote_Asset>(ModObj, "Coyote_Asset")
 	.def(py::init<>())
 	ACLASSBD(Coyote_Asset, FileName)

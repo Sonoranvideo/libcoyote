@@ -436,11 +436,32 @@ Coyote::StatusCode Coyote::Session::ShutdownCoyote(void)
 }
 
 	
-Coyote::StatusCode Coyote::Session::IsUpdateDetected(bool &ValueOut)
+Coyote::StatusCode Coyote::Session::IsMirror(bool &ValueOut)
 {
 	DEF_SESS;
 	
-	const char *CmdName = "IsUpdateDetected";
+	const char *CmdName = "IsMirror";
+	
+	Coyote::StatusCode Status{};
+
+	const std::map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand(CmdName, &Status) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	std::map<std::string, msgpack::object> DataField;
+	
+	Response.at("Data").convert(DataField);
+		
+	ValueOut = DataField[CmdName].as<int>();
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::SynchronizerBusy(bool &ValueOut)
+{
+	DEF_SESS;
+	
+	const char *CmdName = "SynchronizerBusy";
 	
 	Coyote::StatusCode Status{};
 
@@ -452,7 +473,32 @@ Coyote::StatusCode Coyote::Session::IsUpdateDetected(bool &ValueOut)
 	
 	Response.at("Data").convert(DataField);
 		
-	ValueOut = DataField[CmdName].as<int>();
+	ValueOut = DataField["Busy"].as<int>();
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::DeconfigureSync(void)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	SESS.PerformSyncedCommand("DeconfigureSync", &Status);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::AddMirror(const std::string &MirrorIP)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values { { "BackupIP",  msgpack::object{MirrorIP.c_str(), MsgpackProc::Zone } } };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
+	
+	SESS.PerformSyncedCommand("AddMirror", &Status, &Pass);
 	
 	return Status;
 }
@@ -719,6 +765,27 @@ Coyote::StatusCode Coyote::Session::SetHardwareMode(const Coyote::ResolutionMode
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::GetUnitID(std::string &UnitIDOut, std::string &NicknameOut)
+{
+	DEF_SESS;
+	
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetUnitID", &Status) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	std::map<std::string, msgpack::object> Data;
+	Msg.at("Data").convert(Data);
+	
+	assert(Data.count("UnitID") && Data.count("Nickname"));
+	
+	UnitIDOut = Data.at("UnitID").as<std::string>();
+	NicknameOut = Data.at("Nickname").as<std::string>();
+	
+	return Status;
+}
+
 Coyote::StatusCode Coyote::Session::GetServerVersion(std::string &Out)
 {
 	DEF_SESS;
@@ -738,6 +805,33 @@ Coyote::StatusCode Coyote::Session::GetServerVersion(std::string &Out)
 	
 	return Status;
 }
+
+Coyote::StatusCode Coyote::Session::GetMirrors(std::vector<Coyote::Mirror> &Out)
+{
+	DEF_SESS;
+
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetMirrors", &Status) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	
+	std::vector<msgpack::object> Data;
+
+	Msg.at("Data").convert(Data);
+	
+	for (msgpack::object &Object : Data)
+	{
+		LDEBUG_MSG("Found mirror data");
+		std::unique_ptr<Coyote::Mirror> MirrorStruct { static_cast<Coyote::Mirror*>(MsgpackProc::UnpackCoyoteObject(Object, typeid(Coyote::Mirror))) };
+		
+		Out.emplace_back(std::move(*MirrorStruct));
+	}
+
+	return Coyote::COYOTE_STATUS_OK;
+}
+
 
 Coyote::StatusCode Coyote::Session::DetectUpdate(bool &DetectedOut, std::string *Out)
 {

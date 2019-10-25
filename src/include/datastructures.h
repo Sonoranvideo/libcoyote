@@ -85,7 +85,12 @@ namespace Coyote
 	{
 		NetworkInfo(void) : Coyote_NetworkInfo() { }
 	};
-
+	
+	struct Mirror : public BaseObject, public Coyote_Mirror
+	{
+		Mirror(void) : BaseObject(), Coyote_Mirror() {}
+	};
+		
 	struct MediaState : public BaseObject, public Coyote_MediaState
 	{
 		std::vector<int32_t> PlayingPresets; //One extra for a null terminator

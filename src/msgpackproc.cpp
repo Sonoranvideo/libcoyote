@@ -177,6 +177,18 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			{ "AdapterID", msgpack::object{ NetInfo->AdapterID } },
 		};
 	}
+	else if (OurType == typeid(Coyote::Mirror))
+	{
+		const Coyote::Mirror *MirrorInfo = static_cast<const Coyote::Mirror*>(Object);
+		
+		Values = new std::map<std::string, msgpack::object>
+		{
+			{ "IP", msgpack::object{ MirrorInfo->IP.GetCString() } },
+			{ "Busy", msgpack::object{ MirrorInfo->Busy } },
+			{ "SupportsS12G", msgpack::object{ MirrorInfo->SupportsS12G } },
+			{ "UnitID", msgpack::object{ MirrorInfo->UnitID.GetCString() } },
+		};
+	}
 	else if (OurType == typeid(Coyote::Output))
 	{
 		const Coyote::Output *OutputObj = static_cast<const Coyote::Output*>(Object);
@@ -431,6 +443,18 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		std::unique_ptr<Coyote::BaseObject> TC { UnpackCoyoteObject(Fields["TimeCode"], typeid(Coyote::TimeCode)) };
 		
 		MSObj->Time = *static_cast<Coyote::TimeCode*>(TC.get());
+	}
+	else if (Expected == typeid(Coyote::Mirror))
+	{
+		LDEBUG_MSG("Debugging Mirror");
+		
+		Result = new Coyote::Mirror{};
+		Coyote::Mirror *InfoObj = static_cast<Coyote::Mirror*>(Result);
+		
+		InfoObj->IP = Fields["IP"].as<std::string>();
+		InfoObj->UnitID = Fields["UnitID"].as<std::string>();
+		InfoObj->Busy = Fields["Busy"].as<int>();
+		InfoObj->SupportsS12G = Fields["SupportsS12G"].as<int>();
 	}
 	else if (Expected == typeid(Coyote::NetworkInfo))
 	{

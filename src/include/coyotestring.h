@@ -46,6 +46,13 @@ namespace Coyote
 		inline operator std::string(void) const { return this->Buffer; }
 		inline const char *GetCString(void) const { return this->Buffer; }
 		inline std::string GetStdString(void) const { return this->Buffer; }
+		
+		inline void Set(const std::string &NewData)
+		{
+			free(this->Buffer);
+			this->Buffer = strdup(NewData.c_str());
+		}
+		
 		inline size_t GetLength(void) const { return strlen(this->Buffer); }
 		inline CoyoteString(const CoyoteString &Ref) : Buffer(strdup(Ref.Buffer)) {}
 		inline CoyoteString(CoyoteString &&Ref) : Buffer(Ref.Buffer) { Ref.Buffer = nullptr; }
