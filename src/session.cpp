@@ -389,7 +389,124 @@ Coyote::StatusCode InternalSession::CreatePreset_Multi(const Coyote::Preset &Ref
 	
 	return Status;
 }
+
+Coyote::StatusCode Coyote::Session::RenameCountdown(const int32_t PK, const int32_t Time, const std::string &NewName)
+{
+	DEF_SESS;
 	
+	Coyote::StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values
+	{
+		{ "PK", msgpack::object{PK, MsgpackProc::Zone} },
+		{ "Time", msgpack::object{Time, MsgpackProc::Zone} },
+		{ "NewName", msgpack::object{NewName.c_str(), MsgpackProc::Zone} }
+	};
+	
+	const msgpack::object &Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
+	
+	SESS.PerformSyncedCommand("RenameCountdown", &Status, &Pass);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::RenameGoto(const int32_t PK, const int32_t Time, const std::string &NewName)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values
+	{
+		{ "PK", msgpack::object{PK, MsgpackProc::Zone} },
+		{ "Time", msgpack::object{Time, MsgpackProc::Zone} },
+		{ "NewName", msgpack::object{NewName.c_str(), MsgpackProc::Zone} }
+	};
+	
+	const msgpack::object &Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
+	
+	SESS.PerformSyncedCommand("RenameGoto", &Status, &Pass);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::DeleteCountdown(const int32_t PK, const int32_t Time)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values
+	{
+		{ "PK", msgpack::object{PK, MsgpackProc::Zone} },
+		{ "Time", msgpack::object{Time, MsgpackProc::Zone} },
+	};
+	
+	const msgpack::object &Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
+	
+	SESS.PerformSyncedCommand("DeleteCountdown", &Status, &Pass);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::DeleteGoto(const int32_t PK, const int32_t Time)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values
+	{
+		{ "PK", msgpack::object{PK, MsgpackProc::Zone} },
+		{ "Time", msgpack::object{Time, MsgpackProc::Zone} },
+	};
+	
+	const msgpack::object &Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
+	
+	SESS.PerformSyncedCommand("DeleteGoto", &Status, &Pass);
+	
+	return Status;
+}
+Coyote::StatusCode Coyote::Session::CreateCountdown(const int32_t PK, const int32_t Time, const std::string &Name)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values
+	{
+		{ "PK", msgpack::object{PK, MsgpackProc::Zone} },
+		{ "Time", msgpack::object{Time, MsgpackProc::Zone} },
+		{ "Name", msgpack::object{Name.c_str(), MsgpackProc::Zone} }
+	};
+	
+	const msgpack::object &Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
+	
+	SESS.PerformSyncedCommand("CreateCountdown", &Status, &Pass);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::CreateGoto(const int32_t PK, const int32_t Time, const std::string &Name)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values
+	{
+		{ "PK", msgpack::object{PK, MsgpackProc::Zone} },
+		{ "Time", msgpack::object{Time, MsgpackProc::Zone} },
+		{ "Name", msgpack::object{Name.c_str(), MsgpackProc::Zone} }
+	};
+	
+	const msgpack::object &Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
+	
+	SESS.PerformSyncedCommand("CreateGoto", &Status, &Pass);
+	
+	return Status;
+}
+
 Coyote::StatusCode Coyote::Session::BeginUpdate(void)
 {
 	DEF_SESS;

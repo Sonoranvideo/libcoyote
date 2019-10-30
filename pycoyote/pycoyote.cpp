@@ -20,10 +20,6 @@
 
 namespace py = pybind11;
 
-PYBIND11_MAKE_OPAQUE(std::vector<std::string>)
-PYBIND11_MAKE_OPAQUE(std::vector<Coyote::Asset>)
-PYBIND11_MAKE_OPAQUE(std::vector<Coyote::Preset>)
-
 #define ACLASSF(a, b) .def(#b, &Coyote::a::b)
 #define ACLASSD(a, b) .def_readwrite(#b, &Coyote::a::b)
 #define ACLASSBD(a, b) .def_readwrite(#b, &a::b)
@@ -44,10 +40,6 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(CoyoteString, GetStdString)
 	ACLASSF(CoyoteString, GetLength);
 	
-	py::bind_vector<std::vector<Coyote::Preset> >(ModObj, "PresetList");
-	py::bind_vector<std::vector<Coyote::Asset> >(ModObj, "AssetList");
-	py::bind_vector<std::vector<std::string> >(ModObj, "StringList");
-	py::bind_vector<std::vector<Coyote::PresetMark> >(ModObj, "MarkList");
 	
 	py::enum_<Coyote::RefreshMode>(ModObj, "RefreshMode")
 	EMEMDEF(COYOTE_REFRESH_INVALID)
@@ -248,6 +240,12 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, SoftRebootCoyote)
 	ACLASSF(Session, SelectNext)
 	ACLASSF(Session, SelectPrev)
+	ACLASSF(Session, DeleteGoto)
+	ACLASSF(Session, DeleteCountdown)
+	ACLASSF(Session, RenameGoto)
+	ACLASSF(Session, RenameCountdown)
+	ACLASSF(Session, CreateGoto)
+	ACLASSF(Session, CreateCountdown)
 	ACLASSF(Session, TakeNext)
 	ACLASSF(Session, TakePrev)
 	ACLASSF(Session, SetCommandTimeoutSecs)
@@ -301,6 +299,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	
 	py::class_<Coyote::Preset, Coyote::BaseObject, Coyote_Preset>(ModObj, "Preset")
 	.def(py::init<>())
+	.def("__repr__", [] (Coyote::Preset &Obj) { return std::string{"<Preset \""} + Obj.Name.GetStdString() + "\">"; })
 	ACLASSD(Preset, Output1)
 	ACLASSD(Preset, Output2)
 	ACLASSD(Preset, Output3)
@@ -316,7 +315,8 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSBD(Coyote_PresetMark, MarkTime);
 
 	py::class_<Coyote::PresetMark, Coyote::BaseObject, Coyote_PresetMark>(ModObj, "PresetMark")
-	.def(py::init<>());
+	.def(py::init<>())
+	.def("__repr__", [] (Coyote::PresetMark &Obj) { return std::string{"<PresetMark \""} + Obj.MarkName.GetStdString() + "\", time " + std::to_string(Obj.MarkTime) + ">"; });
 	
 	py::class_<Coyote_TimeCode>(ModObj, "Coyote_TimeCode")
 	.def(py::init<>())
@@ -352,6 +352,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	
 	py::class_<Coyote_Asset>(ModObj, "Coyote_Asset")
 	.def(py::init<>())
+	.def("__repr__", [] (Coyote::Asset &Obj) { return std::string{"<Asset \""} + Obj.FileName.GetStdString() + "\">"; })
 	ACLASSBD(Coyote_Asset, FileName)
 	ACLASSBD(Coyote_Asset, NewFileName)
 	ACLASSBD(Coyote_Asset, CopyPercentage)

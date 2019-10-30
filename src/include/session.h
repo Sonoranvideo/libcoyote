@@ -89,7 +89,12 @@ namespace Coyote
 		StatusCode SelectPrev(void);
 		StatusCode TakeNext(void);
 		StatusCode TakePrev(void);
-		
+		StatusCode RenameGoto(const int32_t PK, const int32_t Time, const std::string &Name);
+		StatusCode RenameCountdown(const int32_t PK, const int32_t Time, const std::string &Name);
+		StatusCode DeleteGoto(const int32_t PK, const int32_t Time);
+		StatusCode DeleteCountdown(const int32_t PK, const int32_t Time);
+		StatusCode CreateGoto(const int32_t PK, const int32_t Time, const std::string &Name);
+		StatusCode CreateCountdown(const int32_t PK, const int32_t Time, const std::string &Name);
 		virtual ~Session(void);
 		
 		void SetCommandTimeoutSecs(const time_t TimeoutSecs = DefaultCommandTimeoutSecs);
