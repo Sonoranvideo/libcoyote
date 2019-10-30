@@ -60,7 +60,18 @@ struct Coyote_Asset
 {
 	COYOTESTRING FileName; ///The part we care about most
 	COYOTESTRING NewFileName; //NewFileName should only be used when renaming/moving assets. Leaving it empty the rest of the time is fine.
+	COYOTESTRING Videoencoding_FCC;
+	COYOTESTRING Audioencoding_FCC;
+	int32_t AudioNumChannels;
+	int32_t AudioSampleRate;
+	int32_t DurationMs;
+	int32_t Size;
+	int32_t VideoFrameRate;
+	int32_t VideoHeight;
+	int32_t VideoWidth;
 	uint8_t CopyPercentage; //User shouldn't need to write to this
+	bool SupportedVidEncode;
+	bool SupportedAudEncode;
 	bool IsReady; //or this
 };
 

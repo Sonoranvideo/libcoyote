@@ -112,7 +112,18 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			{ "FileName", msgpack::object{ AssetObj->FileName.GetCString() } },
 			{ "NewFileName", msgpack::object{ AssetObj->NewFileName.GetCString() } },
 			{ "CopyPercentage", msgpack::object{ (int)AssetObj->CopyPercentage } },
-			{ "IsReady", msgpack::object{ AssetObj->IsReady } }
+			{ "IsReady", msgpack::object{ AssetObj->IsReady } },
+			{ "AudioSampleRate", msgpack::object { AssetObj->AudioSampleRate } },
+			{ "AudioNumChannels", msgpack::object { AssetObj->AudioNumChannels } },
+			{ "DurationMs", msgpack::object { AssetObj->DurationMs } },
+			{ "Size", msgpack::object { AssetObj->Size } },
+			{ "VideoFrameRate", msgpack::object { AssetObj->VideoFrameRate } },
+			{ "VideoHeight", msgpack::object { AssetObj->VideoHeight } },
+			{ "VideoWidth", msgpack::object { AssetObj->VideoWidth } },
+			{ "Videoencoding_FCC", msgpack::object { AssetObj->Videoencoding_FCC.GetCString() } },
+			{ "Audioencoding_FCC", msgpack::object { AssetObj->Audioencoding_FCC.GetCString() } },
+			{ "SupportedVidEncode", msgpack::object { AssetObj->SupportedVidEncode } },
+			{ "SupportedAudEncode", msgpack::object { AssetObj->SupportedAudEncode } },
 		};
 	}
 	else if (OurType == typeid(Coyote::HardwareState))
@@ -317,6 +328,17 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		AssetObj->NewFileName = Fields["NewFileName"].as<std::string>();
 		AssetObj->CopyPercentage = Fields["CopyPercentage"].as<uint32_t>(); //Because idk if msgpack treats uint8_t like a character or a number
 		AssetObj->IsReady = Fields["IsReady"].as<int>();
+		AssetObj->AudioSampleRate = Fields["AudioSampleRate"].as<int32_t>();
+		AssetObj->AudioNumChannels = Fields["AudioNumChannels"].as<int32_t>();
+		AssetObj->DurationMs = Fields["DurationMs"].as<int32_t>();
+		AssetObj->Size = Fields["Size"].as<int32_t>();
+		AssetObj->VideoFrameRate = Fields["VideoFrameRate"].as<int32_t>();
+		AssetObj->VideoHeight = Fields["VideoHeight"].as<int32_t>();
+		AssetObj->VideoWidth = Fields["VideoWidth"].as<int32_t>();
+		AssetObj->Videoencoding_FCC = Fields["Videoencoding_FCC"].as<std::string>();
+		AssetObj->Audioencoding_FCC = Fields["Audioencoding_FCC"].as<std::string>();
+		AssetObj->SupportedVidEncode = Fields["SupportedVidEncode"].as<int>();
+		AssetObj->SupportedAudEncode = Fields["SupportedAudEncode"].as<int>();
 	}
 	else if (Expected == typeid(Coyote::TimeCode))
 	{

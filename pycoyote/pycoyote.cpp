@@ -357,7 +357,18 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSBD(Coyote_Asset, FileName)
 	ACLASSBD(Coyote_Asset, NewFileName)
 	ACLASSBD(Coyote_Asset, CopyPercentage)
-	ACLASSBD(Coyote_Asset, IsReady);
+	ACLASSBD(Coyote_Asset, IsReady)
+	ACLASSBD(Coyote_Asset, AudioNumChannels)
+	ACLASSBD(Coyote_Asset, AudioSampleRate)
+	ACLASSBD(Coyote_Asset, DurationMs)
+	ACLASSBD(Coyote_Asset, Size)
+	ACLASSBD(Coyote_Asset, VideoFrameRate)
+	ACLASSBD(Coyote_Asset, VideoHeight)
+	ACLASSBD(Coyote_Asset, VideoWidth)
+	ACLASSBD(Coyote_Asset, Videoencoding_FCC)
+	ACLASSBD(Coyote_Asset, Audioencoding_FCC)
+	ACLASSBD(Coyote_Asset, SupportedVidEncode)
+	ACLASSBD(Coyote_Asset, SupportedAudEncode);
 	
 	py::class_<Coyote::Asset, Coyote::BaseObject, Coyote_Asset>(ModObj, "Asset")
 	.def(py::init<>());
