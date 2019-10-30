@@ -300,7 +300,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	
 	py::class_<Coyote::Preset, Coyote::BaseObject, Coyote_Preset>(ModObj, "Preset")
 	.def(py::init<>())
-	.def("__repr__", [] (Coyote::Preset &Obj) { return std::string{"<Preset \""} + Obj.Name.GetStdString() + "\">"; })
+	.def("__repr__", [] (Coyote::Preset &Obj) { return std::string{"<Preset \""} + Obj.Name.GetStdString() + "\", PK " + std::to_string(Obj.PK) + ", TRT " + std::to_string(Obj.TRT) + ">"; })
 	ACLASSD(Preset, Output1)
 	ACLASSD(Preset, Output2)
 	ACLASSD(Preset, Output3)
