@@ -244,6 +244,7 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			{ "Notes", msgpack::object{ PresetObj->Notes.GetCString() } },
 			{ "Color", msgpack::object{ PresetObj->Color.GetCString() } },
 			{ "PK", msgpack::object{ PresetObj->PK } },
+			{ "TRT", msgpack::object{ PresetObj->TRT } },
 			{ "Index", msgpack::object{ PresetObj->Index } },
 			{ "Loop", msgpack::object{ PresetObj->Loop } },
 			{ "Link", msgpack::object{ PresetObj->Link } },
@@ -353,6 +354,7 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		PresetObj->Notes = Fields["Notes"].as<std::string>();
 		PresetObj->Color = Fields["Color"].as<std::string>();
 		PresetObj->PK = Fields["PK"].as<int>();
+		PresetObj->TRT = Fields["TRT"].as<int>();
 		PresetObj->Index = Fields["Index"].as<int>();
 		PresetObj->Loop = Fields["Loop"].as<int>();
 		PresetObj->Link = Fields["Link"].as<int>();

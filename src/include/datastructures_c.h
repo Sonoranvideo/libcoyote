@@ -95,6 +95,7 @@ struct Coyote_Preset
 	struct Coyote_Output *Output3;
 	struct Coyote_Output *Output4;
 	int32_t PK;
+	int32_t TRT;
 	int32_t Index;
 	int32_t Loop;
 	int32_t Link;
