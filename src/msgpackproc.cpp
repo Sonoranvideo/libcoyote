@@ -149,6 +149,16 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			{ "ScrubBar", msgpack::object{ TCObj->ScrubBar } },
 			{ "Selected", msgpack::object{ TCObj->Selected } },
 			{ "PresetKey", msgpack::object{ TCObj->PresetKey } },
+			{ "LeftChannelVolume", msgpack::object { TCObj->LeftChannelVolume } },
+			{ "RightChannelVolume", msgpack::object { TCObj->RightChannelVolume } },
+			{ "Player1LeftVolume", msgpack::object { TCObj->Player1LeftVolume } },
+			{ "Player1RightVolume", msgpack::object { TCObj->Player1RightVolume } },
+			{ "Player2LeftVolume", msgpack::object { TCObj->Player2LeftVolume } },
+			{ "Player2RightVolume", msgpack::object { TCObj->Player2RightVolume } },
+			{ "Player3LeftVolume", msgpack::object { TCObj->Player3LeftVolume } },
+			{ "Player3RightVolume", msgpack::object { TCObj->Player3RightVolume } },
+			{ "Player4LeftVolume", msgpack::object { TCObj->Player4LeftVolume } },
+			{ "Player4RightVolume", msgpack::object { TCObj->Player4RightVolume } },
 		};
 	}
 	else if (OurType == typeid(Coyote::PresetMark))
@@ -352,6 +362,16 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		TCObj->ScrubBar = Fields["ScrubBar"].as<double>();
 		TCObj->Selected = Fields["Selected"].as<int>();
 		TCObj->PresetKey = Fields["PresetKey"].as<int32_t>();
+		TCObj->LeftChannelVolume = Fields["LeftChannelVolume"].as<int32_t>();
+		TCObj->RightChannelVolume = Fields["LeftChannelVolume"].as<int32_t>();
+		TCObj->Player1LeftVolume = Fields["Player1LeftVolume"].as<int32_t>();
+		TCObj->Player1RightVolume = Fields["Player1RightVolume"].as<int32_t>();
+		TCObj->Player2LeftVolume = Fields["Player2LeftVolume"].as<int32_t>();
+		TCObj->Player2RightVolume = Fields["Player2RightVolume"].as<int32_t>();
+		TCObj->Player3LeftVolume = Fields["Player3LeftVolume"].as<int32_t>();
+		TCObj->Player3RightVolume = Fields["Player3RightVolume"].as<int32_t>();
+		TCObj->Player4LeftVolume = Fields["Player4LeftVolume"].as<int32_t>();
+		TCObj->Player4RightVolume = Fields["Player4RightVolume"].as<int32_t>();
 	}
 	else if (Expected == typeid(Coyote::PresetMark))
 	{

@@ -53,6 +53,16 @@ struct Coyote_TimeCode
 	int32_t Time;
 	int32_t TRT;
 	int32_t PresetKey;
+	int32_t LeftChannelVolume;
+	int32_t RightChannelVolume;
+	int32_t Player1LeftVolume;
+	int32_t Player1RightVolume;
+	int32_t Player2LeftVolume;
+	int32_t Player2RightVolume;
+	int32_t Player3LeftVolume;
+	int32_t Player3RightVolume;
+	int32_t Player4LeftVolume;
+	int32_t Player4RightVolume;
 	bool Selected;
 };
 
