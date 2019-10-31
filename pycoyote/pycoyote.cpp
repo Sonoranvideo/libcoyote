@@ -18,6 +18,9 @@
 #include "pybind11/include/pybind11/stl.h"
 #include "pybind11/include/pybind11/stl_bind.h"
 
+extern const std::map<Coyote::RefreshMode, std::string> RefreshMap;
+extern const std::map<Coyote::ResolutionMode, std::string> ResolutionMap;
+
 namespace py = pybind11;
 
 #define ACLASSF(a, b) .def(#b, &Coyote::a::b)
@@ -100,7 +103,8 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSBD(Coyote_HardwareState, SupportsS12G);
 	
 	py::class_<Coyote::HardwareState, Coyote::BaseObject, Coyote_HardwareState>(ModObj, "HardwareState")
-	.def(py::init<>());
+	.def(py::init<>())
+	.def("__repr__", [] (Coyote::HardwareState &Obj) { return std::string{"<HardwareState of "} + ResolutionMap.at(Obj.Resolution) + "@" + RefreshMap.at(Obj.RefreshRate) + ">"; });
 	
 	
 	py::class_<Coyote::Session>(ModObj, "Session")
@@ -385,7 +389,6 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	
 	py::class_<Coyote_Asset>(ModObj, "Coyote_Asset")
 	.def(py::init<>())
-	.def("__repr__", [] (Coyote::Asset &Obj) { return std::string{"<Asset \""} + Obj.FileName.GetStdString() + "\">"; })
 	ACLASSBD(Coyote_Asset, FileName)
 	ACLASSBD(Coyote_Asset, NewFileName)
 	ACLASSBD(Coyote_Asset, CopyPercentage)
@@ -403,7 +406,8 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSBD(Coyote_Asset, SupportedAudEncode);
 	
 	py::class_<Coyote::Asset, Coyote::BaseObject, Coyote_Asset>(ModObj, "Asset")
-	.def(py::init<>());
+	.def(py::init<>())
+	.def("__repr__", [] (Coyote::Asset &Obj) { return std::string{"<Asset \""} + Obj.FileName.GetStdString() + "\">"; });
 
 	ModObj.doc() = "Interface for controlling Sonoran Video Systems' Coyote playback servers";	
 }
