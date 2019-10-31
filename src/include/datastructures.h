@@ -95,15 +95,16 @@ namespace Coyote
 	{
 		std::vector<int32_t> PlayingPresets; //One extra for a null terminator
 		std::vector<int32_t> PausedPresets;
-		TimeCode Time;
+		std::vector<TimeCode> TimeCodes;
 		
 		inline MediaState(void) : BaseObject(), Coyote_MediaState(), PlayingPresets(), PausedPresets()
 		{
 			this->PlayingPresets.resize(COYOTE_MAX_OUTPUTS + 1);
 			this->PausedPresets.resize(COYOTE_MAX_OUTPUTS + 1);
+			this->TimeCodes.resize(COYOTE_MAX_OUTPUTS + 1);
 			this->Coyote_MediaState::PlayingPresets = this->PlayingPresets.data();
 			this->Coyote_MediaState::PausedPresets = this->PausedPresets.data();
-			this->Coyote_MediaState::Time = &this->Time;
+			this->Coyote_MediaState::TimeCodes = this->TimeCodes.data();
 		}
 	};
 }

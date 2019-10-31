@@ -150,7 +150,7 @@ struct Coyote_NetworkInfo
 
 struct Coyote_MediaState
 {
-	struct Coyote_TimeCode *Time;
+	struct Coyote_TimeCode *TimeCodes;
 	int32_t *PlayingPresets;
 	int32_t *PausedPresets;
 	int32_t NumPresets;

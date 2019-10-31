@@ -177,6 +177,13 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 	else if (OurType == typeid(Coyote::MediaState))
 	{
 		const Coyote::MediaState *MediaStateObj = static_cast<const Coyote::MediaState*>(Object);
+
+		std::vector<msgpack::object> TCs;
+		
+		for (const Coyote::TimeCode &TC : MediaStateObj->TimeCodes)
+		{
+			TCs.emplace_back(PackCoyoteObject(&TC));
+		}
 		
 		Values = new std::map<std::string, msgpack::object>
 		{
@@ -184,8 +191,8 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			{ "SelectedPreset", msgpack::object{ MediaStateObj->SelectedPreset } },
 			{ "PlayingPresets", msgpack::object{ STLArrayToMsgpackArray(MediaStateObj->PlayingPresets) } },
 			{ "PausedPresets", msgpack::object{ STLArrayToMsgpackArray(MediaStateObj->PausedPresets) } },
-			{ "TimeCode", PackCoyoteObject(&MediaStateObj->Time) },
-		};			
+			{ "TimeCodes", msgpack::object{ STLArrayToMsgpackArray(TCs) } },
+		};
 	}
 	else if (OurType == typeid(Coyote::NetworkInfo))
 	{
@@ -484,9 +491,18 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		MSObj->NumPresets = Fields["NumPresets"].as<int>();
 		MSObj->SelectedPreset = Fields["SelectedPreset"].as<int>();
 		
-		std::unique_ptr<Coyote::BaseObject> TC { UnpackCoyoteObject(Fields["TimeCode"], typeid(Coyote::TimeCode)) };
+		std::list<msgpack::object> TimeCodeObjects;
 		
-		MSObj->Time = *static_cast<Coyote::TimeCode*>(TC.get());
+		Fields["TimeCodes"].convert(TimeCodeObjects);
+		
+		uint8_t Counter = 0;
+		for (msgpack::object &Obj : TimeCodeObjects)
+		{
+			std::unique_ptr<Coyote::BaseObject> TC { UnpackCoyoteObject(Obj, typeid(Coyote::TimeCode)) };
+			MSObj->TimeCodes.at(Counter++) = std::move(*static_cast<Coyote::TimeCode*>(TC.get()));
+		}
+
+		assert(Counter < COYOTE_MAX_OUTPUTS + 1);
 	}
 	else if (Expected == typeid(Coyote::Mirror))
 	{

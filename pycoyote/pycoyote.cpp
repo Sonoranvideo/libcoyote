@@ -122,6 +122,27 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		
 		return std::make_tuple(Status, Detected, Version);
 	})
+	.def("GetMediaState",
+	[] (Coyote::Session &Obj)
+	{
+		Coyote::MediaState State{};
+		
+		const Coyote::StatusCode Status = Obj.GetMediaState(State);
+		
+		int MaxPlayingIndex = 0;
+		int MaxPausedIndex = 0;
+		int MaxTCIndex = 0;
+		
+		while (State.PlayingPresets[MaxPlayingIndex]) ++MaxPlayingIndex;
+		while (State.PausedPresets[MaxPausedIndex]) ++MaxPausedIndex;
+		while (State.TimeCodes[MaxTCIndex].PresetKey) ++MaxTCIndex;
+		
+		State.PausedPresets.resize(MaxPausedIndex);
+		State.PlayingPresets.resize(MaxPlayingIndex);
+		State.TimeCodes.resize(MaxTCIndex);
+		
+		return std::make_tuple(Status, State);
+	})
 	.def("GetServerVersion",
 	[] (Coyote::Session &Obj)
 	{
@@ -338,7 +359,8 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSBD(Coyote_TimeCode, Selected);
 
 	py::class_<Coyote::TimeCode, Coyote::BaseObject, Coyote_TimeCode>(ModObj, "TimeCode")
-	.def(py::init<>());
+	.def(py::init<>())
+	.def("__repr__", [] (Coyote::TimeCode &Obj) { return std::string{"<TimeCode for PK "} + std::to_string(Obj.PresetKey) + " with time " + std::to_string(Obj.Time) + ">"; });
 
 	py::class_<Coyote_Mirror>(ModObj, "Coyote_Mirror")
 	.def(py::init<>())
@@ -359,7 +381,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	.def(py::init<>())
 	ACLASSD(MediaState, PlayingPresets)
 	ACLASSD(MediaState, PausedPresets)
-	ACLASSD(MediaState, Time);
+	ACLASSD(MediaState, TimeCodes);
 	
 	py::class_<Coyote_Asset>(ModObj, "Coyote_Asset")
 	.def(py::init<>())
