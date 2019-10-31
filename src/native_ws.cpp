@@ -138,7 +138,7 @@ Rescan:
 		
 		if (Connection->HasError() || Connection->CheckPingout())
 		{
-			std::cout << "LibCoyote: Detected dead connection, pruning" << std::endl;
+			std::cout << "libcoyote: Detected dead connection, pruning" << std::endl;
 
 			SessionSneak_DeactivateConnection(Connection->UserData);
 			
@@ -295,16 +295,36 @@ bool WS::WSConnection::EstablishConnection(const std::string &Host)
 	
 	QObject::connect(this->WebSocket.get(), &QWebSocket::binaryMessageReceived, this, &WSConnection::OnRecv);
 	
-	QEventLoop Waiter;
+	QEventLoop Waiter;	
+	std::unique_ptr<QTimer> TempTimer { new QTimer };
 	
-	QObject::connect(this->WebSocket.get(), &QWebSocket::connected, this,  [this, &Waiter] { this->OnConnected(); Waiter.quit(); });
+	TempTimer->start(PingoutMS);
+	
+	QObject::connect(this->WebSocket.get(), &QWebSocket::connected, TempTimer.get(),
+	[this, &Waiter]
+	{
+		this->OnConnected();
+		Waiter.quit();
+		std::cout << "libcoyote: Connection established." << std::endl;
+	});
 
-	std::cout << "LibCoyote: Attempting to establish a new connection to " << qs2cs(URL) << std::endl;
+
+	
+	QObject::connect(TempTimer.get(), &QTimer::timeout, TempTimer.get(),
+	[&, this]
+	{
+		Waiter.quit();
+		this->ErrorDetectedFlag = true;
+		emit ErrorDetected(this);
+		TempTimer.reset();
+		std::cerr << "libcoyote: Connect to " << qs2cs(URL) << " failed. Timed out after " << (PingoutMS / 1000) << " seconds." << std::endl;
+	});
+	
+	std::cout << "libcoyote: Attempting to establish a new connection to " << qs2cs(URL) << std::endl;
+		
 	Waiter.exec();
 	
-	std::cout << "LibCoyote: Connection established." << std::endl;
-	
-	return true;
+	return !this->ErrorDetectedFlag;
 }
 
 bool WS::WSConnection::CheckPingout(void) const
