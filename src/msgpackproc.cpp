@@ -16,6 +16,7 @@
 #include "common.h"
 #include "msgpackproc.h"
 #include "include/libcoyote.h"
+#include "include/layouts.h"
 
 #ifdef MSGPACK_DEFAULT_API_VERSION
 #undef MSGPACK_DEFAULT_API_VERSION
@@ -268,7 +269,7 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			{ "Output3", msgpack::object{ PackCoyoteObject(&PresetObj->Output3) } },
 			{ "Output4", msgpack::object{ PackCoyoteObject(&PresetObj->Output4) } },
 			{ "Name", msgpack::object{ PresetObj->Name.GetCString() } },
-			{ "Layout", msgpack::object{ PresetObj->Layout.GetCString() } },
+			{ "Layout", msgpack::object{ LookupPresetLayoutByID(PresetObj->Layout)->TextName.c_str() } },
 			{ "Notes", msgpack::object{ PresetObj->Notes.GetCString() } },
 			{ "Color", msgpack::object{ PresetObj->Color.GetCString() } },
 			{ "PK", msgpack::object{ PresetObj->PK } },
@@ -399,7 +400,7 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		Coyote::Preset *PresetObj = static_cast<Coyote::Preset*>(Result);
 		
 		PresetObj->Name = Fields["Name"].as<std::string>();
-		PresetObj->Layout = Fields["Layout"].as<std::string>();
+		PresetObj->Layout = Coyote::LookupPresetLayoutByString(Fields["Layout"].as<std::string>())->ID;
 		PresetObj->Notes = Fields["Notes"].as<std::string>();
 		PresetObj->Color = Fields["Color"].as<std::string>();
 		PresetObj->PK = Fields["PK"].as<int>();

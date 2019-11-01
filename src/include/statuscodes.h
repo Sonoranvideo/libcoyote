@@ -91,11 +91,57 @@ namespace Coyote
 		COYOTE_REFRESH_60 		= 8,
 		COYOTE_REFRESH_MAX
 	};
+#ifdef __cplusplus
+	enum PresetLayout
+#else
+	enum CoyotePresetLayout
+#endif //__cplusplus
+	{
+		COYOTE_PSLAYOUT_INVALID = 0,
+		COYOTE_PSLAYOUT_A		= 1,
+		COYOTE_PSLAYOUT_B		= 2,
+		COYOTE_PSLAYOUT_C1		= 3,
+		COYOTE_PSLAYOUT_C2		= 4,
+		COYOTE_PSLAYOUT_C3		= 5,
+		COYOTE_PSLAYOUT_F		= 6,
+		COYOTE_PSLAYOUT_MAX
+	};
+
+#ifdef __cplusplus
+	enum SDIOutput
+#else
+	enum CoyoteSDIOutput
+#endif //__cplusplus
+	{
+		COYOTE_SDI_INVALID = 0,
+		COYOTE_SDI_1 = 1 << 0,
+		COYOTE_SDI_2 = 1 << 1,
+		COYOTE_SDI_3 = 1 << 2,
+		COYOTE_SDI_4 = 1 << 3,
+		COYOTE_SDI_MAXVALUE = COYOTE_SDI_4
+	};
+	
+#ifdef __cplusplus
+	enum Player
+#else
+	enum CoyotePlayer
+#endif //__cplusplus
+	{
+		COYOTE_PLAYER_INVALID = 0,
+		COYOTE_PLAYER_1 = 1 << 0,
+		COYOTE_PLAYER_2 = 1 << 1,
+		COYOTE_PLAYER_3 = 1 << 2,
+		COYOTE_PLAYER_4 = 1 << 3,
+		COYOTE_PLAYER_MAXVALUE = COYOTE_PLAYER_4
+	};
+
 #ifndef __cplusplus
 	typedef enum CoyoteResolutionMode CoyoteResolutionMode;
 	typedef enum CoyoteRefreshMode CoyoteRefreshMode;
 	typedef enum CoyoteHardwareMode CoyoteHardwareMode;
 	typedef enum CoyoteStatusCode CoyoteStatusCode;
+	typedef enum CoyotePresetLayout CoyotePresetLayout;
+	typedef enum CoyoteSDIOutput CoyoteSDIOutput;
 #else
 }
 #endif // !__cplusplus

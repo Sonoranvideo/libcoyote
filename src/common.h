@@ -35,6 +35,7 @@
 #include <typeinfo>
 #include <chrono>
 #include <thread>
+#include <type_traits>
 
 #ifdef LCVERBOSE //Only usable for C++
 #define LDEBUG (std::cerr << "THREAD " << std::this_thread::get_id() << " Executing " << __func__ << "() line number " << __LINE__ << " in file " << __FILE__ << std::endl)
@@ -56,5 +57,19 @@
 #define COYOTE_SLEEP(x) usleep((x ) * 1000);
 #endif //WIN32
 
+template <typename MapType>
+auto RebuildMapBackwards(const MapType &Original)
+{
+	auto Iter = Original.begin();
+	
+	std::map<decltype(Iter->second), decltype(Iter->first) > RetVal;
+	
+	for (; Iter != Original.end(); ++Iter)
+	{
+		RetVal.emplace(Iter->second, Iter->first);
+	}
+	
+	return RetVal;
+}
 
 #endif //__LIBCOYOTE_COMMON_H__

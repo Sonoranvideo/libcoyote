@@ -36,13 +36,18 @@ if (NOT MSGPACK_HEADER)
 	message(FATAL_ERROR "msgpack-c was not detected. Only the header files are required for the C++ version, but they're missing.")
 endif()
 
-set(sourcefiles msgpackproc.cpp session.cpp asyncmsgs.cpp asynctosync.cpp subscriptions.cpp native_ws.cpp)
+set(sourcefiles msgpackproc.cpp session.cpp asyncmsgs.cpp asynctosync.cpp subscriptions.cpp layouts.cpp native_ws.cpp)
 if (NOT NO_C_API)
 	set(sourcefiles ${sourcefiles} cinterface.cpp)
 endif()
 
 add_library(coyote SHARED ${sourcefiles})
 add_library(coyote_static STATIC ${sourcefiles})
+
+set_property(TARGET coyote_static PROPERTY CXX_STANDARD 14)
+set_property(TARGET coyote_static PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET coyote PROPERTY CXX_STANDARD 14)
+set_property(TARGET coyote PROPERTY CXX_STANDARD_REQUIRED ON)
 
 qt5_use_modules(coyote Core WebSockets)
 qt5_use_modules(coyote_static Core WebSockets)

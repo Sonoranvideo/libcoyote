@@ -36,6 +36,7 @@ typedef Coyote::CoyoteString COYOTESTRING;
 typedef Coyote::HardwareMode COYOTEHARDWAREMODE;
 typedef Coyote::ResolutionMode COYOTERESOLUTIONMODE;
 typedef Coyote::RefreshMode COYOTEREFRESHMODE;
+typedef Coyote::PresetLayout COYOTEPRESETLAYOUT;
 extern "C" {
 #endif
 
@@ -106,7 +107,7 @@ struct Coyote_Output
 struct Coyote_Preset
 {
 	COYOTESTRING Name;
-	COYOTESTRING Layout;
+	COYOTEPRESETLAYOUT Layout;
 	COYOTESTRING Notes;
 	COYOTESTRING Color;
 	COYOTESTRING timeCodeUpdate;

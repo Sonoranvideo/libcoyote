@@ -48,23 +48,24 @@ extern const std::map<Coyote::ResolutionMode, std::string> ResolutionMap
 	{ Coyote::COYOTE_RES_1080I, "1080i" },
 };
 
+static const auto &ReverseRefreshMapObj { RebuildMapBackwards(RefreshMap) };
+static const auto &ReverseResolutionMapObj { RebuildMapBackwards(ResolutionMap) };
+
+
 Coyote::RefreshMode ReverseRefreshMap(const std::string &Lookup)
 {
-	for (auto Pair : RefreshMap)
-	{
-		if (Pair.second == Lookup) return Pair.first;
-	}
-	return Coyote::COYOTE_REFRESH_INVALID;
+	if (!ReverseRefreshMapObj.count(Lookup)) return Coyote::COYOTE_REFRESH_INVALID;
+
+	return ReverseRefreshMapObj.at(Lookup);
 }
 
 Coyote::ResolutionMode ReverseResolutionMap(const std::string &Lookup)
 {
-	for (auto Pair : ResolutionMap)
-	{
-		if (Pair.second == Lookup) return Pair.first;
-	}
-	return Coyote::COYOTE_RES_INVALID;
+	if (!ReverseResolutionMapObj.count(Lookup)) return Coyote::COYOTE_RES_INVALID;
+	
+	return ReverseResolutionMapObj.at(Lookup);
 }
+
 
 struct InternalSession
 {

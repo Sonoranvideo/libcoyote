@@ -14,6 +14,8 @@
    limitations under the License.
 */
 #include "../src/include/session.h"
+#include "../src/include/layouts.h"
+
 #include "pybind11/include/pybind11/pybind11.h"
 #include "pybind11/include/pybind11/stl.h"
 #include "pybind11/include/pybind11/stl_bind.h"
@@ -31,6 +33,11 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(pycoyote, ModObj)
 {
+	ModObj.def("LookupPresetLayoutByID", Coyote::LookupPresetLayoutByID);
+	ModObj.def("LookupPresetLayoutByString", Coyote::LookupPresetLayoutByString);
+	ModObj.def("GetPresetPlayers", Coyote::GetPresetPlayers);
+	ModObj.def("GetPresetSDIOutputs", Coyote::GetPresetSDIOutputs);
+	
 	py::class_<Coyote::BaseObject>(ModObj, "BaseObject")
 	.def(py::init<>());
 	
@@ -54,20 +61,23 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_REFRESH_50)
 	EMEMDEF(COYOTE_REFRESH_59_94)
 	EMEMDEF(COYOTE_REFRESH_60)
-	EMEMDEF(COYOTE_REFRESH_MAX);
+	EMEMDEF(COYOTE_REFRESH_MAX)
+	.export_values();
 	
 	py::enum_<Coyote::ResolutionMode>(ModObj, "ResolutionMode")
 	EMEMDEF(COYOTE_RES_INVALID)
 	EMEMDEF(COYOTE_RES_1080P)
 	EMEMDEF(COYOTE_RES_2160P)
 	EMEMDEF(COYOTE_RES_1080I)
-	EMEMDEF(COYOTE_RES_MAX);
+	EMEMDEF(COYOTE_RES_MAX)
+	.export_values();
 	
 	py::enum_<Coyote::HardwareMode>(ModObj, "HardwareMode")
 	EMEMDEF(COYOTE_MODE_INVALID)
 	EMEMDEF(COYOTE_MODE_Q3G)
 	EMEMDEF(COYOTE_MODE_S12G)
-	EMEMDEF(COYOTE_MODE_MAX);
+	EMEMDEF(COYOTE_MODE_MAX)
+	.export_values();
 	
 	py::enum_<Coyote::StatusCode>(ModObj, "StatusCode")
 	EMEMDEF(COYOTE_STATUS_INVALID)
@@ -77,14 +87,49 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_STATUS_INTERNALERROR)
 	EMEMDEF(COYOTE_STATUS_MISUSED)
 	EMEMDEF(COYOTE_STATUS_NETWORKERROR)
-	EMEMDEF(COYOTE_STATUS_MAX);
+	EMEMDEF(COYOTE_STATUS_MAX)
+	.export_values();
 	
 	py::enum_<Coyote::UnitRole>(ModObj, "UnitRole")
 	EMEMDEF(COYOTE_ROLE_INVALID) 
 	EMEMDEF(COYOTE_ROLE_SINGLE)
 	EMEMDEF(COYOTE_ROLE_PRIMARY)
 	EMEMDEF(COYOTE_ROLE_MIRROR)
-	EMEMDEF(COYOTE_ROLE_MAX);
+	EMEMDEF(COYOTE_ROLE_MAX)
+	.export_values();
+
+	
+	py::enum_<Coyote::PresetLayout>(ModObj, "PresetLayout")
+	EMEMDEF(COYOTE_PSLAYOUT_INVALID)
+	EMEMDEF(COYOTE_PSLAYOUT_A)
+	EMEMDEF(COYOTE_PSLAYOUT_B)
+	EMEMDEF(COYOTE_PSLAYOUT_C1)
+	EMEMDEF(COYOTE_PSLAYOUT_C2)
+	EMEMDEF(COYOTE_PSLAYOUT_C3)
+	EMEMDEF(COYOTE_PSLAYOUT_F)
+	EMEMDEF(COYOTE_PSLAYOUT_MAX)
+	.export_values();
+
+	
+	py::enum_<Coyote::SDIOutput>(ModObj, "SDIOutput", py::arithmetic())
+	EMEMDEF(COYOTE_SDI_INVALID)
+	EMEMDEF(COYOTE_SDI_1)
+	EMEMDEF(COYOTE_SDI_2)
+	EMEMDEF(COYOTE_SDI_3)
+	EMEMDEF(COYOTE_SDI_4)
+	EMEMDEF(COYOTE_SDI_MAXVALUE)
+	.export_values();
+
+	
+	py::enum_<Coyote::Player>(ModObj, "Player", py::arithmetic())
+	EMEMDEF(COYOTE_PLAYER_INVALID)
+	EMEMDEF(COYOTE_PLAYER_1)
+	EMEMDEF(COYOTE_PLAYER_2)
+	EMEMDEF(COYOTE_PLAYER_3)
+	EMEMDEF(COYOTE_PLAYER_4)
+	EMEMDEF(COYOTE_PLAYER_MAXVALUE)
+	.export_values();
+
 	
 	py::class_<Coyote_NetworkInfo>(ModObj, "Coyote_NetworkInfo")
 	.def(py::init<>())
@@ -380,12 +425,20 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	.def(py::init<>())
 	ACLASSBD(Coyote_MediaState, NumPresets)
 	ACLASSBD(Coyote_MediaState, SelectedPreset);
-	
+
 	py::class_<Coyote::MediaState, Coyote::BaseObject, Coyote_MediaState>(ModObj, "MediaState")
 	.def(py::init<>())
 	ACLASSD(MediaState, PlayingPresets)
 	ACLASSD(MediaState, PausedPresets)
 	ACLASSD(MediaState, TimeCodes);
+	
+	py::class_<Coyote::LayoutInfo>(ModObj, "LayoutInfo")
+	.def(py::init<>())
+	.def("__repr__", [] (Coyote::LayoutInfo &Obj) { return std::string{"<LayoutInfo for preset layout "} + Obj.TextName + ">"; })
+	ACLASSD(LayoutInfo, TextName)
+	ACLASSD(LayoutInfo, ID)
+	ACLASSD(LayoutInfo, Players)
+	ACLASSD(LayoutInfo, SDIOuts);
 	
 	py::class_<Coyote_Asset>(ModObj, "Coyote_Asset")
 	.def(py::init<>())
