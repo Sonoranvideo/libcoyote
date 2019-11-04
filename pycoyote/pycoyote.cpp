@@ -37,6 +37,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ModObj.def("LookupPresetLayoutByString", Coyote::LookupPresetLayoutByString);
 	ModObj.def("GetPresetPlayers", Coyote::GetPresetPlayers);
 	ModObj.def("GetPresetSDIOutputs", Coyote::GetPresetSDIOutputs);
+	ModObj.def("GetPlayerSDIOutputs", Coyote::GetPlayerSDIOutputs);
 	
 	py::class_<Coyote::BaseObject>(ModObj, "BaseObject")
 	.def(py::init<>());
