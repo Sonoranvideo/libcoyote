@@ -142,6 +142,15 @@ Coyote::Player Coyote::GetPresetPlayers(const Coyote::Preset &Input)
 	return RetVal;
 }
 
+Coyote::SDIOutput Coyote::GetPlayerSDIOutputs(const Coyote::Preset &Input, const Coyote::Player InPlayer)
+{
+	const LayoutInfo *const Info = LookupPresetLayoutByID(Input.Layout);
+	
+	if (!Info || !Info->SDIOuts.count(InPlayer)) return COYOTE_SDI_INVALID;
+	
+	return Info->SDIOuts.at(InPlayer);
+}
+
 Coyote::SDIOutput Coyote::GetPresetSDIOutputs(const Coyote::Preset &Input)
 {	
 	SDIOutput RetVal = COYOTE_SDI_INVALID;

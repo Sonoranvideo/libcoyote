@@ -37,6 +37,7 @@ namespace Coyote
 	Coyote::Player GetPresetPlayers(const Coyote::Preset &Input);
 	const LayoutInfo *LookupPresetLayoutByID(const Coyote::PresetLayout LayoutID);
 	const LayoutInfo *LookupPresetLayoutByString(const std::string &LayoutName);
+	Coyote::SDIOutput GetPlayerSDIOutputs(const Coyote::Preset &Input, const Coyote::Player InPlayer);
 }
 
 #endif //__LIBCOYOTE_LAYOUTS_H__

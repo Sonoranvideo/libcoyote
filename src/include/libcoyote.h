@@ -23,6 +23,7 @@
 #include "macros.h"
 #include "datastructures.h"
 #include "session.h"
+#include "layouts.h"
 #include "statuscodes.h"
 
 namespace Coyote
