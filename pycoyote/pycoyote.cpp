@@ -139,6 +139,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSBD(Coyote_NetworkInfo, AdapterID);
 	
 	py::class_<Coyote::NetworkInfo, Coyote::BaseObject, Coyote_NetworkInfo>(ModObj, "NetworkInfo")
+	.def("__repr__", [] (Coyote::NetworkInfo &Obj) { return std::string{"<NetworkInfo, IP "} + Obj.IP.GetStdString() + ", subnet " + Obj.Subnet.GetStdString() + ">"; })
 	.def(py::init<>());
 	
 	py::class_<Coyote_HardwareState>(ModObj, "Coyote_HardwareState")
@@ -306,7 +307,6 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, DetectUpdate)
 	ACLASSF(Session, EjectDisk)
 	ACLASSF(Session, RestartService)
-	ACLASSF(Session, GetIP)
 	ACLASSF(Session, SetIP)
 	ACLASSF(Session, InitializeCoyote)
 	ACLASSF(Session, SetHardwareMode)
