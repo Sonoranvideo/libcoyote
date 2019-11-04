@@ -155,6 +155,14 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	
 	py::class_<Coyote::Session>(ModObj, "Session")
 	.def(py::init<const std::string &>())
+	.def("SynchronizerBusy",
+	[] (Coyote::Session &Obj)
+	{
+		bool Value{};
+		const Coyote::StatusCode Status = Obj.SynchronizerBusy(Value);
+		
+		return std::make_tuple(Status, Value);
+	})
 	.def("IsMirror",
 	[] (Coyote::Session &Obj)
 	{
@@ -303,7 +311,6 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, InitializeCoyote)
 	ACLASSF(Session, SetHardwareMode)
 	ACLASSF(Session, SelectPreset)
-	ACLASSF(Session, SynchronizerBusy)
 	ACLASSF(Session, AddMirror)
 	ACLASSF(Session, DeconfigureSync)
 	ACLASSF(Session, RebootCoyote)
