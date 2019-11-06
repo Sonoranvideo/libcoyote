@@ -95,10 +95,15 @@ namespace Coyote
 		StatusCode DeleteCountdown(const int32_t PK, const int32_t Time);
 		StatusCode CreateGoto(const int32_t PK, const int32_t Time, const std::string &Name);
 		StatusCode CreateCountdown(const int32_t PK, const int32_t Time, const std::string &Name);
+		StatusCode GetLogsZip(std::vector<uint8_t> &OutBuffer);
+		StatusCode ReadLog(const std::string &SpokeName, const int Year, const int Month, const int Day, std::string &LogOut);
 		virtual ~Session(void);
 		
 		void SetCommandTimeoutSecs(const time_t TimeoutSecs = DefaultCommandTimeoutSecs);
 		time_t GetCommandTimeoutSecs(void) const;
+		
+		StatusCode _SVS_WriteCytLog_(const std::string &Param1, const std::string &Param2); //Users: DO NOT use this method.
+		
 	};
 	
 }

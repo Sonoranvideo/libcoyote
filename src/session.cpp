@@ -138,14 +138,8 @@ bool InternalSession::OnMessageReady(WS::WSConnection *Conn, WSMessage *Msg)
 	
 	std::map<std::string, msgpack::object> Values;
 	
-	try
-	{
+		LDEBUG_MSG("Decoding message");
 		Values = MsgpackProc::InitIncomingMsg(Msg->GetBody(), Msg->GetBodySize());
-	}
-	catch(...)
-	{
-		return false;
-	}
 	
 	const bool IsSynchronousMsg = Values.count("MsgID");
 	
@@ -987,6 +981,70 @@ Coyote::StatusCode Coyote::Session::DetectUpdate(bool &DetectedOut, std::string 
 	DetectedOut = Data.at("IsUpdateDetected").as<int>();
 	
 	if (Out) *Out = Data.at("Version").as<std::string>();
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::GetLogsZip(std::vector<uint8_t> &OutBuffer)
+{
+	DEF_SESS;
+	
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetLogsZip", &Status) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	std::map<std::string, msgpack::object> Data;
+
+	Msg.at("Data").convert(Data);
+	
+	Data.at("ZipBytes").convert(OutBuffer);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::ReadLog(const std::string &SpokeName, const int Year, const int Month, const int Day, std::string &LogOut)
+{
+	DEF_SESS;
+	
+	StatusCode Status{};
+	
+
+	LDEBUG_MSG("Building values");
+	const std::map<std::string, msgpack::object> Values { {"SpokeName", msgpack::object{SpokeName.c_str()} }, { "Year", msgpack::object{Year} }, { "Month", msgpack::object{Month} }, { "Day", msgpack::object{Day} } };
+	
+	LDEBUG_MSG("Performing conversions");
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
+	
+	LDEBUG_MSG("Executing method");
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("ReadLog", &Status, &Pass) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	
+	std::map<std::string, msgpack::object> Data;
+
+	LDEBUG_MSG("Converting Data");
+	Msg.at("Data").convert(Data);
+	
+	LDEBUG_MSG("Converting LogText");
+	Data.at("LogText").convert(LogOut);
+
+	LDEBUG_MSG("Success");
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::_SVS_WriteCytLog_(const std::string &Param1, const std::string &Param2)
+{ //This function is intended for Sonoran Video Systems use only. Use by users will either not work or just confuse unit logs.
+	DEF_SESS;
+	
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values { { "SpokeName", msgpack::object{Param1.c_str()} }, { "LogText", msgpack::object{Param2.c_str()} } };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
+
+	SESS.PerformSyncedCommand("__LOGWRITE__", &Status, &Pass);
 	
 	return Status;
 }

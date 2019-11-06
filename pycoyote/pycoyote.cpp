@@ -164,6 +164,23 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		
 		return std::make_tuple(Status, Value);
 	})
+	.def("ReadLog",
+	[] (Coyote::Session &Obj, const std::string SpokeName, const int Year, const int Month, const int Day)
+	{
+		std::string LogText;
+		const Coyote::StatusCode Status = Obj.ReadLog(SpokeName, Year, Month, Day, LogText);
+		
+		return std::make_tuple(Status, LogText);
+	})
+	.def("GetLogsZip",
+	[] (Coyote::Session &Obj)
+	{
+		std::vector<uint8_t> Bytes;
+		
+		const Coyote::StatusCode Status = Obj.GetLogsZip(Bytes);
+		
+		return std::make_tuple(Status, py::bytes((const char*)Bytes.data(), Bytes.size()));
+	})
 	.def("IsMirror",
 	[] (Coyote::Session &Obj)
 	{
