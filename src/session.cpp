@@ -137,9 +137,22 @@ bool InternalSession::OnMessageReady(WS::WSConnection *Conn, WSMessage *Msg)
 	
 	
 	std::map<std::string, msgpack::object> Values;
-	
-		LDEBUG_MSG("Decoding message");
+
+	try
+	{
+		LDEBUG_MSG("Decoding WSMessage of size " << Msg->GetBodySize());
 		Values = MsgpackProc::InitIncomingMsg(Msg->GetBody(), Msg->GetBodySize());
+	}
+	catch (const std::bad_cast &Error)
+	{
+		LDEBUG_MSG("Corrupted or malformed message received, exception was " << Error.what());
+		return false;
+	}
+	catch (...)
+	{
+		LDEBUG_MSG("Unknown exception was caught decoding a message.");
+		return false;
+	}
 	
 	const bool IsSynchronousMsg = Values.count("MsgID");
 	
