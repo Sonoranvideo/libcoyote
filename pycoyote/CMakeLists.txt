@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 project("pycoyote")
 cmake_policy(SET CMP0003 NEW)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../src ${CMAKE_CURRENT_LIST_DIR}/../build)
 
 #This CMake config will only work on MinGW or POSIX. Don't bother trying to build with MSVC.
 
@@ -34,7 +35,7 @@ endif()
 
 set_target_properties(pycoyote PROPERTIES PREFIX "")
 target_link_directories(pycoyote PUBLIC "../build/" "../winbuild")
-target_link_libraries(pycoyote -lcoyote ${PYLIBS} ${EXTRA_LD} -Wl,-R -Wl,. -Wl,-R -Wl,../build -Wl,-R -Wl,../winbuild)
+target_link_libraries(pycoyote coyote ${PYLIBS} ${EXTRA_LD} -Wl,-R -Wl,. -Wl,-R -Wl,../build -Wl,-R -Wl,../winbuild)
 target_include_directories(pycoyote PUBLIC ${PYHEADERS})
 
 #target_compile_options(pycoyote PUBLIC ${PYTHON3_CFLAGS_OTHER})
