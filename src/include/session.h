@@ -97,6 +97,8 @@ namespace Coyote
 		StatusCode CreateCountdown(const int32_t PK, const int32_t Time, const std::string &Name);
 		StatusCode GetLogsZip(std::vector<uint8_t> &OutBuffer);
 		StatusCode ReadLog(const std::string &SpokeName, const int Year, const int Month, const int Day, std::string &LogOut);
+		StatusCode ExportLogsZip(const std::string &DriveLetter);
+
 		virtual ~Session(void);
 		
 		void SetCommandTimeoutSecs(const time_t TimeoutSecs = DefaultCommandTimeoutSecs);

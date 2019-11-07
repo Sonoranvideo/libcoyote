@@ -1048,6 +1048,21 @@ Coyote::StatusCode Coyote::Session::ReadLog(const std::string &SpokeName, const 
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::ExportLogsZip(const std::string &DriveLetter)
+{
+	DEF_SESS;
+	
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values { { "DriveLetter", msgpack::object{DriveLetter.c_str()} } };
+	
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
+
+	SESS.PerformSyncedCommand("ExportLogsZip", &Status, &Pass);
+	
+	return Status;
+}
+	
 Coyote::StatusCode Coyote::Session::_SVS_WriteCytLog_(const std::string &Param1, const std::string &Param2)
 { //This function is intended for Sonoran Video Systems use only. Use by users will either not work or just confuse unit logs.
 	DEF_SESS;

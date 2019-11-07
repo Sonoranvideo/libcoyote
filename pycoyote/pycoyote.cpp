@@ -343,6 +343,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, CreateCountdown)
 	ACLASSF(Session, TakeNext)
 	ACLASSF(Session, TakePrev)
+	ACLASSF(Session, ExportLogsZip)
 	ACLASSF(Session, SetCommandTimeoutSecs)
 	ACLASSF(Session, GetCommandTimeoutSecs);
 	
