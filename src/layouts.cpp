@@ -90,6 +90,36 @@ static const std::map<Coyote::PresetLayout, Coyote::LayoutInfo> Layouts
 			}
 		}
 	},
+	{
+		COYOTE_PSLAYOUT_E,
+		{
+			"E", COYOTE_PSLAYOUT_E, COYOTE_PLAYER_1,
+			{
+				{ COYOTE_PLAYER_1, (SDIOutput)(COYOTE_SDI_1 | COYOTE_SDI_2 | COYOTE_SDI_3 | COYOTE_SDI_4) },
+			}
+		}
+		
+	},
+	{
+		COYOTE_PSLAYOUT_D1,
+		{
+			"D1", COYOTE_PSLAYOUT_D1, (Player)(COYOTE_PLAYER_1 | COYOTE_PLAYER_4),
+			{
+				{ COYOTE_PLAYER_1, (SDIOutput)(COYOTE_SDI_1 | COYOTE_SDI_2 | COYOTE_SDI_3) },
+				{ COYOTE_PLAYER_4, COYOTE_SDI_4 },
+			}
+		}
+	},
+	{
+		COYOTE_PSLAYOUT_D2,
+		{
+			"D2", COYOTE_PSLAYOUT_D2, (Player)(COYOTE_PLAYER_1 | COYOTE_PLAYER_2),
+			{
+				{ COYOTE_PLAYER_1, COYOTE_SDI_1 },
+				{ COYOTE_PLAYER_4, (SDIOutput)(COYOTE_SDI_2 | COYOTE_SDI_3 | COYOTE_SDI_4) },
+			}
+		}
+	},
 };
 
 static const auto &LayoutNameMap

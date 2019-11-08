@@ -96,7 +96,7 @@ namespace Coyote
 #else
 	enum CoyotePresetLayout
 #endif //__cplusplus
-	{
+	{ //Out of order because support is being added incrementally for different layouts
 		COYOTE_PSLAYOUT_INVALID = 0,
 		COYOTE_PSLAYOUT_A		= 1,
 		COYOTE_PSLAYOUT_B		= 2,
@@ -104,6 +104,9 @@ namespace Coyote
 		COYOTE_PSLAYOUT_C2		= 4,
 		COYOTE_PSLAYOUT_C3		= 5,
 		COYOTE_PSLAYOUT_F		= 6,
+		COYOTE_PSLAYOUT_E		= 7,
+		COYOTE_PSLAYOUT_D1		= 8,
+		COYOTE_PSLAYOUT_D2		= 9,
 		COYOTE_PSLAYOUT_MAX
 	};
 
