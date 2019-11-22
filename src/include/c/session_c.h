@@ -16,6 +16,9 @@ void CoyoteObject_Destroy(void *Object);
 
 CoyoteStatusCode Coyote_Take(struct CoyoteSession *Sess, const int32_t PK);
 CoyoteStatusCode Coyote_Pause(struct CoyoteSession *Sess, const int32_t PK);
+CoyoteStatusCode Coyote_SetPause(struct CoyoteSession *Sess, const int32_t PK);
+CoyoteStatusCode Coyote_UnsetPause(struct CoyoteSession *Sess, const int32_t PK);
+CoyoteStatusCode Coyote_SetPausedState(struct CoyoteSession *Sess, const int32_t PK, const bool Value);
 CoyoteStatusCode Coyote_End(struct CoyoteSession *Sess, const int32_t PK);
 CoyoteStatusCode Coyote_SelectPrev(struct CoyoteSession *Sess);
 CoyoteStatusCode Coyote_SelectNext(struct CoyoteSession *Sess);

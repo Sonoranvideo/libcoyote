@@ -314,6 +314,32 @@ Coyote::StatusCode Coyote::Session::Pause(const int32_t PK)
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::SetPausedState(const int32_t PK, const bool Value)
+{
+	DEF_SESS;
+	
+	Coyote::StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values { MAPARG(PK) };
+	
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values) };
+	
+	SESS.PerformSyncedCommand(Value ? "SetPause" : "UnsetPause", &Status, &Pass);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::SetPause(const int32_t PK)
+{
+	return this->SetPausedState(PK, true);
+}
+
+Coyote::StatusCode Coyote::Session::UnsetPause(const int32_t PK)
+{
+	return this->SetPausedState(PK, false);
+}
+
+
 Coyote::StatusCode Coyote::Session::End(const int32_t PK)
 {
 	DEF_SESS;

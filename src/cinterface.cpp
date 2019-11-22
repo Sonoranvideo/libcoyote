@@ -44,6 +44,27 @@ Coyote::StatusCode Coyote_Pause(Coyote::Session *Sess, const int32_t PK)
 	return Sess->Pause(PK);
 }
 
+Coyote::StatusCode Coyote_SetPause(Coyote::Session *Sess, const int32_t PK)
+{
+	assert(Sess != nullptr);
+
+	return Sess->SetPause(PK);
+}
+
+Coyote::StatusCode Coyote_UnsetPause(Coyote::Session *Sess, const int32_t PK)
+{
+	assert(Sess != nullptr);
+
+	return Sess->UnsetPause(PK);
+}
+
+Coyote::StatusCode Coyote_SetPausedState(Coyote::Session *Sess, const int32_t PK, const bool Value)
+{
+	assert(Sess != nullptr);
+
+	return Sess->SetPausedState(PK, Value);
+}
+
 Coyote::StatusCode Coyote_End(Coyote::Session *Sess, const int32_t PK)
 {
 	assert(Sess != nullptr);

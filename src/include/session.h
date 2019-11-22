@@ -98,7 +98,9 @@ namespace Coyote
 		StatusCode GetLogsZip(std::vector<uint8_t> &OutBuffer);
 		StatusCode ReadLog(const std::string &SpokeName, const int Year, const int Month, const int Day, std::string &LogOut);
 		StatusCode ExportLogsZip(const std::string &DriveLetter);
-
+		StatusCode SetPausedState(const int32_t PK, const bool Value);
+		StatusCode SetPause(const int32_t PK);
+		StatusCode UnsetPause(const int32_t PK);
 		virtual ~Session(void);
 		
 		void SetCommandTimeoutSecs(const time_t TimeoutSecs = DefaultCommandTimeoutSecs);
