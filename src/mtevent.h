@@ -19,8 +19,7 @@
 #include "common.h"
 #include <thread>
 #include <mutex>
-#include <semaphore.h>
-#include <pthread.h>
+#include <QSemaphore>
 #include <atomic>
 
 template <typename T = void*>
@@ -29,53 +28,45 @@ class MTEvent
 private:
 	mutable std::mutex Mutex, DropDeadMutex;
 	T Lump;
-	sem_t Semaphore;
-	std::atomic<sem_t*> DropDeadPtr;
+	QSemaphore Semaphore;
+	std::atomic<QSemaphore*> DropDeadPtr;
 	
 public:
-	MTEvent(const T *InitialValue = nullptr) : Lump(InitialValue ? std::move(*InitialValue) : T()), Semaphore(), DropDeadPtr()
+	MTEvent(const T *InitialValue = nullptr) : Lump(InitialValue ? std::move(*InitialValue) : T()), DropDeadPtr()
 	{
-		sem_init(&this->Semaphore, 0, 0);
 	}
 
 	~MTEvent(void)
 	{
 		this->TriggerDeath();
-		sem_destroy(&this->Semaphore);
 	}
 	
 	inline void TriggerDeath(void)
 	{
 		const std::lock_guard<std::mutex> G2 { this->DropDeadMutex };
 
-		if (this->DropDeadPtr) sem_post(this->DropDeadPtr);
+		if (this->DropDeadPtr) this->DropDeadPtr.load()->release();
 	}
 	
 	bool Wait(T &ValueOut, const time_t Timeout = 5) //Return by value!
 	{
 		bool Success = false;
 		
-		std::unique_ptr<sem_t> DropDeadSemaphore { new sem_t{} };
+		std::unique_ptr<QSemaphore> DropDeadSemaphore { new QSemaphore{} };
 
-		sem_init(DropDeadSemaphore.get(), 0, 0);
-		
-		
 		std::unique_lock<std::mutex> G2 { this->DropDeadMutex };
 		
 		this->DropDeadPtr = DropDeadSemaphore.get();
 		
 		G2.unlock();
 		
-		for (uint32_t Inc = 0; Inc < Timeout * 1000 && !Success && sem_trywait(DropDeadSemaphore.get()) != 0; ++Inc)
+		for (uint32_t Inc = 0; Inc < Timeout * 1000 && !Success && !this->DropDeadPtr.load()->tryAcquire(); ++Inc)
 		{
-			Success = sem_trywait(&this->Semaphore) == 0;
-			
-			if (!Success) COYOTE_SLEEP(1);
+			Success = this->Semaphore.tryAcquire(1, 1);
 		}
 
 		G2.lock();
 		this->DropDeadPtr = nullptr; //So we aren't holding onto it after we're done with the ticket, like we are.
-		sem_destroy(DropDeadSemaphore.get());
 		
 		G2.unlock();
 		
@@ -99,7 +90,7 @@ public:
 	
 		this->Lump = Value;
 		
-		sem_post(&this->Semaphore);
+		this->Semaphore.release();
 	}
 	
 	void Post(T &&Value = {})
@@ -108,7 +99,7 @@ public:
 	
 		this->Lump = Value;
 		
-		sem_post(&this->Semaphore);
+		this->Semaphore.release();
 	}
 	
 	const T *Peek(void) const
