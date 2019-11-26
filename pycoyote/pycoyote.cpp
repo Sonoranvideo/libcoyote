@@ -25,7 +25,7 @@ extern const std::map<Coyote::ResolutionMode, std::string> ResolutionMap;
 
 namespace py = pybind11;
 
-#define ACLASSF(a, b) .def(#b, &Coyote::a::b)
+#define ACLASSF(a, b) .def(#b, &Coyote::a::b, py::call_guard<py::gil_scoped_release>())
 #define ACLASSD(a, b) .def_readwrite(#b, &Coyote::a::b)
 #define ACLASSBD(a, b) .def_readwrite(#b, &a::b)
 
@@ -166,7 +166,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		const Coyote::StatusCode Status = Obj.SynchronizerBusy(Value);
 		
 		return std::make_tuple(Status, Value);
-	})
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("ReadLog",
 	[] (Coyote::Session &Obj, const std::string SpokeName, const int Year, const int Month, const int Day)
 	{
@@ -174,7 +174,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		const Coyote::StatusCode Status = Obj.ReadLog(SpokeName, Year, Month, Day, LogText);
 		
 		return std::make_tuple(Status, LogText);
-	})
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetLogsZip",
 	[] (Coyote::Session &Obj)
 	{
@@ -183,7 +183,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		const Coyote::StatusCode Status = Obj.GetLogsZip(Bytes);
 		
 		return std::make_tuple(Status, py::bytes((const char*)Bytes.data(), Bytes.size()));
-	})
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("IsMirror",
 	[] (Coyote::Session &Obj)
 	{
@@ -191,7 +191,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		const Coyote::StatusCode Status = Obj.IsMirror(Value);
 		
 		return std::make_tuple(Status, Value);
-	})
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("DetectUpdate",
 	[] (Coyote::Session &Obj)
 	{
@@ -200,7 +200,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		const Coyote::StatusCode Status = Obj.DetectUpdate(Detected, &Version);
 		
 		return std::make_tuple(Status, Detected, Version);
-	})
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetMediaState",
 	[] (Coyote::Session &Obj)
 	{
@@ -221,7 +221,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		State.TimeCodes.resize(MaxTCIndex);
 		
 		return std::make_tuple(Status, State);
-	})
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetServerVersion",
 	[] (Coyote::Session &Obj)
 	{
@@ -238,7 +238,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		const Coyote::StatusCode Status = Obj.GetUnitID(Vals["UnitID"], Vals["Nickname"]);
 		
 		return std::make_tuple(Status, Vals);
-	})
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetHardwareState",
 	[] (Coyote::Session &Obj)
 	{
@@ -247,7 +247,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		const Coyote::StatusCode Status = Obj.GetHardwareState(Value);
 		
 		return std::make_tuple(Status, Value);
-	})
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetCurrentRole",
 	[] (Coyote::Session &Obj)
 	{
@@ -256,7 +256,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		const Coyote::StatusCode Status = Obj.GetCurrentRole(Value);
 		
 		return std::make_tuple(Status, Value);
-	})
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetTimeCode",
 	[] (Coyote::Session &Obj, int32_t PK)
 	{
@@ -265,7 +265,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		const Coyote::StatusCode Status = Obj.GetTimeCode(Value, PK);
 		
 		return std::make_tuple(Status, Value);
-	})
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetIP",
 	[] (Coyote::Session &Obj, const int32_t AdapterID)
 	{
@@ -274,7 +274,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		const Coyote::StatusCode Status = Obj.GetIP(AdapterID, Value);
 		
 		return std::make_tuple(Status, Value);
-	})
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetDisks",
 	[] (Coyote::Session &Obj)
 	{
@@ -283,7 +283,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		const Coyote::StatusCode Status = Obj.GetDisks(Disks);
 		
 		return std::make_tuple(Status, Disks);
-	})
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetPresets",
 	[] (Coyote::Session &Obj)
 	{
@@ -292,7 +292,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		const Coyote::StatusCode Status = Obj.GetPresets(Presets);
 		
 		return std::make_tuple(Status, Presets);
-	})
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetAssets",
 	[] (Coyote::Session &Obj)
 	{
@@ -301,7 +301,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		const Coyote::StatusCode Status = Obj.GetAssets(Assets);
 		
 		return std::make_tuple(Status, Assets);
-	})
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetMirrors",
 	[] (Coyote::Session &Obj)
 	{
@@ -310,7 +310,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		const Coyote::StatusCode Status = Obj.GetMirrors(Mirrors);
 		
 		return std::make_tuple(Status, Mirrors);
-	})
+	}, py::call_guard<py::gil_scoped_release>())
 	ACLASSF(Session, Take)
 	ACLASSF(Session, End)
 	ACLASSF(Session, Pause)
