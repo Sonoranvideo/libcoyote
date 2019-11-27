@@ -31,6 +31,7 @@
 
 extern const std::map<Coyote::RefreshMode, std::string> RefreshMap
 {
+	{ Coyote::COYOTE_REFRESH_INVALID, "" },
 	{ Coyote::COYOTE_REFRESH_23_98, "23.98" },
 	{ Coyote::COYOTE_REFRESH_24, "24" },
 	{ Coyote::COYOTE_REFRESH_25, "25" },
@@ -43,6 +44,7 @@ extern const std::map<Coyote::RefreshMode, std::string> RefreshMap
 
 extern const std::map<Coyote::ResolutionMode, std::string> ResolutionMap
 {
+	{ Coyote::COYOTE_RES_INVALID, "" },
 	{ Coyote::COYOTE_RES_1080P, "1080p" },
 	{ Coyote::COYOTE_RES_2160P, "2160p" },
 	{ Coyote::COYOTE_RES_1080I, "1080i" },
@@ -807,7 +809,15 @@ Coyote::StatusCode Coyote::Session::GetHardwareState(Coyote::HardwareState &Out)
 {
 	DEF_SESS;
 	
-	std::unique_ptr<Coyote::HardwareState> Ptr { SESS.ASyncSess.SubSession.GetHardwareState() };
+	std::unique_ptr<Coyote::HardwareState> Ptr;
+	try
+	{
+		Ptr.reset(SESS.ASyncSess.SubSession.GetHardwareState());
+	}
+	catch (...)
+	{
+		return Coyote::COYOTE_STATUS_FAILED;
+	}
 	
 	if (!Ptr || Ptr->Resolution == Coyote::COYOTE_RES_INVALID) return Coyote::COYOTE_STATUS_FAILED;
 	
