@@ -32,8 +32,6 @@
 static bool HasValidIncomingHeaders(const std::map<std::string, msgpack::object> &Values);
 static bool IsSubscriptionEvent(const std::map<std::string, msgpack::object> &Values);
 
-thread_local msgpack::zone &MsgpackProc::Zone = *new msgpack::zone; //I don't want this on the stack because I don't trust it.
-
 extern const std::map<Coyote::ResolutionMode, std::string> ResolutionMap;
 extern const std::map<Coyote::RefreshMode, std::string> RefreshMap;
 
@@ -43,13 +41,15 @@ Coyote::ResolutionMode ReverseResolutionMap(const std::string &Lookup);
 //Definitions
 void MsgpackProc::InitOutgoingMsg(msgpack::packer<msgpack::sbuffer> &Pack, const std::string &CommandName, const uint64_t MsgID, const msgpack::object *Values)
 {
+	msgpack::zone TempZone;
+	
 	std::map<std::string, msgpack::object> TotalValues
 	{
-		{ "CommandName", msgpack::object{ CommandName.c_str(), Zone } },
-		{ "CoyoteAPIVersion", msgpack::object{ COYOTE_API_VERSION, Zone } },
+		{ "CommandName", msgpack::object{ CommandName.c_str(), TempZone} },
+		{ "CoyoteAPIVersion", msgpack::object{ COYOTE_API_VERSION, TempZone } },
 	};
 	
-	if (MsgID) TotalValues.emplace("MsgID", msgpack::object{ MsgID, Zone });
+	if (MsgID) TotalValues.emplace("MsgID", msgpack::object{ MsgID });
 	
 	if (Values != nullptr) TotalValues["Data"] = *Values;
 
@@ -74,12 +74,12 @@ static bool IsSubscriptionEvent(const std::map<std::string, msgpack::object> &Va
 	return Values.count("SubscriptionEvent");
 }
 
-std::map<std::string, msgpack::object> MsgpackProc::InitIncomingMsg(const void *Data, const size_t DataLength, uint64_t *MsgIDOut)
+std::map<std::string, msgpack::object> MsgpackProc::InitIncomingMsg(const void *Data, const size_t DataLength, msgpack::zone &TempZone, uint64_t *MsgIDOut)
 {
 	//Unpack binary data.
 	msgpack::unpacked Result;
 
-	msgpack::object Object { msgpack::unpack(Zone, (const char*)Data, DataLength) };
+	const msgpack::object &Object { msgpack::unpack(TempZone, (const char*)Data, DataLength) };
 	
 	//Convert into a map of smaller msgpack objects
 	std::map<std::string, msgpack::object> Values;
@@ -97,11 +97,11 @@ std::map<std::string, msgpack::object> MsgpackProc::InitIncomingMsg(const void *
 	return Values;
 }
 
-msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, msgpack::packer<msgpack::sbuffer> *Pack)
+msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, msgpack::zone &TempZone, msgpack::packer<msgpack::sbuffer> *Pack)
 { //I haven't used typeid/RTTI since 2014. I figured 'why not', it's here anyways.
 	
 	const std::type_info &OurType { typeid(*Object) };
-	
+
 	std::map<std::string, msgpack::object> *Values = nullptr;
 	
 	if 		(OurType == typeid(Coyote::Asset))
@@ -110,21 +110,21 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 		
 		Values = new std::map<std::string, msgpack::object>
 		{
-			{ "FileName", msgpack::object{ AssetObj->FileName.GetCString() } },
-			{ "NewFileName", msgpack::object{ AssetObj->NewFileName.GetCString() } },
-			{ "CopyPercentage", msgpack::object{ (int)AssetObj->CopyPercentage } },
-			{ "IsReady", msgpack::object{ AssetObj->IsReady } },
-			{ "AudioSampleRate", msgpack::object { AssetObj->AudioSampleRate } },
-			{ "AudioNumChannels", msgpack::object { AssetObj->AudioNumChannels } },
-			{ "DurationMs", msgpack::object { AssetObj->DurationMs } },
-			{ "Size", msgpack::object { AssetObj->Size } },
-			{ "VideoFrameRate", msgpack::object { AssetObj->VideoFrameRate } },
-			{ "VideoHeight", msgpack::object { AssetObj->VideoHeight } },
-			{ "VideoWidth", msgpack::object { AssetObj->VideoWidth } },
-			{ "Videoencoding_FCC", msgpack::object { AssetObj->Videoencoding_FCC.GetCString() } },
-			{ "Audioencoding_FCC", msgpack::object { AssetObj->Audioencoding_FCC.GetCString() } },
-			{ "SupportedVidEncode", msgpack::object { AssetObj->SupportedVidEncode } },
-			{ "SupportedAudEncode", msgpack::object { AssetObj->SupportedAudEncode } },
+			{ "FileName", msgpack::object{ AssetObj->FileName.GetCString(), TempZone } },
+			{ "NewFileName", msgpack::object{ AssetObj->NewFileName.GetCString(), TempZone } },
+			{ "CopyPercentage", msgpack::object{ (int)AssetObj->CopyPercentage, TempZone } },
+			{ "IsReady", msgpack::object{ AssetObj->IsReady, TempZone } },
+			{ "AudioSampleRate", msgpack::object { AssetObj->AudioSampleRate, TempZone } },
+			{ "AudioNumChannels", msgpack::object { AssetObj->AudioNumChannels, TempZone } },
+			{ "DurationMs", msgpack::object { AssetObj->DurationMs, TempZone } },
+			{ "Size", msgpack::object { AssetObj->Size, TempZone } },
+			{ "VideoFrameRate", msgpack::object { AssetObj->VideoFrameRate, TempZone } },
+			{ "VideoHeight", msgpack::object { AssetObj->VideoHeight, TempZone } },
+			{ "VideoWidth", msgpack::object { AssetObj->VideoWidth, TempZone } },
+			{ "Videoencoding_FCC", msgpack::object { AssetObj->Videoencoding_FCC.GetCString(), TempZone } },
+			{ "Audioencoding_FCC", msgpack::object { AssetObj->Audioencoding_FCC.GetCString(), TempZone } },
+			{ "SupportedVidEncode", msgpack::object { AssetObj->SupportedVidEncode, TempZone } },
+			{ "SupportedAudEncode", msgpack::object { AssetObj->SupportedAudEncode, TempZone } },
 		};
 	}
 	else if (OurType == typeid(Coyote::HardwareState))
@@ -133,10 +133,10 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 		
 		Values = new std::map<std::string, msgpack::object>
 		{
-			{ "SupportsS12G", msgpack::object{ HWStateObj->SupportsS12G } },
-			{ "Resolution", msgpack::object{ ResolutionMap.at(HWStateObj->Resolution).c_str() } },
-			{ "RefreshRate", msgpack::object{ RefreshMap.at(HWStateObj->RefreshRate).c_str() } },
-			{ "CurrentMode", msgpack::object{ static_cast<int>(HWStateObj->CurrentMode) } },
+			{ "SupportsS12G", msgpack::object{ HWStateObj->SupportsS12G, TempZone } },
+			{ "Resolution", msgpack::object{ ResolutionMap.at(HWStateObj->Resolution).c_str(), TempZone } },
+			{ "RefreshRate", msgpack::object{ RefreshMap.at(HWStateObj->RefreshRate).c_str(), TempZone } },
+			{ "CurrentMode", msgpack::object{ static_cast<int>(HWStateObj->CurrentMode), TempZone } },
 		};
 	}
 	else if (OurType == typeid(Coyote::TimeCode))
@@ -145,21 +145,21 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 		
 		Values = new std::map<std::string, msgpack::object>
 		{
-			{ "TRT", msgpack::object{ TCObj->TRT } },
-			{ "Time", msgpack::object{ TCObj->Time } },
-			{ "ScrubBar", msgpack::object{ TCObj->ScrubBar } },
-			{ "Selected", msgpack::object{ TCObj->Selected } },
-			{ "PresetKey", msgpack::object{ TCObj->PresetKey } },
-			{ "LeftChannelVolume", msgpack::object { TCObj->LeftChannelVolume } },
-			{ "RightChannelVolume", msgpack::object { TCObj->RightChannelVolume } },
-			{ "Player1LeftVolume", msgpack::object { TCObj->Player1LeftVolume } },
-			{ "Player1RightVolume", msgpack::object { TCObj->Player1RightVolume } },
-			{ "Player2LeftVolume", msgpack::object { TCObj->Player2LeftVolume } },
-			{ "Player2RightVolume", msgpack::object { TCObj->Player2RightVolume } },
-			{ "Player3LeftVolume", msgpack::object { TCObj->Player3LeftVolume } },
-			{ "Player3RightVolume", msgpack::object { TCObj->Player3RightVolume } },
-			{ "Player4LeftVolume", msgpack::object { TCObj->Player4LeftVolume } },
-			{ "Player4RightVolume", msgpack::object { TCObj->Player4RightVolume } },
+			{ "TRT", msgpack::object{ TCObj->TRT, TempZone } },
+			{ "Time", msgpack::object{ TCObj->Time, TempZone } },
+			{ "ScrubBar", msgpack::object{ TCObj->ScrubBar, TempZone } },
+			{ "Selected", msgpack::object{ TCObj->Selected, TempZone } },
+			{ "PresetKey", msgpack::object{ TCObj->PresetKey, TempZone } },
+			{ "LeftChannelVolume", msgpack::object { TCObj->LeftChannelVolume, TempZone } },
+			{ "RightChannelVolume", msgpack::object { TCObj->RightChannelVolume, TempZone } },
+			{ "Player1LeftVolume", msgpack::object { TCObj->Player1LeftVolume, TempZone } },
+			{ "Player1RightVolume", msgpack::object { TCObj->Player1RightVolume, TempZone } },
+			{ "Player2LeftVolume", msgpack::object { TCObj->Player2LeftVolume, TempZone } },
+			{ "Player2RightVolume", msgpack::object { TCObj->Player2RightVolume, TempZone } },
+			{ "Player3LeftVolume", msgpack::object { TCObj->Player3LeftVolume, TempZone } },
+			{ "Player3RightVolume", msgpack::object { TCObj->Player3RightVolume, TempZone } },
+			{ "Player4LeftVolume", msgpack::object { TCObj->Player4LeftVolume, TempZone } },
+			{ "Player4RightVolume", msgpack::object { TCObj->Player4RightVolume, TempZone } },
 		};
 	}
 	else if (OurType == typeid(Coyote::PresetMark))
@@ -168,10 +168,10 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 		
 		Values = new std::map<std::string, msgpack::object>
 		{
-			{ "MarkNumber", msgpack::object { MarkObj->MarkNumber.GetCString() } },
-			{ "MarkName", msgpack::object { MarkObj->MarkName.GetCString() } },
-			{ "MarkDisplayTime", msgpack::object { MarkObj->MarkDisplayTime.GetCString() } },
-			{ "MarkTime", msgpack::object { MarkObj->MarkTime } },
+			{ "MarkNumber", msgpack::object { MarkObj->MarkNumber.GetCString(), TempZone } },
+			{ "MarkName", msgpack::object { MarkObj->MarkName.GetCString(), TempZone } },
+			{ "MarkDisplayTime", msgpack::object { MarkObj->MarkDisplayTime.GetCString(), TempZone } },
+			{ "MarkTime", msgpack::object { MarkObj->MarkTime, TempZone } },
 			
 		};
 	}
@@ -183,16 +183,16 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 		
 		for (const Coyote::TimeCode &TC : MediaStateObj->TimeCodes)
 		{
-			TCs.emplace_back(PackCoyoteObject(&TC));
+			TCs.emplace_back(PackCoyoteObject(&TC, TempZone));
 		}
 		
 		Values = new std::map<std::string, msgpack::object>
 		{
-			{ "NumPresets", msgpack::object{ MediaStateObj->NumPresets } },
-			{ "SelectedPreset", msgpack::object{ MediaStateObj->SelectedPreset } },
-			{ "PlayingPresets", msgpack::object{ STLArrayToMsgpackArray(MediaStateObj->PlayingPresets) } },
-			{ "PausedPresets", msgpack::object{ STLArrayToMsgpackArray(MediaStateObj->PausedPresets) } },
-			{ "TimeCodes", msgpack::object{ STLArrayToMsgpackArray(TCs) } },
+			{ "NumPresets", msgpack::object{ MediaStateObj->NumPresets, TempZone } },
+			{ "SelectedPreset", msgpack::object{ MediaStateObj->SelectedPreset, TempZone } },
+			{ "PlayingPresets", msgpack::object{ STLArrayToMsgpackArray(MediaStateObj->PlayingPresets, TempZone) } },
+			{ "PausedPresets", msgpack::object{ STLArrayToMsgpackArray(MediaStateObj->PausedPresets, TempZone) } },
+			{ "TimeCodes", msgpack::object{ STLArrayToMsgpackArray(TCs, TempZone) } },
 		};
 	}
 	else if (OurType == typeid(Coyote::NetworkInfo))
@@ -201,9 +201,9 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 		
 		Values = new std::map<std::string, msgpack::object>
 		{
-			{ "IP", msgpack::object{ NetInfo->IP.GetCString() } },
-			{ "Subnet", msgpack::object{ NetInfo->Subnet.GetCString() } },
-			{ "AdapterID", msgpack::object{ NetInfo->AdapterID } },
+			{ "IP", msgpack::object{ NetInfo->IP.GetCString(), TempZone } },
+			{ "Subnet", msgpack::object{ NetInfo->Subnet.GetCString(), TempZone } },
+			{ "AdapterID", msgpack::object{ NetInfo->AdapterID, TempZone } },
 		};
 	}
 	else if (OurType == typeid(Coyote::Mirror))
@@ -212,10 +212,10 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 		
 		Values = new std::map<std::string, msgpack::object>
 		{
-			{ "IP", msgpack::object{ MirrorInfo->IP.GetCString() } },
-			{ "Busy", msgpack::object{ MirrorInfo->Busy } },
-			{ "SupportsS12G", msgpack::object{ MirrorInfo->SupportsS12G } },
-			{ "UnitID", msgpack::object{ MirrorInfo->UnitID.GetCString() } },
+			{ "IP", msgpack::object{ MirrorInfo->IP.GetCString(), TempZone } },
+			{ "Busy", msgpack::object{ MirrorInfo->Busy, TempZone } },
+			{ "SupportsS12G", msgpack::object{ MirrorInfo->SupportsS12G, TempZone } },
+			{ "UnitID", msgpack::object{ MirrorInfo->UnitID.GetCString(), TempZone } },
 		};
 	}
 	else if (OurType == typeid(Coyote::Output))
@@ -224,20 +224,20 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 		
 		Values = new std::map<std::string, msgpack::object>
 		{
-			{ "Filename", msgpack::object{ OutputObj->Filename.GetCString() } },
-			{ "Hue", msgpack::object{ OutputObj->Hue } },
-			{ "Saturation", msgpack::object{ OutputObj->Saturation } },
-			{ "Contrast", msgpack::object{ OutputObj->Contrast } },
-			{ "Brightness", msgpack::object{ OutputObj->Brightness } },
-			{ "MediaId", msgpack::object{ OutputObj->MediaId } },
-			{ "FadeOut", msgpack::object{ OutputObj->FadeOut } },
-			{ "Delay", msgpack::object{ OutputObj->Delay } },
-			{ "Active", msgpack::object{ OutputObj->Active } },
-			{ "Audio", msgpack::object{ OutputObj->Audio } },
-			{ "AudioChannel1", msgpack::object{ OutputObj->AudioChannel1 } },
-			{ "AudioChannel2", msgpack::object{ OutputObj->AudioChannel2 } },
-			{ "AudioChannel3", msgpack::object{ OutputObj->AudioChannel3 } },
-			{ "AudioChannel4", msgpack::object{ OutputObj->AudioChannel4 } },
+			{ "Filename", msgpack::object{ OutputObj->Filename.GetCString(), TempZone } },
+			{ "Hue", msgpack::object{ OutputObj->Hue, TempZone } },
+			{ "Saturation", msgpack::object{ OutputObj->Saturation, TempZone } },
+			{ "Contrast", msgpack::object{ OutputObj->Contrast, TempZone } },
+			{ "Brightness", msgpack::object{ OutputObj->Brightness, TempZone } },
+			{ "MediaId", msgpack::object{ OutputObj->MediaId, TempZone } },
+			{ "FadeOut", msgpack::object{ OutputObj->FadeOut, TempZone } },
+			{ "Delay", msgpack::object{ OutputObj->Delay, TempZone } },
+			{ "Active", msgpack::object{ OutputObj->Active, TempZone } },
+			{ "Audio", msgpack::object{ OutputObj->Audio, TempZone } },
+			{ "AudioChannel1", msgpack::object{ OutputObj->AudioChannel1, TempZone } },
+			{ "AudioChannel2", msgpack::object{ OutputObj->AudioChannel2, TempZone } },
+			{ "AudioChannel3", msgpack::object{ OutputObj->AudioChannel3, TempZone } },
+			{ "AudioChannel4", msgpack::object{ OutputObj->AudioChannel4, TempZone } },
 			
 		};
 	}
@@ -250,7 +250,7 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 		
 		for (const Coyote::PresetMark &Mark : PresetObj->gotoMarks)
 		{
-			GotoArray.emplace_back(PackCoyoteObject(&Mark));
+			GotoArray.emplace_back(PackCoyoteObject(&Mark, TempZone));
 		}
 		
 		std::vector<msgpack::object> CountdownArray;
@@ -258,40 +258,40 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 		
 		for (const Coyote::PresetMark &Mark : PresetObj->countDowns)
 		{
-			GotoArray.emplace_back(PackCoyoteObject(&Mark));
+			GotoArray.emplace_back(PackCoyoteObject(&Mark, TempZone));
 		}
 		
 		
 		Values = new std::map<std::string, msgpack::object>
 		{
-			{ "Output1", msgpack::object{ PackCoyoteObject(&PresetObj->Output1) } },
-			{ "Output2", msgpack::object{ PackCoyoteObject(&PresetObj->Output2) } },
-			{ "Output3", msgpack::object{ PackCoyoteObject(&PresetObj->Output3) } },
-			{ "Output4", msgpack::object{ PackCoyoteObject(&PresetObj->Output4) } },
-			{ "Name", msgpack::object{ PresetObj->Name.GetCString() } },
-			{ "Layout", msgpack::object{ LookupPresetLayoutByID(PresetObj->Layout)->TextName.c_str() } },
-			{ "Notes", msgpack::object{ PresetObj->Notes.GetCString() } },
-			{ "Color", msgpack::object{ PresetObj->Color.GetCString() } },
-			{ "PK", msgpack::object{ PresetObj->PK } },
-			{ "TRT", msgpack::object{ PresetObj->TRT } },
-			{ "Index", msgpack::object{ PresetObj->Index } },
-			{ "Loop", msgpack::object{ PresetObj->Loop } },
-			{ "Link", msgpack::object{ PresetObj->Link } },
-			{ "DisplayLink", msgpack::object{ PresetObj->DisplayLink } },
-			{ "Fade", msgpack::object{ PresetObj->Fade } },
-			{ "LeftVolume", msgpack::object{ PresetObj->LeftVolume } },
-			{ "RightVolume", msgpack::object{ PresetObj->RightVolume } },
-			{ "IsPlaying", msgpack::object{ PresetObj->IsPlaying } },
-			{ "IsPaused", msgpack::object{ PresetObj->IsPaused } },
-			{ "Selected", msgpack::object{ PresetObj->Selected } },
-			{ "ScrubberPosition", msgpack::object{ PresetObj->ScrubberPosition } },
-			{ "InPosition", msgpack::object{ PresetObj->InPosition } },
-			{ "OutPosition", msgpack::object{ PresetObj->OutPosition } },
-			{ "VolumeLinked", msgpack::object{ PresetObj->VolumeLinked } },
-			{ "timeCodeUpdate", msgpack::object{ PresetObj->timeCodeUpdate.GetCString() } },
-			{ "tcColor", msgpack::object{ PresetObj->tcColor.GetCString() } },
-			{ "gotoMarks", STLArrayToMsgpackArray(GotoArray) },
-			{ "countDowns", STLArrayToMsgpackArray(CountdownArray) },
+			{ "Output1", msgpack::object{ PackCoyoteObject(&PresetObj->Output1, TempZone) } },
+			{ "Output2", msgpack::object{ PackCoyoteObject(&PresetObj->Output2, TempZone) } },
+			{ "Output3", msgpack::object{ PackCoyoteObject(&PresetObj->Output3, TempZone) } },
+			{ "Output4", msgpack::object{ PackCoyoteObject(&PresetObj->Output4, TempZone) } },
+			{ "Name", msgpack::object{ PresetObj->Name.GetCString(), TempZone } },
+			{ "Layout", msgpack::object{ LookupPresetLayoutByID(PresetObj->Layout)->TextName.c_str(), TempZone } },
+			{ "Notes", msgpack::object{ PresetObj->Notes.GetCString(), TempZone } },
+			{ "Color", msgpack::object{ PresetObj->Color.GetCString(), TempZone } },
+			{ "PK", msgpack::object{ PresetObj->PK, TempZone } },
+			{ "TRT", msgpack::object{ PresetObj->TRT, TempZone } },
+			{ "Index", msgpack::object{ PresetObj->Index, TempZone } },
+			{ "Loop", msgpack::object{ PresetObj->Loop, TempZone } },
+			{ "Link", msgpack::object{ PresetObj->Link, TempZone } },
+			{ "DisplayLink", msgpack::object{ PresetObj->DisplayLink, TempZone } },
+			{ "Fade", msgpack::object{ PresetObj->Fade, TempZone } },
+			{ "LeftVolume", msgpack::object{ PresetObj->LeftVolume, TempZone } },
+			{ "RightVolume", msgpack::object{ PresetObj->RightVolume, TempZone } },
+			{ "IsPlaying", msgpack::object{ PresetObj->IsPlaying, TempZone } },
+			{ "IsPaused", msgpack::object{ PresetObj->IsPaused, TempZone } },
+			{ "Selected", msgpack::object{ PresetObj->Selected, TempZone } },
+			{ "ScrubberPosition", msgpack::object{ PresetObj->ScrubberPosition, TempZone } },
+			{ "InPosition", msgpack::object{ PresetObj->InPosition, TempZone } },
+			{ "OutPosition", msgpack::object{ PresetObj->OutPosition, TempZone } },
+			{ "VolumeLinked", msgpack::object{ PresetObj->VolumeLinked, TempZone } },
+			{ "timeCodeUpdate", msgpack::object{ PresetObj->timeCodeUpdate.GetCString(), TempZone } },
+			{ "tcColor", msgpack::object{ PresetObj->tcColor.GetCString(), TempZone } },
+			{ "gotoMarks", STLArrayToMsgpackArray(GotoArray, TempZone) },
+			{ "countDowns", STLArrayToMsgpackArray(CountdownArray, TempZone) },
 		};
 	}
 
@@ -302,7 +302,7 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 		Pack->pack(*Values);
 	}
 	
-	return STLMapToMsgpackMap(*Values);
+	return STLMapToMsgpackMap(*Values, TempZone);
 	
 }
 
