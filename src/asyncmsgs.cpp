@@ -20,8 +20,10 @@
 #include "msgpackproc.h"
 #include "subscriptions.h"
 
-bool AsyncMsgs::AsynchronousSession::OnMessageReady(const std::map<std::string, msgpack::object> &Values, WS::WSConnection *Conn, WSMessage *Msg)
+bool AsyncMsgs::AsynchronousSession::OnMessageReady(const std::map<std::string, msgpack::object> &Values, WS::WSConnection *Conn, WSMessage *Msg_)
 {
+	const std::unique_ptr<WSMessage> Msg { Msg_ };
+	
 	this->SubSession.ProcessSubscriptionEvent(Values);
 	
 	return true;
