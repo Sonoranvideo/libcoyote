@@ -420,19 +420,19 @@ Coyote::StatusCode Coyote::Session::CreatePreset(const Coyote::Preset &Ref)
 {
 	DEF_SESS;
 
-	msgpack::zone TempZone;	return SESS.CreatePreset_Multi(Ref, "CreatePreset");
+	return SESS.CreatePreset_Multi(Ref, "CreatePreset");
 }
 Coyote::StatusCode Coyote::Session::UpdatePreset(const Coyote::Preset &Ref)
 {
 	DEF_SESS;
 
-	msgpack::zone TempZone;	return SESS.CreatePreset_Multi(Ref, "UpdatePreset");
+	return SESS.CreatePreset_Multi(Ref, "UpdatePreset");
 }
 Coyote::StatusCode Coyote::Session::LoadPreset(const Coyote::Preset &Ref)
 {
 	DEF_SESS;
 
-	msgpack::zone TempZone;	return SESS.CreatePreset_Multi(Ref, "LoadPreset");
+	return SESS.CreatePreset_Multi(Ref, "LoadPreset");
 }
 
 Coyote::StatusCode InternalSession::CreatePreset_Multi(const Coyote::Preset &Ref, const std::string &Cmd)
@@ -799,7 +799,6 @@ Coyote::StatusCode Coyote::Session::GetTimeCode(Coyote::TimeCode &Out, const int
 {
 	DEF_SESS;
 
-	msgpack::zone TempZone;
 	if (Coyote::TimeCode *const TC = SESS.ASyncSess.SubSession.GetTimeCode(PK))
 	{
 		Out = *TC;
@@ -814,7 +813,6 @@ Coyote::StatusCode Coyote::Session::GetPresets(std::vector<Coyote::Preset> &Out)
 {
 	DEF_SESS;
 
-	msgpack::zone TempZone;
 	std::unique_ptr<std::map<int32_t, Coyote::Preset> > Ptr { SESS.ASyncSess.SubSession.GetPresets() };
 	
 	if (!Ptr) return Coyote::COYOTE_STATUS_FAILED;
@@ -834,7 +832,6 @@ Coyote::StatusCode Coyote::Session::GetAssets(std::vector<Coyote::Asset> &Out)
 {
 	DEF_SESS;
 
-	msgpack::zone TempZone;
 	std::unique_ptr<std::map<std::string, Coyote::Asset> > Ptr { SESS.ASyncSess.SubSession.GetAssets() };
 	
 	if (!Ptr) return Coyote::COYOTE_STATUS_FAILED;
@@ -854,7 +851,6 @@ Coyote::StatusCode Coyote::Session::GetHardwareState(Coyote::HardwareState &Out)
 {
 	DEF_SESS;
 
-	msgpack::zone TempZone;	
 	std::unique_ptr<Coyote::HardwareState> Ptr;
 	try
 	{
@@ -912,7 +908,7 @@ Coyote::StatusCode Coyote::Session::SelectPreset(const int32_t PK)
 {
 	DEF_SESS;
 
-	msgpack::zone TempZone;	
+	msgpack::zone TempZone;
 	StatusCode Status{};
 	
 	const std::map<std::string, msgpack::object> Values { MAPARG(PK) };

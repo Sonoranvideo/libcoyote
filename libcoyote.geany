@@ -28,17 +28,17 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=29
-FILE_NAME_0=4837;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fsession.cpp;0;4
+current_page=0
+FILE_NAME_0=12151;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fsession.cpp;0;4
 FILE_NAME_1=1922;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fdatastructures.h;0;4
-FILE_NAME_2=982;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Flibcoyote.h;0;4
+FILE_NAME_2=779;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Flibcoyote.h;0;4
 FILE_NAME_3=3293;C;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fstatuscodes.h;0;4
 FILE_NAME_4=1343;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fsession.h;0;4
 FILE_NAME_5=4153;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fdatastructures_c.h;0;4
 FILE_NAME_6=80;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2FCMakeLists.txt;0;4
-FILE_NAME_7=7798;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fmsgpackproc.cpp;0;4
+FILE_NAME_7=1238;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fmsgpackproc.cpp;0;4
 FILE_NAME_8=6582;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fnative_ws.cpp;0;4
-FILE_NAME_9=1170;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fasynctosync.cpp;0;4
+FILE_NAME_9=1296;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fasynctosync.cpp;0;4
 FILE_NAME_10=992;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fasyncmsgs.cpp;0;4
 FILE_NAME_11=383;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fpycoyote%2FCMakeLists.txt;0;4
 FILE_NAME_12=1738;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fcoyotestring.h;0;4
@@ -47,7 +47,7 @@ FILE_NAME_14=1073;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-f
 FILE_NAME_15=1145;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fsubscriptions.h;0;4
 FILE_NAME_16=1653;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fnative_ws.h;0;4
 FILE_NAME_17=813;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fmtevent.h;0;4
-FILE_NAME_18=2122;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fmsgpackproc.h;0;4
+FILE_NAME_18=1541;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fmsgpackproc.h;0;4
 FILE_NAME_19=1829;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fcommon.h;0;4
 FILE_NAME_20=1640;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fasynctosync.h;0;4
 FILE_NAME_21=838;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fasyncmsgs.h;0;4
@@ -58,14 +58,14 @@ FILE_NAME_25=4742;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%
 FILE_NAME_26=1320;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Flayouts.h;0;4
 FILE_NAME_27=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fc%2Flibcoyote_c.h;0;4
 FILE_NAME_28=1805;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fc%2Fsession_c.h;0;4
-FILE_NAME_29=1750;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote.pure%2Fsrc%2Fmsgpackproc.h;0;4
+FILE_NAME_29=62;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fmacros.h;0;4
 
 [VTE]
 last_dir=/home/ben/coyoterepos/coyote-front-panel-ng
 
 [build-menu]
 C++FT_00_LB=_Compile
-C++FT_00_CM=g++ -std=gnu++14 -fPIC -Wall -pedantic -g3 -O0  -c "%f" `pkg-config --cflags python3` `pkg-config --cflags Qt5WebSockets`
+C++FT_00_CM=g++ -std=gnu++14 -fPIC -Wall -pedantic -g3 -O0  -c "%f" `pkg-config --cflags python3` `pkg-config --cflags Qt5WebSockets` -Wunused
 C++FT_00_WD=
 filetypes=C++;
 C++FT_01_LB=_Build
