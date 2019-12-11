@@ -30,6 +30,8 @@ typedef const char *COYOTESTRING;
 typedef enum CoyoteHardwareMode COYOTEHARDWAREMODE;
 typedef enum CoyoteRefreshRate COYOTEREFRESHMODE;
 typedef enum CoyoteResolutionMode COYOTERESOLUTIONMODE;
+typedef enum CoyoteHDRMode COYOTEHDRMODE;
+typedef enum CoyoteEOFTMode COYOTEEOFTMODE;
 #else
 #include "coyotestring.h"
 typedef Coyote::CoyoteString COYOTESTRING;
@@ -37,6 +39,8 @@ typedef Coyote::HardwareMode COYOTEHARDWAREMODE;
 typedef Coyote::ResolutionMode COYOTERESOLUTIONMODE;
 typedef Coyote::RefreshMode COYOTEREFRESHMODE;
 typedef Coyote::PresetLayout COYOTEPRESETLAYOUT;
+typedef Coyote::HDRMode COYOTEHDRMODE;
+typedef Coyote::EOFTMode COYOTEEOFTMODE;
 extern "C" {
 #endif
 
@@ -89,19 +93,39 @@ struct Coyote_Asset
 struct Coyote_Output
 {
 	COYOTESTRING Filename;
-	double FadeOut;
-	double Delay;
-	int32_t Hue;
-	int32_t Saturation;
-	int32_t Contrast;
-	int32_t Brightness;
-	int32_t MediaId;
-	int32_t AudioChannel1;
-	int32_t AudioChannel2;
-	int32_t AudioChannel3;
-	int32_t AudioChannel4;
-	bool Active;
-	bool Audio;
+	double 	FadeOut;
+	double 	Delay;
+	int32_t	Hue;
+	int32_t	Saturation;
+	int32_t	Contrast;
+	int32_t	Brightness;
+	int32_t	MediaId;
+	int32_t	AudioChannel1;
+	int32_t	AudioChannel2;
+	int32_t	AudioChannel3;
+	int32_t	AudioChannel4;
+	int32_t	OriginalHeight;
+	int32_t	OriginalWidth;
+	int32_t	CustomDestX;
+	int32_t	CustomDestY;
+	int32_t	CustHeight;
+	int32_t	CustWidth;
+	int32_t	HorizontalCrop;
+	int32_t	VerticalCrop;
+
+	bool	JustifyTop;
+	bool	JustifyBottom;
+	bool	JustifyRight;
+	bool	JustifyLeft;
+	bool	CenterVideo;
+	bool	NativeSize;
+	bool	LetterPillarBox;
+	bool	TempFlag;
+	bool	Anamorphic;
+	bool	MultiviewAudio;
+	bool	EnableTimeCode;
+	bool	Active;
+	bool	Audio;
 };
 
 struct Coyote_Preset
@@ -128,10 +152,13 @@ struct Coyote_Preset
 	int32_t ScrubberPosition;
 	int32_t InPosition;
 	int32_t OutPosition;
+	int32_t DisplayOrderIndex;
+	int32_t Dissolve;
 	bool IsPlaying;
 	bool IsPaused;
 	bool Selected;
 	bool VolumeLinked;
+	bool FreezeAtEnd;
 };
 
 struct Coyote_HardwareState
@@ -139,7 +166,10 @@ struct Coyote_HardwareState
 	COYOTERESOLUTIONMODE Resolution;
 	COYOTEREFRESHMODE RefreshRate;
 	COYOTEHARDWAREMODE CurrentMode;
+	COYOTEHDRMODE HDRMode;
+	COYOTEEOFTMODE EOFTSetting;
 	bool SupportsS12G;
+	bool ConstLumin;
 };
 
 struct Coyote_NetworkInfo

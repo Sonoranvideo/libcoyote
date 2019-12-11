@@ -73,6 +73,22 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_RES_MAX)
 	.export_values();
 	
+	py::enum_<Coyote::HDRMode>(ModObj, "HDRMode")
+	EMEMDEF(COYOTE_HDR_DISABLED)
+	EMEMDEF(COYOTE_HDR_BT2020)
+	EMEMDEF(COYOTE_HDR_DCI_P3)
+	EMEMDEF(COYOTE_HDR_DOLBY)
+	EMEMDEF(COYOTE_HDR_MAX)
+	.export_values();
+	
+	py::enum_<Coyote::EOFTMode>(ModObj, "EOFTMode")
+	EMEMDEF(COYOTE_EOFT_NORMAL)
+	EMEMDEF(COYOTE_EOFT_HLG)
+	EMEMDEF(COYOTE_EOFT_PQ)
+	EMEMDEF(COYOTE_EOFT_UNSPECIFIED)
+	EMEMDEF(COYOTE_EOFT_MAX)
+	.export_values();
+	
 	py::enum_<Coyote::HardwareMode>(ModObj, "HardwareMode")
 	EMEMDEF(COYOTE_MODE_INVALID)
 	EMEMDEF(COYOTE_MODE_Q3G)
@@ -150,7 +166,10 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSBD(Coyote_HardwareState, Resolution)
 	ACLASSBD(Coyote_HardwareState, RefreshRate)
 	ACLASSBD(Coyote_HardwareState, CurrentMode)
-	ACLASSBD(Coyote_HardwareState, SupportsS12G);
+	ACLASSBD(Coyote_HardwareState, HDRMode)
+	ACLASSBD(Coyote_HardwareState, EOFTSetting)
+	ACLASSBD(Coyote_HardwareState, SupportsS12G)
+	ACLASSBD(Coyote_HardwareState, ConstLumin);
 	
 	py::class_<Coyote::HardwareState, Coyote::BaseObject, Coyote_HardwareState>(ModObj, "HardwareState")
 	.def(py::init<>())
@@ -369,7 +388,26 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSBD(Coyote_Output, AudioChannel1)
 	ACLASSBD(Coyote_Output, AudioChannel2)
 	ACLASSBD(Coyote_Output, AudioChannel3)
-	ACLASSBD(Coyote_Output, AudioChannel4);
+	ACLASSBD(Coyote_Output, AudioChannel4)
+	ACLASSBD(Coyote_Output, EnableTimeCode)
+	ACLASSBD(Coyote_Output, OriginalHeight)
+	ACLASSBD(Coyote_Output, OriginalWidth)
+	ACLASSBD(Coyote_Output, CustomDestX)
+	ACLASSBD(Coyote_Output, CustomDestY)
+	ACLASSBD(Coyote_Output, CustHeight)
+	ACLASSBD(Coyote_Output, CustWidth)
+	ACLASSBD(Coyote_Output, JustifyTop)
+	ACLASSBD(Coyote_Output, JustifyBottom)
+	ACLASSBD(Coyote_Output, JustifyRight)
+	ACLASSBD(Coyote_Output, JustifyLeft)
+	ACLASSBD(Coyote_Output, CenterVideo)
+	ACLASSBD(Coyote_Output, NativeSize)
+	ACLASSBD(Coyote_Output, LetterPillarBox)
+	ACLASSBD(Coyote_Output, TempFlag)
+	ACLASSBD(Coyote_Output, Anamorphic)
+	ACLASSBD(Coyote_Output, MultiviewAudio)
+	ACLASSBD(Coyote_Output, HorizontalCrop)
+	ACLASSBD(Coyote_Output, VerticalCrop);
 	
 	py::class_<Coyote::Output, Coyote::BaseObject, Coyote_Output>(ModObj, "Output")
 	.def(py::init<>());
@@ -397,7 +435,10 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSBD(Coyote_Preset, Notes)
 	ACLASSBD(Coyote_Preset, Color)
 	ACLASSBD(Coyote_Preset, timeCodeUpdate)
-	ACLASSBD(Coyote_Preset, tcColor);
+	ACLASSBD(Coyote_Preset, tcColor)
+	ACLASSBD(Coyote_Preset, FreezeAtEnd)
+	ACLASSBD(Coyote_Preset, DisplayOrderIndex)
+	ACLASSBD(Coyote_Preset, Dissolve);
 
 	
 	py::class_<Coyote::Preset, Coyote::BaseObject, Coyote_Preset>(ModObj, "Preset")

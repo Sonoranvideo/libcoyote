@@ -125,6 +125,32 @@ namespace Coyote
 	};
 	
 #ifdef __cplusplus
+	enum HDRMode
+#else
+	enum CoyoteHDRMode
+#endif //__cplusplus
+	{
+		COYOTE_HDR_DISABLED = 0,
+		COYOTE_HDR_BT2020,
+		COYOTE_HDR_DCI_P3,
+		COYOTE_HDR_DOLBY,
+		COYOTE_HDR_MAX
+	};
+	
+#ifdef __cplusplus
+	enum EOFTMode
+#else
+	enum CoyoteEOFTMode
+#endif //__cplusplus
+	{
+		COYOTE_EOFT_NORMAL = 0,
+		COYOTE_EOFT_HLG = 1,
+		COYOTE_EOFT_PQ = 2,
+		COYOTE_EOFT_UNSPECIFIED = 3,
+		COYOTE_EOFT_MAX
+	};
+		
+#ifdef __cplusplus
 	enum Player
 #else
 	enum CoyotePlayer
@@ -145,6 +171,8 @@ namespace Coyote
 	typedef enum CoyoteStatusCode CoyoteStatusCode;
 	typedef enum CoyotePresetLayout CoyotePresetLayout;
 	typedef enum CoyoteSDIOutput CoyoteSDIOutput;
+	typedef enum CoyoteEOFTMode CoyoteEOFTMode;
+	typedef enum CoyoteHDRMode CoyoteHDRMode;
 #else
 }
 #endif // !__cplusplus

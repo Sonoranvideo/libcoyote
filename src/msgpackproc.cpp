@@ -136,6 +136,9 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			{ "SupportsS12G", msgpack::object{ HWStateObj->SupportsS12G, TempZone } },
 			{ "Resolution", msgpack::object{ ResolutionMap.at(HWStateObj->Resolution).c_str(), TempZone } },
 			{ "RefreshRate", msgpack::object{ RefreshMap.at(HWStateObj->RefreshRate).c_str(), TempZone } },
+			{ "HDRMode", msgpack::object{ static_cast<int>(HWStateObj->HDRMode), TempZone } },
+			{ "EOFTSetting", msgpack::object{ static_cast<int>(HWStateObj->EOFTSetting), TempZone } },
+			{ "ConstLumin", msgpack::object{ static_cast<int>(HWStateObj->ConstLumin), TempZone } },
 			{ "CurrentMode", msgpack::object{ static_cast<int>(HWStateObj->CurrentMode), TempZone } },
 		};
 	}
@@ -238,7 +241,25 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			{ "AudioChannel2", msgpack::object{ OutputObj->AudioChannel2, TempZone } },
 			{ "AudioChannel3", msgpack::object{ OutputObj->AudioChannel3, TempZone } },
 			{ "AudioChannel4", msgpack::object{ OutputObj->AudioChannel4, TempZone } },
-			
+			{ "OriginalHeight", msgpack::object { OutputObj->OriginalHeight, TempZone } },
+			{ "OriginalWidth", msgpack::object { OutputObj->OriginalWidth, TempZone } },
+			{ "CustomDestX", msgpack::object { OutputObj->CustomDestX, TempZone } },
+			{ "CustomDestY", msgpack::object { OutputObj->CustomDestY, TempZone } },
+			{ "CustHeight", msgpack::object { OutputObj->CustHeight, TempZone } },
+			{ "CustWidth", msgpack::object { OutputObj->CustWidth, TempZone } },
+			{ "HorizontalCrop", msgpack::object { OutputObj->HorizontalCrop, TempZone } },
+			{ "VerticalCrop", msgpack::object { OutputObj->VerticalCrop, TempZone } },
+			{ "JustifyTop", msgpack::object { OutputObj->JustifyTop, TempZone } },
+			{ "JustifyBottom", msgpack::object { OutputObj->JustifyBottom, TempZone } },
+			{ "JustifyRight", msgpack::object { OutputObj->JustifyRight, TempZone } },
+			{ "JustifyLeft", msgpack::object { OutputObj->JustifyLeft, TempZone } },
+			{ "CenterVideo", msgpack::object { OutputObj->CenterVideo, TempZone } },
+			{ "NativeSize", msgpack::object { OutputObj->NativeSize, TempZone } },
+			{ "LetterPillarBox", msgpack::object { OutputObj->LetterPillarBox, TempZone } },
+			{ "TempFlag", msgpack::object { OutputObj->TempFlag, TempZone } },
+			{ "Anamorphic", msgpack::object { OutputObj->Anamorphic, TempZone } },
+			{ "MultiviewAudio", msgpack::object { OutputObj->MultiviewAudio, TempZone } },
+			{ "EnableTimeCode", msgpack::object { OutputObj->EnableTimeCode, TempZone } },
 		};
 	}
 	else if (OurType == typeid(Coyote::Preset))
@@ -289,6 +310,9 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			{ "OutPosition", msgpack::object{ PresetObj->OutPosition, TempZone } },
 			{ "VolumeLinked", msgpack::object{ PresetObj->VolumeLinked, TempZone } },
 			{ "timeCodeUpdate", msgpack::object{ PresetObj->timeCodeUpdate.GetCString(), TempZone } },
+			{ "FreezeAtEnd", msgpack::object{ PresetObj->FreezeAtEnd, TempZone } },
+			{ "DisplayOrderIndex", msgpack::object{ PresetObj->DisplayOrderIndex, TempZone } },
+			{ "Dissolve", msgpack::object{ PresetObj->Dissolve, TempZone } },
 			{ "tcColor", msgpack::object{ PresetObj->tcColor.GetCString(), TempZone } },
 			{ "gotoMarks", STLArrayToMsgpackArray(GotoArray, TempZone) },
 			{ "countDowns", STLArrayToMsgpackArray(CountdownArray, TempZone) },
@@ -330,11 +354,29 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		OutputObj->FadeOut = Fields["FadeOut"].as<double>();
 		OutputObj->Delay = Fields["Delay"].as<double>();
 		OutputObj->Active = Fields["Active"].as<int>();
-		OutputObj->Audio = Fields["Audio"].as<int>();
+		OutputObj->EnableTimeCode = Fields["EnableTimeCode"].as<int>();
+		OutputObj->JustifyTop = Fields["JustifyTop"].as<int>();
+		OutputObj->JustifyBottom = Fields["JustifyBottom"].as<int>();
+		OutputObj->JustifyLeft = Fields["JustifyLeft"].as<int>();
+		OutputObj->JustifyRight = Fields["JustifyRight"].as<int>();
+		OutputObj->CenterVideo = Fields["CenterVideo"].as<int>();
+		OutputObj->NativeSize = Fields["NativeSize"].as<int>();
+		OutputObj->LetterPillarBox = Fields["LetterPillarBox"].as<int>();
+		OutputObj->TempFlag = Fields["TempFlag"].as<int>();
+		OutputObj->Anamorphic = Fields["Anamorphic"].as<int>();
+		OutputObj->MultiviewAudio = Fields["MultiviewAudio"].as<int>();
 		OutputObj->AudioChannel1 = Fields["AudioChannel1"].as<int32_t>();
 		OutputObj->AudioChannel2 = Fields["AudioChannel2"].as<int32_t>();
 		OutputObj->AudioChannel3 = Fields["AudioChannel3"].as<int32_t>();
 		OutputObj->AudioChannel4 = Fields["AudioChannel4"].as<int32_t>();
+		OutputObj->OriginalHeight = Fields["OriginalHeight"].as<int32_t>();
+		OutputObj->OriginalWidth = Fields["OriginalWidth"].as<int32_t>();
+		OutputObj->CustomDestX = Fields["CustomDestX"].as<int32_t>();
+		OutputObj->CustomDestY = Fields["CustomDestY"].as<int32_t>();
+		OutputObj->CustHeight = Fields["CustHeight"].as<int32_t>();
+		OutputObj->CustWidth = Fields["CustWidth"].as<int32_t>();
+		OutputObj->HorizontalCrop = Fields["HorizontalCrop"].as<int32_t>();
+		OutputObj->VerticalCrop = Fields["VerticalCrop"].as<int32_t>();
 	}
 	else if (Expected == typeid(Coyote::Asset))
 	{
@@ -415,7 +457,9 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		PresetObj->IsPlaying = Fields["IsPlaying"].as<int>();
 		PresetObj->IsPaused = Fields["IsPaused"].as<int>();
 		PresetObj->Selected = Fields["Selected"].as<int>();
-		PresetObj->ScrubberPosition = Fields["ScrubberPosition"].as<int32_t>();
+		PresetObj->FreezeAtEnd = Fields["FreezeAtEnd"].as<int>();
+		PresetObj->DisplayOrderIndex = Fields["DisplayOrderIndex"].as<int32_t>();
+		PresetObj->Dissolve = Fields["Dissolve"].as<int32_t>();
 		PresetObj->InPosition = Fields["InPosition"].as<int32_t>();
 		PresetObj->OutPosition = Fields["OutPosition"].as<int32_t>();
 		PresetObj->VolumeLinked = Fields["VolumeLinked"].as<int>();
@@ -464,9 +508,12 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		Coyote::HardwareState *HWObj = static_cast<Coyote::HardwareState*>(Result);
 		
 		HWObj->SupportsS12G = Fields["SupportsS12G"].as<int>();
+		HWObj->ConstLumin = Fields["ConstLumin"].as<int>();
 		HWObj->Resolution = ReverseResolutionMap(Fields["Resolution"].as<std::string>());
 		HWObj->RefreshRate = ReverseRefreshMap(Fields["RefreshRate"].as<std::string>());
 		HWObj->CurrentMode = static_cast<Coyote::HardwareMode>(Fields["CurrentMode"].as<int>());
+		HWObj->HDRMode = static_cast<Coyote::HDRMode>(Fields["HDRMode"].as<int>());
+		HWObj->EOFTSetting = static_cast<Coyote::EOFTMode>(Fields["EOFTSetting"].as<int>());
 	}
 	else if (Expected == typeid(Coyote::MediaState))
 	{
