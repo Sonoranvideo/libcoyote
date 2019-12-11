@@ -81,12 +81,12 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_HDR_MAX)
 	.export_values();
 	
-	py::enum_<Coyote::EOFTMode>(ModObj, "EOFTMode")
-	EMEMDEF(COYOTE_EOFT_NORMAL)
-	EMEMDEF(COYOTE_EOFT_HLG)
-	EMEMDEF(COYOTE_EOFT_PQ)
-	EMEMDEF(COYOTE_EOFT_UNSPECIFIED)
-	EMEMDEF(COYOTE_EOFT_MAX)
+	py::enum_<Coyote::EOTFMode>(ModObj, "EOTFMode")
+	EMEMDEF(COYOTE_EOTF_NORMAL)
+	EMEMDEF(COYOTE_EOTF_HLG)
+	EMEMDEF(COYOTE_EOTF_PQ)
+	EMEMDEF(COYOTE_EOTF_UNSPECIFIED)
+	EMEMDEF(COYOTE_EOTF_MAX)
 	.export_values();
 	
 	py::enum_<Coyote::HardwareMode>(ModObj, "HardwareMode")
@@ -167,7 +167,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSBD(Coyote_HardwareState, RefreshRate)
 	ACLASSBD(Coyote_HardwareState, CurrentMode)
 	ACLASSBD(Coyote_HardwareState, HDRMode)
-	ACLASSBD(Coyote_HardwareState, EOFTSetting)
+	ACLASSBD(Coyote_HardwareState, EOTFSetting)
 	ACLASSBD(Coyote_HardwareState, SupportsS12G)
 	ACLASSBD(Coyote_HardwareState, ConstLumin);
 	

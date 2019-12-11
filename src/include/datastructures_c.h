@@ -31,7 +31,7 @@ typedef enum CoyoteHardwareMode COYOTEHARDWAREMODE;
 typedef enum CoyoteRefreshRate COYOTEREFRESHMODE;
 typedef enum CoyoteResolutionMode COYOTERESOLUTIONMODE;
 typedef enum CoyoteHDRMode COYOTEHDRMODE;
-typedef enum CoyoteEOFTMode COYOTEEOFTMODE;
+typedef enum CoyoteEOTFMode COYOTEEOTFMODE;
 #else
 #include "coyotestring.h"
 typedef Coyote::CoyoteString COYOTESTRING;
@@ -40,7 +40,7 @@ typedef Coyote::ResolutionMode COYOTERESOLUTIONMODE;
 typedef Coyote::RefreshMode COYOTEREFRESHMODE;
 typedef Coyote::PresetLayout COYOTEPRESETLAYOUT;
 typedef Coyote::HDRMode COYOTEHDRMODE;
-typedef Coyote::EOFTMode COYOTEEOFTMODE;
+typedef Coyote::EOTFMode COYOTEEOTFMODE;
 extern "C" {
 #endif
 
@@ -167,7 +167,7 @@ struct Coyote_HardwareState
 	COYOTEREFRESHMODE RefreshRate;
 	COYOTEHARDWAREMODE CurrentMode;
 	COYOTEHDRMODE HDRMode;
-	COYOTEEOFTMODE EOFTSetting;
+	COYOTEEOTFMODE EOTFSetting;
 	bool SupportsS12G;
 	bool ConstLumin;
 };

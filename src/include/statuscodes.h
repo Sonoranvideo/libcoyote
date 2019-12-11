@@ -138,16 +138,16 @@ namespace Coyote
 	};
 	
 #ifdef __cplusplus
-	enum EOFTMode
+	enum EOTFMode
 #else
-	enum CoyoteEOFTMode
+	enum CoyoteEOTFMode
 #endif //__cplusplus
 	{
-		COYOTE_EOFT_NORMAL = 0,
-		COYOTE_EOFT_HLG = 1,
-		COYOTE_EOFT_PQ = 2,
-		COYOTE_EOFT_UNSPECIFIED = 3,
-		COYOTE_EOFT_MAX
+		COYOTE_EOTF_NORMAL = 0,
+		COYOTE_EOTF_HLG = 1,
+		COYOTE_EOTF_PQ = 2,
+		COYOTE_EOTF_UNSPECIFIED = 3,
+		COYOTE_EOTF_MAX
 	};
 		
 #ifdef __cplusplus
@@ -171,7 +171,7 @@ namespace Coyote
 	typedef enum CoyoteStatusCode CoyoteStatusCode;
 	typedef enum CoyotePresetLayout CoyotePresetLayout;
 	typedef enum CoyoteSDIOutput CoyoteSDIOutput;
-	typedef enum CoyoteEOFTMode CoyoteEOFTMode;
+	typedef enum CoyoteEOTFMode CoyoteEOTFMode;
 	typedef enum CoyoteHDRMode CoyoteHDRMode;
 #else
 }

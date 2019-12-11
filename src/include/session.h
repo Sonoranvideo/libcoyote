@@ -71,7 +71,11 @@ namespace Coyote
 		StatusCode GetIP(const int32_t AdapterID, NetworkInfo &Out);
 		StatusCode SetIP(const NetworkInfo &Input);
 		StatusCode InitializeCoyote(const ResolutionMode Resolution, const RefreshMode RefreshRate);
-		StatusCode SetHardwareMode(const ResolutionMode Resolution, const RefreshMode RefreshRate);
+		StatusCode SetHardwareMode(	const ResolutionMode Resolution,
+									const RefreshMode RefreshRate,
+									const HDRMode HDRMode = Coyote::COYOTE_HDR_DISABLED,
+									const EOTFMode EOTFSetting = Coyote::COYOTE_EOTF_NORMAL,
+									const bool ConstLumin = false);
 		StatusCode SelectPreset(const int32_t PK);
 		StatusCode GetMediaState(MediaState &Out);
 		StatusCode GetServerVersion(std::string &Out);

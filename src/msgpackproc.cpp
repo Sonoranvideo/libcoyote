@@ -137,7 +137,7 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			{ "Resolution", msgpack::object{ ResolutionMap.at(HWStateObj->Resolution).c_str(), TempZone } },
 			{ "RefreshRate", msgpack::object{ RefreshMap.at(HWStateObj->RefreshRate).c_str(), TempZone } },
 			{ "HDRMode", msgpack::object{ static_cast<int>(HWStateObj->HDRMode), TempZone } },
-			{ "EOFTSetting", msgpack::object{ static_cast<int>(HWStateObj->EOFTSetting), TempZone } },
+			{ "EOTFSetting", msgpack::object{ static_cast<int>(HWStateObj->EOTFSetting), TempZone } },
 			{ "ConstLumin", msgpack::object{ static_cast<int>(HWStateObj->ConstLumin), TempZone } },
 			{ "CurrentMode", msgpack::object{ static_cast<int>(HWStateObj->CurrentMode), TempZone } },
 		};
@@ -513,7 +513,7 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		HWObj->RefreshRate = ReverseRefreshMap(Fields["RefreshRate"].as<std::string>());
 		HWObj->CurrentMode = static_cast<Coyote::HardwareMode>(Fields["CurrentMode"].as<int>());
 		HWObj->HDRMode = static_cast<Coyote::HDRMode>(Fields["HDRMode"].as<int>());
-		HWObj->EOFTSetting = static_cast<Coyote::EOFTMode>(Fields["EOFTSetting"].as<int>());
+		HWObj->EOTFSetting = static_cast<Coyote::EOTFMode>(Fields["EOTFSetting"].as<int>());
 	}
 	else if (Expected == typeid(Coyote::MediaState))
 	{

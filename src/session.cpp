@@ -956,7 +956,11 @@ Coyote::StatusCode Coyote::Session::InitializeCoyote(const Coyote::ResolutionMod
 	return Status;
 }
 
-Coyote::StatusCode Coyote::Session::SetHardwareMode(const Coyote::ResolutionMode Resolution, const Coyote::RefreshMode RefreshRate)
+Coyote::StatusCode Coyote::Session::SetHardwareMode(const ResolutionMode Resolution,
+													const RefreshMode RefreshRate,
+													const HDRMode HDRMode,
+													const EOTFMode EOTFSetting,
+													const bool ConstLumin)
 {
 	DEF_SESS;
 
@@ -966,7 +970,14 @@ Coyote::StatusCode Coyote::Session::SetHardwareMode(const Coyote::ResolutionMode
 	
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "Resolution", msgpack::object{ResolutionMap.at(Resolution).c_str()} }, { "Refresh", msgpack::object{RefreshMap.at(RefreshRate).c_str()} } };
+	const std::map<std::string, msgpack::object> Values
+	{
+		{ "Resolution", msgpack::object{ResolutionMap.at(Resolution).c_str()} },
+		{ "Refresh", msgpack::object{RefreshMap.at(RefreshRate).c_str()} },
+		{ "HDRMode", msgpack::object{ (int)HDRMode } },
+		{ "EOTFSetting", msgpack::object{ (int)EOTFSetting } },
+		{ "ConstLumin", msgpack::object{ ConstLumin } },
+	};
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 
 	SESS.PerformSyncedCommand("SetHardwareMode", TempZone, &Status, &Pass);
