@@ -428,12 +428,6 @@ Coyote::StatusCode Coyote::Session::UpdatePreset(const Coyote::Preset &Ref)
 
 	return SESS.CreatePreset_Multi(Ref, "UpdatePreset");
 }
-Coyote::StatusCode Coyote::Session::LoadPreset(const Coyote::Preset &Ref)
-{
-	DEF_SESS;
-
-	return SESS.CreatePreset_Multi(Ref, "LoadPreset");
-}
 
 Coyote::StatusCode InternalSession::CreatePreset_Multi(const Coyote::Preset &Ref, const std::string &Cmd)
 {
@@ -755,17 +749,6 @@ Coyote::StatusCode Coyote::Session::ReorderPresets(const int32_t PK1, const int3
 	return Status;
 }
 
-Coyote::StatusCode Coyote::Session::RestartService(void)
-{
-	DEF_SESS;
-
-	msgpack::zone TempZone;	
-	Coyote::StatusCode Status{};
-	
-	SESS.PerformSyncedCommand("RestartService", TempZone, &Status);
-	
-	return Status;
-}
 Coyote::StatusCode Coyote::Session::DeletePreset(const int32_t PK)
 {
 	DEF_SESS;
@@ -934,24 +917,6 @@ Coyote::StatusCode Coyote::Session::GetMediaState(Coyote::MediaState &Out)
 	std::unique_ptr<Coyote::MediaState> Ptr { static_cast<Coyote::MediaState*>(MsgpackProc::UnpackCoyoteObject(Msg.at("Data"), typeid(Coyote::MediaState))) };
 	
 	Out = *Ptr;
-	
-	return Status;
-}
-	
-Coyote::StatusCode Coyote::Session::InitializeCoyote(const Coyote::ResolutionMode Resolution, const Coyote::RefreshMode RefreshRate)
-{
-	DEF_SESS;
-
-	msgpack::zone TempZone;	
-	assert(RefreshMap.count(RefreshRate));
-	assert(ResolutionMap.count(Resolution));
-	
-	StatusCode Status{};
-	
-	const std::map<std::string, msgpack::object> Values { { "Resolution", msgpack::object{ResolutionMap.at(Resolution).c_str()} }, { "Refresh", msgpack::object{RefreshMap.at(RefreshRate).c_str()} } };
-	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
-
-	SESS.PerformSyncedCommand("InitializeCoyote", TempZone, &Status, &Pass);
 	
 	return Status;
 }

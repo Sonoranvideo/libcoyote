@@ -99,13 +99,6 @@ Coyote::StatusCode Coyote_TakeNext(Coyote::Session *Sess)
 	return Sess->TakeNext();
 }
 
-Coyote::StatusCode Coyote_RestartService(Coyote::Session *Sess)
-{
-	assert(Sess != nullptr);
-
-	return Sess->RestartService();
-}
-
 Coyote::StatusCode Coyote_ShutdownCoyote(Coyote::Session *Sess)
 {
 	assert(Sess != nullptr);
@@ -296,15 +289,6 @@ Coyote::StatusCode Coyote_DeletePreset(Coyote::Session *Sess, const int32_t PK)
 	return Sess->DeletePreset(PK);
 }
 
-Coyote::StatusCode Coyote_LoadPreset(Coyote::Session *Sess, const Coyote_Preset *Input_)
-{
-	assert(Sess != nullptr);
-
-	const Coyote::Preset *Input = static_cast<const Coyote::Preset*>(Input_);
-	
-	return Sess->LoadPreset(*Input);
-}
-
 Coyote::StatusCode Coyote_UpdatePreset(Coyote::Session *Sess, const Coyote_Preset *Input_)
 {
 	assert(Sess != nullptr);
@@ -412,13 +396,6 @@ Coyote::StatusCode Coyote_SetHardwareMode(Coyote::Session *Sess, const Coyote::R
 	assert(Sess != nullptr);
 	
 	return Sess->SetHardwareMode(Resolution, RefreshRate);
-}
-
-Coyote::StatusCode Coyote_InitializeCoyote(Coyote::Session *Sess, const Coyote::ResolutionMode Resolution, const Coyote::RefreshMode RefreshRate)
-{
-	assert(Sess != nullptr);
-	
-	return Sess->InitializeCoyote(Resolution, RefreshRate);
 }
 
 } //End of C linkage

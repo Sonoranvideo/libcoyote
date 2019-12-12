@@ -61,16 +61,13 @@ namespace Coyote
 		StatusCode DeletePreset(const int32_t PK);
 		StatusCode CreatePreset(const Preset &Ref);
 		StatusCode UpdatePreset(const Preset &Ref);
-		StatusCode LoadPreset(const Preset &Ref);
 		StatusCode BeginUpdate(void);
 		StatusCode GetDisks(std::vector<std::string> &Out);
 		StatusCode EjectDisk(const std::string &DriveLetter);
 		StatusCode GetUnitID(std::string &UnitIDOut, std::string &NicknameOut);
 		StatusCode GetHardwareState(HardwareState &Out);
-		StatusCode RestartService(void);
 		StatusCode GetIP(const int32_t AdapterID, NetworkInfo &Out);
 		StatusCode SetIP(const NetworkInfo &Input);
-		StatusCode InitializeCoyote(const ResolutionMode Resolution, const RefreshMode RefreshRate);
 		StatusCode SetHardwareMode(	const ResolutionMode Resolution,
 									const RefreshMode RefreshRate,
 									const HDRMode HDRMode = Coyote::COYOTE_HDR_DISABLED,
