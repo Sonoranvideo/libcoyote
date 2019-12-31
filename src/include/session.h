@@ -1,5 +1,5 @@
 /*
-   Copyright 2019 Sonoran Video Systems
+   Copyright 2020 Sonoran Video Systems
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -102,6 +102,8 @@ namespace Coyote
 		StatusCode SetPausedState(const int32_t PK, const bool Value);
 		StatusCode SetPause(const int32_t PK);
 		StatusCode UnsetPause(const int32_t PK);
+		StatusCode SetUnitNickname(const std::string &Nickname);
+		
 		virtual ~Session(void);
 		
 		void SetCommandTimeoutSecs(const time_t TimeoutSecs = DefaultCommandTimeoutSecs);

@@ -1,5 +1,5 @@
 /*
-   Copyright 2019 Sonoran Video Systems
+   Copyright 2020 Sonoran Video Systems
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -1111,6 +1111,23 @@ Coyote::StatusCode Coyote::Session::ReadLog(const std::string &SpokeName, const 
 	Data.at("LogText").convert(LogOut);
 
 	LDEBUG_MSG("Success");
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::SetUnitNickname(const std::string &Nickname)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;
+
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values { { "Nickname", msgpack::object{Nickname.c_str()} } };
+	
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+
+	SESS.PerformSyncedCommand("SetUnitNickname", TempZone, &Status, &Pass);
+	
 	return Status;
 }
 
