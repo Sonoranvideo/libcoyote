@@ -45,17 +45,7 @@
 #define LDEBUG_MSG(x) ((void)0)
 #endif //LCVERBOSE
 
-#else
-#include <stdbool.h>
-#endif //__cplusplus
-
-#ifdef WIN32
-#include <windows.h>
-#define COYOTE_SLEEP(x) Sleep(x);
-#else
-#include <unistd.h>
-#define COYOTE_SLEEP(x) usleep((x ) * 1000);
-#endif //WIN32
+#if __cplusplus >= 201300
 
 template <typename MapType>
 auto RebuildMapBackwards(const MapType &Original)
@@ -71,5 +61,22 @@ auto RebuildMapBackwards(const MapType &Original)
 	
 	return RetVal;
 }
+#endif //__cplusplus >= 201300
+
+#else
+#include <stdbool.h>
+#endif //__cplusplus
+
+#ifdef WIN32
+#include <winsock2.h>
+#include <windows.h>
+#define COYOTE_SLEEP(x) Sleep(x);
+#define EXPFUNC __declspec(dllexport)
+#else
+#include <unistd.h>
+#define COYOTE_SLEEP(x) usleep((x ) * 1000);
+#define EXPFUNC
+#endif //WIN32
+
 
 #endif //__LIBCOYOTE_COMMON_H__

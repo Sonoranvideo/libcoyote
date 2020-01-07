@@ -20,9 +20,8 @@
 #ifndef __cplusplus
 #error "This is the C++ set of bindings, you're looking for libcoyote_c.h"
 #endif //__cplusplus
-#include <string>
-#include <stdint.h>
-#include <vector>
+#include "common.h"
+
 #include <time.h>
 #include "macros.h"
 #include "statuscodes.h"
@@ -30,7 +29,7 @@
 
 namespace Coyote
 {
-	class Session
+	class EXPFUNC Session
 	{
 	private:
 		void *Internal;

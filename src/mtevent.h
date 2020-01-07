@@ -16,7 +16,7 @@
 #ifndef __LIBCOYOTE_MTEVENT_H__
 #define __LIBCOYOTE_MTEVENT_H__
 
-#include "common.h"
+#include "include/common.h"
 #include <thread>
 #include <mutex>
 #include <QSemaphore>

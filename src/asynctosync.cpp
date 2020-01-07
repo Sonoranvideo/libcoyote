@@ -17,7 +17,7 @@
 //We have such sights to show you.
 #define WSMESSAGES_NOLWS
 #include "../wsmessages/wsmessages.hpp"
-#include "common.h"
+#include "include/common.h"
 #include "asynctosync.h"
 #include "msgpackproc.h"
 #include "native_ws.h"

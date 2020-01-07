@@ -15,6 +15,7 @@
 */
 
 #define WSMESSAGES_NOLWS
+#include "include/common.h"
 #include "../wsmessages/wsmessages.hpp"
 #include "asyncmsgs.h"
 #include "msgpackproc.h"

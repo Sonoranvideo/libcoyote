@@ -15,7 +15,7 @@
 */
 #include <QtWebSockets>
 #include <QCoreApplication>
-#include "common.h"
+#include "include/common.h"
 #include "msgpackproc.h"
 #include "native_ws.h"
 #include <msgpack.hpp>

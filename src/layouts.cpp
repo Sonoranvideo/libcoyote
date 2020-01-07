@@ -16,7 +16,7 @@
 
 ///This file should have never needed to exist in the first place.
 
-#include "common.h"
+#include "include/common.h"
 #include "include/layouts.h"
 #include "include/statuscodes.h"
 #include "include/datastructures.h"

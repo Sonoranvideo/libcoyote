@@ -1,6 +1,6 @@
 [submodule "src/include/internal/wsmessages"]
 	path = wsmessages
-	url = https://bitbucket.org/coyoteproject/wsmessages
+	url = https://github.com/Sonoranvideo/wsmessages
 [submodule "pycoyote/pybind11"]
 	path = pycoyote/pybind11
 	url = https://github.com/pybind/pybind11.git

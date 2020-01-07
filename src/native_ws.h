@@ -19,7 +19,7 @@
 #define WSMESSAGES_NOLWS
 #include "../wsmessages/wsmessages.hpp"
 
-#include "common.h"
+#include "include/common.h"
 #include "mtevent.h"
 #include <thread>
 #include <atomic>

@@ -16,7 +16,7 @@
 #ifndef __LIBCOYOTE_SUBSCRIPTIONS_H__
 #define __LIBCOYOTE_SUBSCRIPTIONS_H__
 
-#include "common.h"
+#include "include/common.h"
 #include "include/datastructures.h"
 #define MSGPACK_DEFAULT_API_VERSION 2
 #include <msgpack.hpp>

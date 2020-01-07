@@ -13,15 +13,18 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+#include <Python.h>
+#include "../src/include/common.h"
 #include "../src/include/session.h"
 #include "../src/include/layouts.h"
-
+#include <stddef.h>
+#include <stdint.h>
 #include "pybind11/include/pybind11/pybind11.h"
 #include "pybind11/include/pybind11/stl.h"
 #include "pybind11/include/pybind11/stl_bind.h"
 
-extern const std::map<Coyote::RefreshMode, std::string> RefreshMap;
-extern const std::map<Coyote::ResolutionMode, std::string> ResolutionMap;
+extern EXPFUNC const std::map<Coyote::RefreshMode, std::string> RefreshMap;
+extern EXPFUNC const std::map<Coyote::ResolutionMode, std::string> ResolutionMap;
 
 namespace py = pybind11;
 

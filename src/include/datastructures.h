@@ -16,6 +16,7 @@
 
 #ifndef __LIBCOYOTE_DATASTRUCTURES_H__
 #define __LIBCOYOTE_DATASTRUCTURES_H__
+#include "common.h"
 
 #include <stdint.h>
 #include <string>

@@ -6,20 +6,25 @@ set(EXTRA_CXXFLAGS)
 set(EXTRA_LD "")
 
 if (LCVERBOSE)
-	set(EXTRA_CXXFLAGS ${EXTRA_CXXFLAGS} -DLCVERBOSE)
+	add_compile_definitions(LCVERBOSE)
 endif()
 
 if (DEBUG)
-	add_link_options(-fstack-protector-all)
-	add_compile_options(-std=gnu++14 -fPIC -DDEBUG -pedantic -Wall -g3 -O0 -Wno-deprecated-declarations -Wno-unused-function -fstack-protector-all -fno-omit-frame-pointer ${EXTRA_CXXFLAGS})
-else()
-	add_compile_options(-std=gnu++14 -fPIC -pedantic -Wall -O3 -Wno-deprecated-declarations -Wno-unused-function -fomit-frame-pointer ${EXTRA_CXXFLAGS})
+	add_compile_definitions(DEBUG)
+endif()
+
+if (NOT MSVC)
+	if (DEBUG)
+		add_link_options(-fstack-protector-all)
+		add_compile_options(-std=gnu++14 -fPIC -pedantic -Wall -g3 -O0 -Wno-deprecated-declarations -Wno-unused-function -fstack-protector-all -fno-omit-frame-pointer ${EXTRA_CXXFLAGS})
+	else()
+		add_compile_options(-std=gnu++14 -fPIC -pedantic -Wall -O3 -Wno-deprecated-declarations -Wno-unused-function -fomit-frame-pointer ${EXTRA_CXXFLAGS})
+	endif()
+	
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-R  -Wl,.")
 endif()
 
 	
-
-	
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-R  -Wl,.")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 message("== Searching for Qt5WebSockets...")
 set(CMAKE_AUTOUIC ON)
@@ -28,13 +33,6 @@ set(CMAKE_AUTORCC ON)
 find_package(Qt5 COMPONENTS WebSockets Core)
 
 message("== Ok, found Qt5WebSockets")
-INCLUDE (CheckIncludeFileCXX)
-
-CHECK_INCLUDE_FILE_CXX(msgpack.hpp MSGPACK_HEADER)
-
-if (NOT MSGPACK_HEADER)
-	message(FATAL_ERROR "msgpack-c was not detected. Only the header files are required for the C++ version, but they're missing.")
-endif()
 
 set(sourcefiles msgpackproc.cpp session.cpp asyncmsgs.cpp asynctosync.cpp subscriptions.cpp layouts.cpp native_ws.cpp)
 if (NOT NO_C_API)
@@ -54,10 +52,18 @@ qt5_use_modules(coyote_static Core WebSockets)
 #qt5_wrap_cpp(sourcefiles "${CMAKE_SOURCE_DIR}/include/internal/native_ws.h")
 
 
-if (WIN32)
+if (WIN32 AND NOT MSVC)
 	set(EXTRA_LD ${EXTRA_LD} -lws2_32)
 endif()
 
+target_include_directories(coyote PUBLIC ${LIBCOYOTE_INCLUDES})
 
+include(CheckIncludeFileCXX)
+
+CHECK_INCLUDE_FILE_CXX(msgpack.hpp MSGPACK_HEADER)
+
+if (NOT MSGPACK_HEADER)
+	message(FATAL_ERROR "msgpack-c was not detected. Only the header files are required for the C++ version, but they're missing.")
+endif()
 
 target_link_libraries(coyote ${EXTRA_LD})

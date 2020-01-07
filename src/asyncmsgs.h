@@ -17,7 +17,7 @@
 #ifndef __LIBCOYOTE_ASYNCMSGS_H__
 #define __LIBCOYOTE_ASYNCMSGS_H__
 
-#include "common.h"
+#include "include/common.h"
 #include "native_ws.h"
 #include "msgpackproc.h"
 #include "subscriptions.h"

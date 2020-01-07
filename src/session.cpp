@@ -15,7 +15,7 @@
 */
 #define WSMESSAGES_NOLWS
 #include "../wsmessages/wsmessages.hpp"
-#include "common.h"
+#include "include/common.h"
 #include "native_ws.h"
 #include "asynctosync.h"
 #include "asyncmsgs.h"
@@ -29,7 +29,7 @@
 #define DEF_SESS InternalSession &SESS = *static_cast<InternalSession*>(this->Internal)
 #define MAPARG(x) { #x, msgpack::object{ x, TempZone } }
 
-extern const std::map<Coyote::RefreshMode, std::string> RefreshMap
+extern EXPFUNC const std::map<Coyote::RefreshMode, std::string> RefreshMap
 {
 	{ Coyote::COYOTE_REFRESH_INVALID, "" },
 	{ Coyote::COYOTE_REFRESH_23_98, "23.98" },
@@ -42,7 +42,7 @@ extern const std::map<Coyote::RefreshMode, std::string> RefreshMap
 	{ Coyote::COYOTE_REFRESH_60, "60" }
 };
 
-extern const std::map<Coyote::ResolutionMode, std::string> ResolutionMap
+extern EXPFUNC const std::map<Coyote::ResolutionMode, std::string> ResolutionMap
 {
 	{ Coyote::COYOTE_RES_INVALID, "" },
 	{ Coyote::COYOTE_RES_1080P, "1080p" },
@@ -54,14 +54,14 @@ static const auto &ReverseRefreshMapObj { RebuildMapBackwards(RefreshMap) };
 static const auto &ReverseResolutionMapObj { RebuildMapBackwards(ResolutionMap) };
 
 
-Coyote::RefreshMode ReverseRefreshMap(const std::string &Lookup)
+EXPFUNC Coyote::RefreshMode ReverseRefreshMap(const std::string &Lookup)
 {
 	if (!ReverseRefreshMapObj.count(Lookup)) return Coyote::COYOTE_REFRESH_INVALID;
 
 	return ReverseRefreshMapObj.at(Lookup);
 }
 
-Coyote::ResolutionMode ReverseResolutionMap(const std::string &Lookup)
+EXPFUNC Coyote::ResolutionMode ReverseResolutionMap(const std::string &Lookup)
 {
 	if (!ReverseResolutionMapObj.count(Lookup)) return Coyote::COYOTE_RES_INVALID;
 	

@@ -25,7 +25,7 @@
 #include <msgpack.hpp>
 #include <mutex>
 #include <condition_variable>
-
+#include "include/common.h"
 #include "native_ws.h"
 #include "mtevent.h"
 

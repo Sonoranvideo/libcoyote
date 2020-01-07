@@ -19,7 +19,7 @@
 #include <string>
 #include <stdlib.h>
 #include <string.h>
-
+#include "common.h"
 #ifndef __cplusplus
 #error "Included CoyoteString class in a C project!"
 #endif //__cplusplus

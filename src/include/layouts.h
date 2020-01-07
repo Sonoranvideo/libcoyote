@@ -19,6 +19,7 @@
 
 #include <string>
 #include <map>
+#include "common.h"
 
 #include "statuscodes.h"
 #include "datastructures.h"
@@ -33,11 +34,11 @@ namespace Coyote
 		std::map<Coyote::Player, Coyote::SDIOutput> SDIOuts;
 	};
 	
-	Coyote::SDIOutput GetPresetSDIOutputs(const Coyote::Preset &Input);
-	Coyote::Player GetPresetPlayers(const Coyote::Preset &Input);
-	const LayoutInfo *LookupPresetLayoutByID(const Coyote::PresetLayout LayoutID);
-	const LayoutInfo *LookupPresetLayoutByString(const std::string &LayoutName);
-	Coyote::SDIOutput GetPlayerSDIOutputs(const Coyote::Preset &Input, const Coyote::Player InPlayer);
+	EXPFUNC Coyote::SDIOutput GetPresetSDIOutputs(const Coyote::Preset &Input);
+	EXPFUNC Coyote::Player GetPresetPlayers(const Coyote::Preset &Input);
+	EXPFUNC const LayoutInfo *LookupPresetLayoutByID(const Coyote::PresetLayout LayoutID);
+	EXPFUNC const LayoutInfo *LookupPresetLayoutByString(const std::string &LayoutName);
+	EXPFUNC Coyote::SDIOutput GetPlayerSDIOutputs(const Coyote::Preset &Input, const Coyote::Player InPlayer);
 }
 
 #endif //__LIBCOYOTE_LAYOUTS_H__

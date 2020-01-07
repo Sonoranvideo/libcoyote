@@ -15,24 +15,24 @@
 */
 
 #include "include/macros.h"
-#include "common.h"
+#include "include/common.h"
 #include "include/datastructures.h"
 #include "include/session.h"
 
 extern "C"
 {
 	
-Coyote::Session *CoyoteSession_New(const char *Host)
+EXPFUNC Coyote::Session *CoyoteSession_New(const char *Host)
 {
 	return new Coyote::Session(Host);
 }
 
-void CoyoteSession_Destroy(Coyote::Session *Sess)
+EXPFUNC void CoyoteSession_Destroy(Coyote::Session *Sess)
 {
 	delete Sess;
 }
 
-Coyote::StatusCode Coyote_GetTimeCode(Coyote::Session *Sess, const int32_t PK, Coyote_TimeCode *OutTC)
+EXPFUNC Coyote::StatusCode Coyote_GetTimeCode(Coyote::Session *Sess, const int32_t PK, Coyote_TimeCode *OutTC)
 {
 	assert(Sess != nullptr);
 	assert(OutTC != nullptr);
@@ -46,117 +46,117 @@ Coyote::StatusCode Coyote_GetTimeCode(Coyote::Session *Sess, const int32_t PK, C
 	return Status;
 }
 
-Coyote::StatusCode Coyote_Take(Coyote::Session *Sess, const int32_t PK)
+EXPFUNC Coyote::StatusCode Coyote_Take(Coyote::Session *Sess, const int32_t PK)
 {
 	assert(Sess != nullptr);
 
 	return Sess->Take(PK);
 }
 
-Coyote::StatusCode Coyote_Pause(Coyote::Session *Sess, const int32_t PK)
+EXPFUNC Coyote::StatusCode Coyote_Pause(Coyote::Session *Sess, const int32_t PK)
 {
 	assert(Sess != nullptr);
 
 	return Sess->Pause(PK);
 }
 
-Coyote::StatusCode Coyote_SetPause(Coyote::Session *Sess, const int32_t PK)
+EXPFUNC Coyote::StatusCode Coyote_SetPause(Coyote::Session *Sess, const int32_t PK)
 {
 	assert(Sess != nullptr);
 
 	return Sess->SetPause(PK);
 }
 
-Coyote::StatusCode Coyote_UnsetPause(Coyote::Session *Sess, const int32_t PK)
+EXPFUNC Coyote::StatusCode Coyote_UnsetPause(Coyote::Session *Sess, const int32_t PK)
 {
 	assert(Sess != nullptr);
 
 	return Sess->UnsetPause(PK);
 }
 
-Coyote::StatusCode Coyote_SetPausedState(Coyote::Session *Sess, const int32_t PK, const bool Value)
+EXPFUNC Coyote::StatusCode Coyote_SetPausedState(Coyote::Session *Sess, const int32_t PK, const bool Value)
 {
 	assert(Sess != nullptr);
 
 	return Sess->SetPausedState(PK, Value);
 }
 
-Coyote::StatusCode Coyote_End(Coyote::Session *Sess, const int32_t PK)
+EXPFUNC Coyote::StatusCode Coyote_End(Coyote::Session *Sess, const int32_t PK)
 {
 	assert(Sess != nullptr);
 
 	return Sess->End(PK);
 }
 
-Coyote::StatusCode Coyote_SelectPrev(Coyote::Session *Sess)
+EXPFUNC Coyote::StatusCode Coyote_SelectPrev(Coyote::Session *Sess)
 {
 	assert(Sess != nullptr);
 
 	return Sess->SelectPrev();
 }
 
-Coyote::StatusCode Coyote_SelectNext(Coyote::Session *Sess)
+EXPFUNC Coyote::StatusCode Coyote_SelectNext(Coyote::Session *Sess)
 {
 	assert(Sess != nullptr);
 
 	return Sess->SelectNext();
 }
-Coyote::StatusCode Coyote_TakePrev(Coyote::Session *Sess)
+EXPFUNC Coyote::StatusCode Coyote_TakePrev(Coyote::Session *Sess)
 {
 	assert(Sess != nullptr);
 
 	return Sess->TakePrev();
 }
 
-Coyote::StatusCode Coyote_TakeNext(Coyote::Session *Sess)
+EXPFUNC Coyote::StatusCode Coyote_TakeNext(Coyote::Session *Sess)
 {
 	assert(Sess != nullptr);
 
 	return Sess->TakeNext();
 }
 
-Coyote::StatusCode Coyote_ShutdownCoyote(Coyote::Session *Sess)
+EXPFUNC Coyote::StatusCode Coyote_ShutdownCoyote(Coyote::Session *Sess)
 {
 	assert(Sess != nullptr);
 
 	return Sess->ShutdownCoyote();
 }
 
-Coyote::StatusCode Coyote_BeginUpdate(Coyote::Session *Sess)
+EXPFUNC Coyote::StatusCode Coyote_BeginUpdate(Coyote::Session *Sess)
 {
 	assert(Sess != nullptr);
 
 	return Sess->BeginUpdate();
 }
 
-Coyote::StatusCode Coyote_SoftRebootCoyote(Coyote::Session *Sess)
+EXPFUNC Coyote::StatusCode Coyote_SoftRebootCoyote(Coyote::Session *Sess)
 {
 	assert(Sess != nullptr);
 
 	return Sess->SoftRebootCoyote();
 }
-Coyote::StatusCode Coyote_RebootCoyote(Coyote::Session *Sess)
+EXPFUNC Coyote::StatusCode Coyote_RebootCoyote(Coyote::Session *Sess)
 {
 	assert(Sess != nullptr);
 
 	return Sess->RebootCoyote();
 }
 
-Coyote::StatusCode Coyote_SeekTo(Coyote::Session *Sess, const int32_t PK, const uint32_t TimeIndex)
+EXPFUNC Coyote::StatusCode Coyote_SeekTo(Coyote::Session *Sess, const int32_t PK, const uint32_t TimeIndex)
 {
 	assert(Sess != nullptr);
 
 	return Sess->SeekTo(PK, TimeIndex);
 }
 
-void CoyoteObject_Destroy(void *Object)
+EXPFUNC void CoyoteObject_Destroy(void *Object)
 {
 	Coyote::BaseObject *Obj = static_cast<Coyote::BaseObject*>(Object);
 	
 	delete Obj;
 }
 
-Coyote::StatusCode Coyote_GetIP(Coyote::Session *Sess, const int32_t AdapterID, Coyote_NetworkInfo *Out)
+EXPFUNC Coyote::StatusCode Coyote_GetIP(Coyote::Session *Sess, const int32_t AdapterID, Coyote_NetworkInfo *Out)
 {
 	assert(Sess != nullptr);
 
@@ -175,14 +175,14 @@ Coyote::StatusCode Coyote_GetIP(Coyote::Session *Sess, const int32_t AdapterID, 
 	return Status;
 }
 
-Coyote::StatusCode Coyote_SetIP(Coyote::Session *Sess, const Coyote_NetworkInfo *Input)
+EXPFUNC Coyote::StatusCode Coyote_SetIP(Coyote::Session *Sess, const Coyote_NetworkInfo *Input)
 {
 	const Coyote::NetworkInfo *NetInfo = static_cast<const Coyote::NetworkInfo*>(Input);
 	
 	return Sess->SetIP(*NetInfo);
 }
 
-Coyote::StatusCode Coyote_GetServerVersion(Coyote::Session *Sess, const char **const VersionStringOut)
+EXPFUNC Coyote::StatusCode Coyote_GetServerVersion(Coyote::Session *Sess, const char **const VersionStringOut)
 {
 	assert(Sess != nullptr);
 
@@ -197,7 +197,7 @@ Coyote::StatusCode Coyote_GetServerVersion(Coyote::Session *Sess, const char **c
 	return Status;
 }
 
-Coyote::StatusCode Coyote_DetectUpdate(Coyote::Session *Sess, bool *IsDetected, char *OutBuf, const size_t OutBufCapacity)
+EXPFUNC Coyote::StatusCode Coyote_DetectUpdate(Coyote::Session *Sess, bool *IsDetected, char *OutBuf, const size_t OutBufCapacity)
 {
 	assert(Sess != nullptr);
 
@@ -222,7 +222,7 @@ Coyote::StatusCode Coyote_DetectUpdate(Coyote::Session *Sess, bool *IsDetected, 
 	return Code;
 }
 
-Coyote::StatusCode Coyote_GetHardwareState(Coyote::Session *Sess, Coyote_HardwareState **StateOut)
+EXPFUNC Coyote::StatusCode Coyote_GetHardwareState(Coyote::Session *Sess, Coyote_HardwareState **StateOut)
 {
 	assert(Sess != nullptr);
 
@@ -241,7 +241,7 @@ Coyote::StatusCode Coyote_GetHardwareState(Coyote::Session *Sess, Coyote_Hardwar
 	return Status;
 }
 
-Coyote::StatusCode Coyote_GetPresets(Coyote::Session *Sess, Coyote_PresetArray *PresetsOut)
+EXPFUNC Coyote::StatusCode Coyote_GetPresets(Coyote::Session *Sess, Coyote_PresetArray *PresetsOut)
 {
 	assert(Sess != nullptr);
 
@@ -264,48 +264,49 @@ Coyote::StatusCode Coyote_GetPresets(Coyote::Session *Sess, Coyote_PresetArray *
 	return Status;
 }
 
-Coyote::StatusCode Coyote_InstallAsset(Coyote::Session *Sess, const char *AssetPath)
+EXPFUNC Coyote::StatusCode Coyote_InstallAsset(Coyote::Session *Sess, const char *AssetPath)
 {
 	assert(Sess != nullptr);
 
 	return Sess->InstallAsset(AssetPath);
 }
-Coyote::StatusCode Coyote_DeleteAsset(Coyote::Session *Sess, const char *AssetPath)
+
+EXPFUNC Coyote::StatusCode Coyote_DeleteAsset(Coyote::Session *Sess, const char *AssetPath)
 {
 	assert(Sess != nullptr);
 
 	return Sess->DeleteAsset(AssetPath);
 }
 
-Coyote::StatusCode Coyote_RenameAsset(Coyote::Session *Sess, const char *CurrentName, const char *NewName)
+EXPFUNC Coyote::StatusCode Coyote_RenameAsset(Coyote::Session *Sess, const char *CurrentName, const char *NewName)
 {
 	assert(Sess != nullptr);
 
 	return Sess->RenameAsset(CurrentName, NewName);
 }
 
-Coyote::StatusCode Coyote_ReorderPresets(Coyote::Session *Sess, const int32_t PK1, const int32_t PK2)
+EXPFUNC Coyote::StatusCode Coyote_ReorderPresets(Coyote::Session *Sess, const int32_t PK1, const int32_t PK2)
 {
 	assert(Sess != nullptr);
 
 	return Sess->ReorderPresets(PK1, PK2);
 }
 
-Coyote::StatusCode Coyote_SelectPreset(Coyote::Session *Sess, const int32_t PK)
+EXPFUNC Coyote::StatusCode Coyote_SelectPreset(Coyote::Session *Sess, const int32_t PK)
 {
 	assert(Sess != nullptr);
 	
 	return Sess->SelectPreset(PK);
 }
 
-Coyote::StatusCode Coyote_DeletePreset(Coyote::Session *Sess, const int32_t PK)
+EXPFUNC Coyote::StatusCode Coyote_DeletePreset(Coyote::Session *Sess, const int32_t PK)
 {
 	assert(Sess != nullptr);
 
 	return Sess->DeletePreset(PK);
 }
 
-Coyote::StatusCode Coyote_UpdatePreset(Coyote::Session *Sess, const Coyote_Preset *Input_)
+EXPFUNC Coyote::StatusCode Coyote_UpdatePreset(Coyote::Session *Sess, const Coyote_Preset *Input_)
 {
 	assert(Sess != nullptr);
 
@@ -314,7 +315,7 @@ Coyote::StatusCode Coyote_UpdatePreset(Coyote::Session *Sess, const Coyote_Prese
 	return Sess->UpdatePreset(*Input);
 }
 
-Coyote::StatusCode Coyote_CreatePreset(Coyote::Session *Sess, const Coyote_Preset *Input_)
+EXPFUNC Coyote::StatusCode Coyote_CreatePreset(Coyote::Session *Sess, const Coyote_Preset *Input_)
 {
 	assert(Sess != nullptr);
 
@@ -324,7 +325,7 @@ Coyote::StatusCode Coyote_CreatePreset(Coyote::Session *Sess, const Coyote_Prese
 }
 
 
-Coyote::StatusCode Coyote_GetAssets(Coyote::Session *Sess, Coyote_AssetArray *PresetsOut)
+EXPFUNC Coyote::StatusCode Coyote_GetAssets(Coyote::Session *Sess, Coyote_AssetArray *PresetsOut)
 {
 	assert(Sess != nullptr);
 
@@ -347,7 +348,7 @@ Coyote::StatusCode Coyote_GetAssets(Coyote::Session *Sess, Coyote_AssetArray *Pr
 	return Status;
 }
 
-Coyote::StatusCode Coyote_GetDisks(Coyote::Session *Sess, const char **OutString)
+EXPFUNC Coyote::StatusCode Coyote_GetDisks(Coyote::Session *Sess, const char **OutString)
 {
 	assert(Sess != nullptr);
 
@@ -372,14 +373,14 @@ Coyote::StatusCode Coyote_GetDisks(Coyote::Session *Sess, const char **OutString
 	return Status;
 }
 
-Coyote::StatusCode Coyote_EjectDisk(Coyote::Session *Sess, const char *DriveLetter)
+EXPFUNC Coyote::StatusCode Coyote_EjectDisk(Coyote::Session *Sess, const char *DriveLetter)
 {
 	assert(Sess != nullptr);
 
 	return Sess->EjectDisk(DriveLetter);
 }
 
-void Coyote_AssetArray_Destroy(Coyote_AssetArray *Arr)
+EXPFUNC void Coyote_AssetArray_Destroy(Coyote_AssetArray *Arr)
 {
 	auto Ptr = static_cast<std::vector<Coyote::Asset>* >(Arr->_Handle);
 	
@@ -393,7 +394,7 @@ void Coyote_AssetArray_Destroy(Coyote_AssetArray *Arr)
 	memset(Arr, 0, sizeof *Arr);
 }
 
-void Coyote_PresetArray_Destroy(Coyote_PresetArray *Arr)
+EXPFUNC void Coyote_PresetArray_Destroy(Coyote_PresetArray *Arr)
 {
 	auto Ptr = static_cast<std::vector<Coyote::Preset>* >(Arr->_Handle);
 	
@@ -407,7 +408,7 @@ void Coyote_PresetArray_Destroy(Coyote_PresetArray *Arr)
 	memset(Arr, 0, sizeof *Arr);
 }
 
-Coyote::StatusCode Coyote_SetHardwareMode(Coyote::Session *Sess, const Coyote::ResolutionMode Resolution, const Coyote::RefreshMode RefreshRate)
+EXPFUNC Coyote::StatusCode Coyote_SetHardwareMode(Coyote::Session *Sess, const Coyote::ResolutionMode Resolution, const Coyote::RefreshMode RefreshRate)
 {
 	assert(Sess != nullptr);
 	

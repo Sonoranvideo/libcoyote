@@ -17,7 +17,7 @@
 #ifndef __LIBCOYOTE_STATUSCODES_H__
 #define __LIBCOYOTE_STATUSCODES_H__
 
-#include <stdint.h>
+#include "common.h"
 
 #ifdef __cplusplus
 namespace Coyote

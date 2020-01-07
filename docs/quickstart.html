@@ -1,0 +1,453 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 6.3.3.2.0 (Linux)"/>
+	<meta name="created" content="2019-08-09T11:20:29"/>
+	<meta name="changed" content="2020-01-07T10:31:51.482853513"/>
+	<style type="text/css">
+		@page { size: 8.27in 11.69in; margin: 0.79in }
+		p { margin-bottom: 0.1in; direction: ltr; color: #000000; line-height: 115%; text-align: left; orphans: 2; widows: 2; background: transparent }
+		p.western { font-family: "Liberation Serif", serif; font-size: 12pt; so-language: en-US }
+		p.cjk { font-family: "Droid Sans Fallback"; font-size: 12pt; so-language: zh-CN }
+		p.ctl { font-family: "Droid Sans Devanagari"; font-size: 12pt; so-language: hi-IN }
+		a:link { color: #000080; so-language: zxx; text-decoration: underline }
+		a:visited { color: #800000; so-language: zxx; text-decoration: underline }
+	</style>
+</head>
+<body lang="en-US" text="#000000" link="#000080" vlink="#800000" dir="ltr"><p class="western" align="center" style="margin-bottom: 0in; line-height: 100%">
+<img src="quickstart_html_372c7bfd63c639f6.png" name="Image1" align="left" width="384" height="102" border="0"/>
+<br/>
+
+</p>
+<p class="western" align="center" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="center" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="center" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<font size="6" style="font-size: 22pt"><b>libcoyote </b></font><font size="6" style="font-size: 22pt"><b>Coyote
+</b></font><font size="6" style="font-size: 22pt"><b>P</b></font><font size="6" style="font-size: 22pt"><b>layback
+Server </b></font><font color="#000000"><font face="Liberation Serif, serif"><font size="6" style="font-size: 22pt"><span lang="en-US"><b>SDK</b></span></font></font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<font size="1" style="font-size: 7pt"><b>By Daniel Hopson</b></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+libcoyote is a C++ and Python 3 SDK for controlling and manipulating
+Coyote playback servers.</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+The SDK is:</p>
+<ul>
+	<li><p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+	Portable – should run on any multithreaded platform that
+	Qt5WebSockets supports.</p>
+	<li><p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+	Free and open – Apache 2.0 licensed</p>
+	<li><p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+	Powerful – with libcoyote, you can create rich, fast applications
+	that manipulate the Coyote.</p>
+	<li><p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+	<span style="font-weight: normal">Efficient – Performance was a
+	target with libcoyote, and as such, all Coyotes run a native,
+	optimized server specifically dedicated to receive libcoyote
+	commands. The latency can be considerably better than JSON TCP or
+	HTTP.</span></p>
+	<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+	</p>
+</ul>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<font size="5" style="font-size: 18pt"><b>Languages</b></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font size="3" style="font-size: 12pt">libcoyote supports C++11 and
+up, Python 3, and to a very limited extent, C.</font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<font size="5" style="font-size: 18pt"><b>Compiling</b></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<font size="3" style="font-size: 12pt"><span style="font-weight: normal">To
+compile libcoyote, you will need CMake, Qt5WebSockets, msgpack-c, and
+a </span></font><font color="#000000"><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US"><span style="font-weight: normal">(</span></span></font></font></font><font color="#000000"><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US"><span style="font-weight: normal">preferably
+GNU or Clang based) C++14 compliant</span></span></font></font></font><font size="3" style="font-size: 12pt"><span style="font-weight: normal">
+C++ compile</span></font><font size="3" style="font-size: 12pt"><span style="font-weight: normal">r</span></font><font size="3" style="font-size: 12pt"><span style="font-weight: normal">.
+</span></font><font size="3" style="font-size: 12pt"><span style="font-weight: normal">libcoyote
+should be fine used with C++11 projects, but it i</span></font><font color="#000000"><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US"><span style="font-weight: normal">nternally
+</span></span></font></font></font><font size="3" style="font-size: 12pt"><span style="font-weight: normal">utilizes
+some C++14 features, so it’s required for the build process.</span></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<font size="3" style="font-size: 12pt"><span style="font-weight: normal">It
+is theoretically possible to compile libcoyote with MSVC, but this is
+somewhat discouraged as there are no</span></font><font color="#000000"><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US"><span style="font-weight: normal">
+build scripts</span></span></font></font></font><font size="3" style="font-size: 12pt"><span style="font-weight: normal">
+for it and it is not well tested. T</span></font><font size="3" style="font-size: 12pt"><span style="font-weight: normal">hat
+said, effort has been made to ensure that libcoyote will compile for
+Visual Studio if the correct build scripts and headers are provided.</span></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<font size="3" style="font-size: 12pt"><span style="font-weight: normal">GNU-</span></font><font size="3" style="font-size: 12pt"><span style="font-weight: normal">specific</span></font><font size="3" style="font-size: 12pt"><span style="font-weight: normal">
+compiler extensions were </span></font><font size="3" style="font-size: 12pt"><span style="font-weight: normal">deliberately
+avoided</span></font><font size="3" style="font-size: 12pt"><span style="font-weight: normal">
+in writing libcoyote, so the C++ should be portable.</span></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<b><font size="3" style="font-size: 12pt">M</font><font size="3" style="font-size: 12pt">ake
+sure to recursively clone this repository, as libcoyote pulls in a
+couple of small dependencies as git submodules.</font></b></p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<b><font size="3" style="font-size: 12pt">Windows</font></b></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font size="3" style="font-size: 12pt">You will need MSYS2, </font><font size="3" style="font-size: 12pt">which
+provides a modern GNU-based toolchain for 32 and 64 bit Windows. It</font><font size="3" style="font-size: 12pt">
+can be acquired </font><font size="3" style="font-size: 12pt">at
+msys2.org. </font><font size="3" style="font-size: 12pt">You should
+install Qt5WebSockets via MSYS2’s “pacman” package manager.</font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font size="3" style="font-size: 12pt">For Python support, it is
+strongly advised that you also have a working Python 3 installation,
+separate from MSYS2. You will also need pkg-config to compile Python
+support. It can be installed with MSYS2.</font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font size="3" style="font-size: 12pt">Point CMake to your Python 3
+installation </font><font size="3" style="font-size: 12pt">directory</font><font size="3" style="font-size: 12pt">,
+as demonstrated in the example MSYS2 command line below:</font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Mono, monospace"><font size="2" style="font-size: 10pt">cd
+pycoyote</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Mono, monospace"><font size="2" style="font-size: 10pt">mkdir
+build</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Mono, monospace"><font size="2" style="font-size: 10pt">cd
+build</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Mono, monospace"><font size="2" style="font-size: 10pt">cmake
+.. -G”MSYS Makefiles” -DPYLIBS=/c/Python37
+-DPYHEADERS=/c/Python37/include</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Mono, monospace"><font size="2" style="font-size: 10pt">make
+-j</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt">This
+will generate pycoyote.pyd in the current directory, and
+libcoyote.dll in </font><font face="Liberation Mono, monospace"><font size="2" style="font-size: 10pt">“../../build”</font></font><font size="3" style="font-size: 12pt">.</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt">You
+must keep pycoyote.pyd and libcoyote.dll and their dependencies in
+the same directory, or you will get missing DLL errors.</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span style="font-weight: normal">It
+is recommended that you ensure your Python installation directory’s
+path does not contain whitespace. Some MSYS2 tools can be
+</span></font></font><font color="#000000"><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US"><span style="font-weight: normal">temperamental</span></span></font></font></font><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span style="font-weight: normal">
+about whitespace in paths.</span></font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<b><font size="3" style="font-size: 12pt">Linux/BSD</font></b></p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font size="3" style="font-size: 12pt">On Linux and likely other BSD
+systems, the procedure is more simple.</font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font size="3" style="font-size: 12pt">Simply install the -devel
+package for Qt5WebSockets, msgpack-c, and Python 3,</font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font size="3" style="font-size: 12pt">and run:</font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Mono, monospace"><font size="2" style="font-size: 10pt">cd
+pycoyote</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Mono, monospace"><font size="2" style="font-size: 10pt">mkdir
+build</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Mono, monospace"><font size="2" style="font-size: 10pt">cd
+build</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Mono, monospace"><font size="2" style="font-size: 10pt">cmake
+..</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Mono, monospace"><font size="2" style="font-size: 10pt">make
+-j</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><b>macOS</b></font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt">libcoyote
+is not well tested on macOS, but it should not be difficult to
+compile. You will again need all the dependencies required for
+Linux/BSD, which can likely be installed via MacPorts.</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><b>Other
+platforms</b></font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt">It
+should be easy enough to port libcoyote to other compilers and
+operating systems, so please, feel free to experiment! If you find a
+problem with the compilation scripts for a particular platform,
+please let us know, or even submit a pull request.</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><b>Without
+Python</b></font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt">You
+don’t need to compile Python support if you don’t want to. The
+C++ API is quite feature-complete.</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt">Instead
+of changing to the pycoyote directory, just create a build directory
+in the libcoyote directory, and replace “<font face="Liberation Mono, monospace"><font size="2" style="font-size: 10pt">cmake
+..</font></font>” with “<font face="Liberation Mono, monospace"><font size="2" style="font-size: 10pt">cmake
+../src</font></font>”.</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="5" style="font-size: 18pt"><b>Quirks
+to be aware of</b></font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<ul>
+	<li><p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+	<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span style="font-weight: normal">Because
+	of (currently partially implemented) C support, libcoyote uses a
+	standard layout string class called CoyoteString in C++, which is
+	cast to a character pointer in C. A static assertion checks that it
+	is equal to the size of a character pointer. This is most noticeable
+	in pycoyote, where string members of data structure classes must be
+	specified as e.g.:</span></font></font></p>
+	<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+	“<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><font face="Liberation Mono, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">p.Name
+	= pycoyote.CoyoteString(‘my string here’)</span></font></font><span style="font-weight: normal">”</span></font></font></p>
+	<li><p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+	<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span style="font-weight: normal">Passing
+	a zero to Take, End, Pause, SeekTo, etc, will perform the operation
+	on the currently selected preset, whichever that happens to be.</span></font></font></p>
+	<li><p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+	<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span style="font-weight: normal">To
+	create an entirely new preset, make sure the PK field is zero, or
+	the Coyote unit will attempt to create a new preset with that PK. If
+	such a preset already exists, the operation will fail.</span></font></font></p>
+	<li><p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+	<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span style="font-weight: normal">Via
+	JSON and internally, the preset layouts are stored as a string, but
+	they are stored as an enum in libcoyote and translated back and
+	forth. This makes it easier to understand and manipulate the preset
+	configuration, but is an implementation detail you should be aware
+	of.</span></font></font></p>
+</ul>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="5" style="font-size: 18pt"><b>API
+documentation</b></font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt">The
+best way to learn about how to use libcoyote is to inspect
+pycoyote.cpp and session.h’s exposed methods, and
+datastructures_c.h for the members of various classes used by
+libcoyote.</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt">The
+API is fairly self explanatory.</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt">There
+is a direct one-to-one mapping of libcoyote session method names and
+JSON API command names, though some argument types can differ
+slightly. This is also mostly true for data structures in libcoyote.</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><br/>
+<font size="5" style="font-size: 18pt"><b>Compatibility
+with Coyote software</b></font></font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt">libcoyote
+uses the same “CoyoteAPIVersion” field as JSON commands, and this
+is used to determine compatibility. As long as <font face="Liberation Mono, monospace"><font size="2" style="font-size: 10pt">COYOTE_API_VERSION</font></font>
+in macros.h matches, libcoyote should work. It will be bumped when
+breaking changes are necessary. Currently all recent releases of
+Coyote software use API version “0.3”.</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="5" style="font-size: 18pt"><b>Contributing</b></font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt">Sonoran
+Video Systems welcomes any code contributions to libcoyote, provided
+they are of sufficient quality. We want libcoyote to be as useful and
+reliable as possible, and any work towards those goals will be
+appreciated. Not a programmer? No problem. You can submit issues and
+bug reports to us on GitHub.</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="5" style="font-size: 18pt"><b>Download</b></font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt">You
+can find the repository for libcoyote at:</font></font></p>
+<p class="western" align="left" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<a href="https://github.com/Sonoranvideo/libcoyote"><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span style="font-weight: normal">https://github.com/Sonoranvideo/libcoyote</span></font></font></a></p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="left" style="margin-bottom: 0in; line-height: 100%">
+<br/>
+
+</p>
+</body>
+</html>

@@ -21,6 +21,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include "common.h"
+
 #include "macros.h"
 #include "statuscodes.h"
 
