@@ -297,6 +297,7 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			{ "TRT", msgpack::object{ PresetObj->TRT, TempZone } },
 			{ "Index", msgpack::object{ PresetObj->Index, TempZone } },
 			{ "Loop", msgpack::object{ PresetObj->Loop, TempZone } },
+			{ "TotalLoop", msgpack::object{ PresetObj->TotalLoop, TempZone } },
 			{ "Link", msgpack::object{ PresetObj->Link, TempZone } },
 			{ "DisplayLink", msgpack::object{ PresetObj->DisplayLink, TempZone } },
 			{ "Fade", msgpack::object{ PresetObj->Fade, TempZone } },
@@ -449,6 +450,7 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		PresetObj->TRT = Fields["TRT"].as<int>();
 		PresetObj->Index = Fields["Index"].as<int>();
 		PresetObj->Loop = Fields["Loop"].as<int>();
+		PresetObj->TotalLoop = Fields["TotalLoop"].as<int>();
 		PresetObj->Link = Fields["Link"].as<int>();
 		PresetObj->DisplayLink = Fields["DisplayLink"].as<int>();
 		PresetObj->Fade = Fields["Fade"].as<int>();

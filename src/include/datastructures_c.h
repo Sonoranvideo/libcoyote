@@ -146,6 +146,7 @@ struct Coyote_Preset
 	int32_t TRT;
 	int32_t Index;
 	int32_t Loop;
+	int32_t TotalLoop;
 	int32_t Link;
 	int32_t DisplayLink;
 	int32_t Fade;
