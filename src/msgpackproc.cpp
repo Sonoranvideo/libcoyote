@@ -450,7 +450,7 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		PresetObj->TRT = Fields["TRT"].as<int>();
 		PresetObj->Index = Fields["Index"].as<int>();
 		PresetObj->Loop = Fields["Loop"].as<int>();
-		PresetObj->TotalLoop = Fields["TotalLoop"].as<int>();
+		PresetObj->TotalLoop = Fields.count("TotalLoop") ? Fields["TotalLoop"].as<int>() : PresetObj->Loop; //Backwards compatibility
 		PresetObj->Link = Fields["Link"].as<int>();
 		PresetObj->DisplayLink = Fields["DisplayLink"].as<int>();
 		PresetObj->Fade = Fields["Fade"].as<int>();
