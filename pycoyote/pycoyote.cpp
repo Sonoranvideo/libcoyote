@@ -298,6 +298,15 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		
 		return std::make_tuple(Status, Value);
 	}, py::call_guard<py::gil_scoped_release>())
+	.def("GetUnitID",
+	[] (Coyote::Session &Obj)
+	{
+		std::string UnitID, Nickname;
+		
+		const Coyote::StatusCode Status = Obj.GetUnitID(UnitID, Nickname);
+		
+		return std::make_tuple(Status, UnitID, Nickname);
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetTimeCode",
 	[] (Coyote::Session &Obj, int32_t PK)
 	{
