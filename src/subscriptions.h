@@ -18,6 +18,8 @@
 
 #include "include/common.h"
 #include "include/datastructures.h"
+#include "include/statuscodes.h"
+
 #define MSGPACK_DEFAULT_API_VERSION 2
 #include <msgpack.hpp>
 #include <mutex>
@@ -35,13 +37,16 @@ namespace Subs
 		std::map<int32_t, Coyote::Preset> Presets;
 		std::map<std::string, Coyote::Asset> Assets;
 		Coyote::HardwareState HWState;
-		
+		PBEventCallback UserPBEventCallback;
+		void *UserPBEventData;
 	public:
 		bool ProcessSubscriptionEvent(const std::map<std::string, msgpack::object> &Values);
 		Coyote::TimeCode *GetTimeCode(const int32_t PK = 0);
 		std::map<int32_t, Coyote::Preset> *GetPresets(void);
 		std::map<std::string, Coyote::Asset> *GetAssets(void);
 		Coyote::HardwareState *GetHardwareState(void);
+		void SetPlaybackEventCallback(const PBEventCallback, void *const UserData = nullptr);
+		
 		SubscriptionSession() : HWState() { }
 	};
 }

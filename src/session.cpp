@@ -100,6 +100,7 @@ struct InternalSession
 		this->PerformSyncedCommand("SubscribeAssets", TempZone);
 		this->PerformSyncedCommand("SubscribePresets", TempZone);
 		this->PerformSyncedCommand("SubscribeHWState", TempZone);
+		this->PerformSyncedCommand("SubscribePlaybackEvents", TempZone);
 		
 		return true;
 	}
@@ -1082,6 +1083,21 @@ Coyote::StatusCode Coyote::Session::GetLogsZip(std::vector<uint8_t> &OutBuffer)
 	
 	return Status;
 }
+
+bool Coyote::Session::HasConnectionError(void) const
+{
+	DEF_SESS;
+	
+	return SESS.Connection->HasError();
+}
+
+void Coyote::Session::SetPlaybackEventCallback(const PBEventCallback CB, void *const UserData)
+{
+	DEF_SESS;
+	
+	SESS.ASyncSess.SetPlaybackEventCallback(CB, UserData);
+}
+
 
 Coyote::StatusCode Coyote::Session::ReadLog(const std::string &SpokeName, const int Year, const int Month, const int Day, std::string &LogOut)
 {

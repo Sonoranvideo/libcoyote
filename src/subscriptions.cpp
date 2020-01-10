@@ -91,7 +91,24 @@ bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::str
 		
 		return true;
 	}
-
+	else if (EventName == "PlaybackEvent")
+	{
+		std::map<std::string, msgpack::object> DataObjs;
+		
+		Values.at("Data").convert(DataObjs);
+		
+		const Coyote::PlaybackEventType EType = static_cast<Coyote::PlaybackEventType>(DataObjs.at("EType").as<int>());
+		const int32_t PK = DataObjs.at("PK").as<int32_t>();
+		const int32_t NewTime = DataObjs.count("NewTime") ? DataObjs.at("NewTime").as<int32_t>() : 0;
+		
+		if (this->UserPBEventCallback)
+		{
+			this->UserPBEventCallback(EType, PK, NewTime, this->UserPBEventData);
+		}
+		
+		return true;
+	}
+	
 	return false;
 }
 
@@ -124,3 +141,11 @@ Coyote::HardwareState *Subs::SubscriptionSession::GetHardwareState(void)
 	
 	return new Coyote::HardwareState { this->HWState }; //Call copy constructor
 }
+
+
+void Subs::SubscriptionSession::SetPlaybackEventCallback(const PBEventCallback CB, void *const UserData)
+{
+	this->UserPBEventCallback = CB;
+	this->UserPBEventData = UserData;
+}
+

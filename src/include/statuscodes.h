@@ -163,7 +163,20 @@ namespace Coyote
 		COYOTE_PLAYER_4 = 1 << 3,
 		COYOTE_PLAYER_MAXVALUE = COYOTE_PLAYER_4
 	};
-
+	
+#ifdef __cplusplus
+	enum PlaybackEventType
+#else
+	enum CoyotePlaybackEventType
+#endif //__cplusplus
+	{
+		COYOTE_PBEVENT_END = 0,
+		COYOTE_PBEVENT_TAKE = 1,
+		COYOTE_PBEVENT_PAUSE = 2,
+		COYOTE_PBEVENT_UNPAUSE = 3,
+		COYOTE_PBEVENT_SEEK = 4
+	};
+	
 #ifndef __cplusplus
 	typedef enum CoyoteResolutionMode CoyoteResolutionMode;
 	typedef enum CoyoteRefreshMode CoyoteRefreshMode;

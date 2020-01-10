@@ -15,6 +15,7 @@
 */
 #include <Python.h>
 #include "../src/include/common.h"
+#include "../src/include/datastructures.h"
 #include "../src/include/session.h"
 #include "../src/include/layouts.h"
 #include <stddef.h>
@@ -33,7 +34,8 @@ namespace py = pybind11;
 #define ACLASSBD(a, b) .def_readwrite(#b, &a::b)
 
 #define EMEMDEF(a) .value(#a, Coyote::a)
-
+static void PBEventFunc(const Coyote::PlaybackEventType EType, const int32_t PK, const int32_t Time, void *const Pass_);
+	
 PYBIND11_MODULE(pycoyote, ModObj)
 {
 	ModObj.def("LookupPresetLayoutByID", Coyote::LookupPresetLayoutByID);
@@ -91,6 +93,15 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_EOTF_UNSPECIFIED)
 	EMEMDEF(COYOTE_EOTF_MAX)
 	.export_values();
+	
+	py::enum_<Coyote::PlaybackEventType>(ModObj, "PlaybackEventType")
+	EMEMDEF(COYOTE_PBEVENT_END)
+	EMEMDEF(COYOTE_PBEVENT_TAKE)
+	EMEMDEF(COYOTE_PBEVENT_PAUSE)
+	EMEMDEF(COYOTE_PBEVENT_UNPAUSE)
+	EMEMDEF(COYOTE_PBEVENT_SEEK)
+	.export_values();
+		
 	
 	py::enum_<Coyote::HardwareMode>(ModObj, "HardwareMode")
 	EMEMDEF(COYOTE_MODE_INVALID)
@@ -252,15 +263,23 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		
 		return std::make_tuple(Status, Version);
 	})
-	.def("GetUnitID",
-	[] (Coyote::Session &Obj)
+	.def("SetPlaybackEventCallback", 
+	[] (Coyote::Session &Obj, py::function Func, py::object PyUserData)
 	{
-		std::map<std::string, std::string> Vals;
+		static std::pair<py::function, py::object> Pass;
 		
-		const Coyote::StatusCode Status = Obj.GetUnitID(Vals["UnitID"], Vals["Nickname"]);
+		Func.inc_ref();
+		Func.inc_ref();
+		PyUserData.inc_ref();
+		PyUserData.inc_ref();
 		
-		return std::make_tuple(Status, Vals);
-	}, py::call_guard<py::gil_scoped_release>())
+		Pass =	{
+					std::move(Func),
+					std::move(PyUserData)
+				};
+		
+		Obj.SetPlaybackEventCallback(PBEventFunc, &Pass);
+	})
 	.def("GetHardwareState",
 	[] (Coyote::Session &Obj)
 	{
@@ -371,7 +390,8 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, ExportLogsZip)
 	ACLASSF(Session, SetUnitNickname)
 	ACLASSF(Session, SetCommandTimeoutSecs)
-	ACLASSF(Session, GetCommandTimeoutSecs);
+	ACLASSF(Session, GetCommandTimeoutSecs)
+	ACLASSF(Session, HasConnectionError);
 	
 
 	py::class_<Coyote_Output>(ModObj, "Coyote_Output")
@@ -538,4 +558,19 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	.def("__repr__", [] (Coyote::Asset &Obj) { return std::string{"<Asset \""} + Obj.FileName.GetStdString() + "\">"; });
 
 	ModObj.doc() = "Interface for controlling Sonoran Video Systems' Coyote playback servers";	
+}
+
+static void PBEventFunc(const Coyote::PlaybackEventType EType, const int32_t PK, const int32_t Time, void *const Pass_)
+{
+	py::gil_scoped_acquire GILLock;
+	
+	std::pair<py::function, py::object> *const Pass = (decltype(Pass))Pass_;
+
+	if (!Pass || !Pass->first || !PyCallable_Check(Pass->first.ptr()))
+	{
+		LDEBUG_MSG("No pass");
+		return;
+	}
+	
+	Pass->first(EType, PK, Time, Pass->second);
 }

@@ -35,6 +35,12 @@ namespace AsyncMsgs
 		
 		AsynchronousSession(void) {}
 		
+		inline void SetPlaybackEventCallback(const PBEventCallback CB, void *const UserData)
+		{
+			SubSession.SetPlaybackEventCallback(CB, UserData);
+		}
+
+		
 	};
 }
 #endif //__LIBCOYOTE_ASYNCMSGS_H__

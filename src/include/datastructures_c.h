@@ -26,7 +26,6 @@
 #include "macros.h"
 #include "statuscodes.h"
 
-
 #ifndef __cplusplus
 typedef const char *COYOTESTRING;
 typedef enum CoyoteHardwareMode COYOTEHARDWAREMODE;
@@ -34,6 +33,7 @@ typedef enum CoyoteRefreshRate COYOTEREFRESHMODE;
 typedef enum CoyoteResolutionMode COYOTERESOLUTIONMODE;
 typedef enum CoyoteHDRMode COYOTEHDRMODE;
 typedef enum CoyoteEOTFMode COYOTEEOTFMODE;
+typedef enum CoyotePlaybackEventType COYOTEPLAYBACKEVENTTYPE;
 #else
 #include "coyotestring.h"
 typedef Coyote::CoyoteString COYOTESTRING;
@@ -43,8 +43,12 @@ typedef Coyote::RefreshMode COYOTEREFRESHMODE;
 typedef Coyote::PresetLayout COYOTEPRESETLAYOUT;
 typedef Coyote::HDRMode COYOTEHDRMODE;
 typedef Coyote::EOTFMode COYOTEEOTFMODE;
+typedef enum Coyote::PlaybackEventType COYOTEPLAYBACKEVENTTYPE;
+
 extern "C" {
 #endif
+
+typedef void (*PBEventCallback)(const COYOTEPLAYBACKEVENTTYPE EType, const int32_t PK, const int32_t Time, void *UserData);
 
 struct Coyote_PresetMark
 {
