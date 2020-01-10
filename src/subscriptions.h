@@ -47,7 +47,7 @@ namespace Subs
 		Coyote::HardwareState *GetHardwareState(void);
 		void SetPlaybackEventCallback(const PBEventCallback, void *const UserData = nullptr);
 		
-		SubscriptionSession() : HWState() { }
+		SubscriptionSession() : HWState(), UserPBEventCallback(), UserPBEventData() { }
 	};
 }
 #endif //__LIBCOYOTE_SUBSCRIPTIONS_H__
