@@ -40,7 +40,7 @@ if (NOT NO_C_API)
 endif()
 
 add_library(coyote SHARED ${sourcefiles})
-add_library(coyote_static STATIC ${sourcefiles})
+add_library(coyote_static STATIC EXCLUDE_FROM_ALL ${sourcefiles})
 
 set_property(TARGET coyote_static PROPERTY CXX_STANDARD 14)
 set_property(TARGET coyote_static PROPERTY CXX_STANDARD_REQUIRED ON)
