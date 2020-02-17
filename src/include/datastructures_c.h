@@ -34,6 +34,7 @@ typedef enum CoyoteResolutionMode COYOTERESOLUTIONMODE;
 typedef enum CoyoteHDRMode COYOTEHDRMODE;
 typedef enum CoyoteEOTFMode COYOTEEOTFMODE;
 typedef enum CoyotePlaybackEventType COYOTEPLAYBACKEVENTTYPE;
+typedef enum CoyoteAssetState COYOTEASSETSTATE;
 #else
 #include "coyotestring.h"
 typedef Coyote::CoyoteString COYOTESTRING;
@@ -44,6 +45,7 @@ typedef Coyote::PresetLayout COYOTEPRESETLAYOUT;
 typedef Coyote::HDRMode COYOTEHDRMODE;
 typedef Coyote::EOTFMode COYOTEEOTFMODE;
 typedef enum Coyote::PlaybackEventType COYOTEPLAYBACKEVENTTYPE;
+typedef enum Coyote::AssetState COYOTEASSETSTATE;
 
 extern "C" {
 #endif
@@ -79,21 +81,10 @@ struct Coyote_TimeCode
 
 struct Coyote_Asset
 {
-	COYOTESTRING FileName; ///The part we care about most
-	COYOTESTRING NewFileName; //NewFileName should only be used when renaming/moving assets. Leaving it empty the rest of the time is fine.
-	COYOTESTRING Videoencoding_FCC;
-	COYOTESTRING Audioencoding_FCC;
-	int32_t AudioNumChannels;
-	int32_t AudioSampleRate;
-	int32_t DurationMs;
-	int32_t Size;
-	int32_t VideoFrameRate;
-	int32_t VideoHeight;
-	int32_t VideoWidth;
-	uint8_t CopyPercentage; //User shouldn't need to write to this
-	bool SupportedVidEncode;
-	bool SupportedAudEncode;
-	bool IsReady; //or this
+	COYOTESTRING FullPath; ///The part we care about most
+	COYOTEASSETSTATE Status;
+	int64_t TotalSize;
+	int64_t CurrentSize;
 };
 
 struct Coyote_Output

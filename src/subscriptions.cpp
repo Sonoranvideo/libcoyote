@@ -61,7 +61,7 @@ bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::str
 		
 		return true;
 	}
-	else if (EventName == "Assets")
+	else if (EventName == "AssetSync")
 	{
 		LDEBUG_MSG("Decoding assets");
 		std::vector<msgpack::object> AssetObjects;
@@ -76,8 +76,39 @@ bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::str
 		{
 			std::unique_ptr<Coyote::Asset> Item { static_cast<Coyote::Asset*>(MsgpackProc::UnpackCoyoteObject(*Iter, typeid(Coyote::Asset))) };
 			
-			this->Assets.emplace(Item->FileName.GetStdString(), std::move(*Item));
+			this->Assets.emplace(Item->FullPath.GetStdString(), std::move(*Item));
 		}
+		
+		return true;
+	}
+	else if (EventName == "AssetDelete")
+	{
+		LDEBUG_MSG("Decoding asset deletion request");
+		std::string FullPath;
+
+		Values.at("Data").convert(FullPath);
+	
+		const std::lock_guard<std::mutex> G { this->AssetsLock };
+		
+		if (this->Assets.count(FullPath))
+		{
+			LDEBUG_MSG("Found asset " << FullPath << " to delete, deleting.");
+			this->Assets.erase(FullPath);
+		}
+		
+		return true;
+	}
+	else if (EventName == "AssetPost")
+	{
+		LDEBUG_MSG("Decoding asset post request");
+		
+		std::unique_ptr<Coyote::Asset> Ptr { static_cast<Coyote::Asset*>(MsgpackProc::UnpackCoyoteObject(Values.at("Data"), typeid(Coyote::Asset))) };
+	
+		const std::lock_guard<std::mutex> G { this->AssetsLock };
+		
+		this->Assets[Ptr->FullPath] = std::move(*Ptr);
+		
+		LDEBUG_MSG("Found asset " << FullPath << " to add/update.");
 		
 		return true;
 	}

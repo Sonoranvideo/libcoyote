@@ -177,6 +177,19 @@ namespace Coyote
 		COYOTE_PBEVENT_SEEK = 4
 	};
 	
+#ifdef __cplusplus
+	enum AssetState
+#else
+	enum CoyoteAssetState
+#endif //__cplusplus
+	{
+		COYOTE_ASSETSTATE_INVALID	= 0,
+		COYOTE_ASSETSTATE_READY		= 1,
+		COYOTE_ASSETSTATE_INGESTING	= 2,
+		COYOTE_ASSETSTATE_ERROR		= 3,
+		COYOTE_ASSETSTATE_MAX
+	};
+
 #ifndef __cplusplus
 	typedef enum CoyoteResolutionMode CoyoteResolutionMode;
 	typedef enum CoyoteRefreshMode CoyoteRefreshMode;

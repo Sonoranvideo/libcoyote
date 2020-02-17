@@ -110,21 +110,10 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 		
 		Values = new std::map<std::string, msgpack::object>
 		{
-			{ "FileName", msgpack::object{ AssetObj->FileName.GetCString(), TempZone } },
-			{ "NewFileName", msgpack::object{ AssetObj->NewFileName.GetCString(), TempZone } },
-			{ "CopyPercentage", msgpack::object{ (int)AssetObj->CopyPercentage, TempZone } },
-			{ "IsReady", msgpack::object{ AssetObj->IsReady, TempZone } },
-			{ "AudioSampleRate", msgpack::object { AssetObj->AudioSampleRate, TempZone } },
-			{ "AudioNumChannels", msgpack::object { AssetObj->AudioNumChannels, TempZone } },
-			{ "DurationMs", msgpack::object { AssetObj->DurationMs, TempZone } },
-			{ "Size", msgpack::object { AssetObj->Size, TempZone } },
-			{ "VideoFrameRate", msgpack::object { AssetObj->VideoFrameRate, TempZone } },
-			{ "VideoHeight", msgpack::object { AssetObj->VideoHeight, TempZone } },
-			{ "VideoWidth", msgpack::object { AssetObj->VideoWidth, TempZone } },
-			{ "Videoencoding_FCC", msgpack::object { AssetObj->Videoencoding_FCC.GetCString(), TempZone } },
-			{ "Audioencoding_FCC", msgpack::object { AssetObj->Audioencoding_FCC.GetCString(), TempZone } },
-			{ "SupportedVidEncode", msgpack::object { AssetObj->SupportedVidEncode, TempZone } },
-			{ "SupportedAudEncode", msgpack::object { AssetObj->SupportedAudEncode, TempZone } },
+			{ "FullPath", msgpack::object{ AssetObj->FullPath.GetCString(), TempZone } },
+			{ "Status", msgpack::object{ (int)AssetObj->Status, TempZone } },
+			{ "TotalSize", msgpack::object{ (int64_t)AssetObj->TotalSize, TempZone } },
+			{ "CurrentSize", msgpack::object{ (int64_t)AssetObj->CurrentSize, TempZone } },
 		};
 	}
 	else if (OurType == typeid(Coyote::HardwareState))
@@ -385,21 +374,10 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		Result = new Coyote::Asset{};
 		Coyote::Asset *AssetObj = static_cast<Coyote::Asset*>(Result);
 		
-		AssetObj->FileName = Fields["FileName"].as<std::string>();
-		AssetObj->NewFileName = Fields["NewFileName"].as<std::string>();
-		AssetObj->CopyPercentage = Fields["CopyPercentage"].as<uint32_t>(); //Because idk if msgpack treats uint8_t like a character or a number
-		AssetObj->IsReady = Fields["IsReady"].as<int>();
-		AssetObj->AudioSampleRate = Fields["AudioSampleRate"].as<int32_t>();
-		AssetObj->AudioNumChannels = Fields["AudioNumChannels"].as<int32_t>();
-		AssetObj->DurationMs = Fields["DurationMs"].as<int32_t>();
-		AssetObj->Size = Fields["Size"].as<int32_t>();
-		AssetObj->VideoFrameRate = Fields["VideoFrameRate"].as<int32_t>();
-		AssetObj->VideoHeight = Fields["VideoHeight"].as<int32_t>();
-		AssetObj->VideoWidth = Fields["VideoWidth"].as<int32_t>();
-		AssetObj->Videoencoding_FCC = Fields["Videoencoding_FCC"].as<std::string>();
-		AssetObj->Audioencoding_FCC = Fields["Audioencoding_FCC"].as<std::string>();
-		AssetObj->SupportedVidEncode = Fields["SupportedVidEncode"].as<int>();
-		AssetObj->SupportedAudEncode = Fields["SupportedAudEncode"].as<int>();
+		AssetObj->FullPath = Fields["FullPath"].as<std::string>();
+		AssetObj->Status = (Coyote::AssetState)Fields["Status"].as<int>();
+		AssetObj->TotalSize = Fields["TotalSize"].as<int64_t>();
+		AssetObj->CurrentSize = Fields["CurrentSize"].as<int64_t>();
 	}
 	else if (Expected == typeid(Coyote::TimeCode))
 	{

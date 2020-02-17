@@ -93,6 +93,14 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_EOTF_UNSPECIFIED)
 	EMEMDEF(COYOTE_EOTF_MAX)
 	.export_values();
+
+	py::enum_<Coyote::AssetState>(ModObj, "AssetState")
+	EMEMDEF(COYOTE_ASSETSTATE_INVALID)
+	EMEMDEF(COYOTE_ASSETSTATE_READY)
+	EMEMDEF(COYOTE_ASSETSTATE_INGESTING)
+	EMEMDEF(COYOTE_ASSETSTATE_ERROR)
+	EMEMDEF(COYOTE_ASSETSTATE_MAX)
+	.export_values();
 	
 	py::enum_<Coyote::PlaybackEventType>(ModObj, "PlaybackEventType")
 	EMEMDEF(COYOTE_PBEVENT_END)
@@ -546,25 +554,14 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	
 	py::class_<Coyote_Asset>(ModObj, "Coyote_Asset")
 	.def(py::init<>())
-	ACLASSBD(Coyote_Asset, FileName)
-	ACLASSBD(Coyote_Asset, NewFileName)
-	ACLASSBD(Coyote_Asset, CopyPercentage)
-	ACLASSBD(Coyote_Asset, IsReady)
-	ACLASSBD(Coyote_Asset, AudioNumChannels)
-	ACLASSBD(Coyote_Asset, AudioSampleRate)
-	ACLASSBD(Coyote_Asset, DurationMs)
-	ACLASSBD(Coyote_Asset, Size)
-	ACLASSBD(Coyote_Asset, VideoFrameRate)
-	ACLASSBD(Coyote_Asset, VideoHeight)
-	ACLASSBD(Coyote_Asset, VideoWidth)
-	ACLASSBD(Coyote_Asset, Videoencoding_FCC)
-	ACLASSBD(Coyote_Asset, Audioencoding_FCC)
-	ACLASSBD(Coyote_Asset, SupportedVidEncode)
-	ACLASSBD(Coyote_Asset, SupportedAudEncode);
+	ACLASSBD(Coyote_Asset, FullPath)
+	ACLASSBD(Coyote_Asset, Status)
+	ACLASSBD(Coyote_Asset, TotalSize)
+	ACLASSBD(Coyote_Asset, CurrentSize);
 	
 	py::class_<Coyote::Asset, Coyote::BaseObject, Coyote_Asset>(ModObj, "Asset")
 	.def(py::init<>())
-	.def("__repr__", [] (Coyote::Asset &Obj) { return std::string{"<Asset \""} + Obj.FileName.GetStdString() + "\">"; });
+	.def("__repr__", [] (Coyote::Asset &Obj) { return std::string{"<Asset \""} + Obj.FullPath.GetStdString() + "\">"; });
 
 	ModObj.doc() = "Interface for controlling Sonoran Video Systems' Coyote playback servers";	
 }

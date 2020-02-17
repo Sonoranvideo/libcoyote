@@ -48,8 +48,8 @@ namespace Coyote
 	
 	struct Asset : public BaseObject, public Coyote_Asset
 	{				
-		inline operator const char*(void) const { return this->FileName; }
-		inline operator std::string(void) const { return this->FileName; }
+		inline operator const char*(void) const { return this->FullPath; }
+		inline operator std::string(void) const { return this->FullPath; }
 		Asset(void) : BaseObject(), Coyote_Asset() {}
 	};
 	
