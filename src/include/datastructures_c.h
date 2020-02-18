@@ -87,6 +87,22 @@ struct Coyote_Asset
 	int64_t CurrentSize;
 };
 
+struct Coyote_AssetMetadata
+{
+	COYOTESTRING FullPath;
+	COYOTESTRING FPS; //This is not a Coyote::ResolutionMode because it might list a refresh rate that the Coyote doesn't support.
+	COYOTESTRING VideoCodec;
+	COYOTESTRING AudioCodec;
+	int64_t AssetSize;
+	int32_t TRT;
+	int32_t Width;
+	int32_t Height;
+	int32_t NumAudioChannels;
+	int32_t AudioSampleRate;
+	bool SupportedVideoCodec;
+	bool SupportedAudioCodec;
+};
+
 struct Coyote_Output
 {
 	COYOTESTRING Filename;

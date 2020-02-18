@@ -324,6 +324,15 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		
 		return std::make_tuple(Status, Value);
 	}, py::call_guard<py::gil_scoped_release>())
+	.def("ReadAssetMetadata",
+	[] (Coyote::Session &Obj, const std::string &FullPath)
+	{
+		Coyote::AssetMetadata Value{};
+		
+		const Coyote::StatusCode Status = Obj.ReadAssetMetadata(FullPath, Value);
+		
+		return std::make_tuple(Status, Value);
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetIP",
 	[] (Coyote::Session &Obj, const int32_t AdapterID)
 	{
@@ -379,6 +388,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, InstallAsset)
 	ACLASSF(Session, DeleteAsset)
 	ACLASSF(Session, RenameAsset)
+	ACLASSF(Session, ReadAssetMetadata)
 	ACLASSF(Session, ReorderPresets)
 	ACLASSF(Session, DeletePreset)
 	ACLASSF(Session, CreatePreset)
@@ -558,6 +568,25 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSBD(Coyote_Asset, Status)
 	ACLASSBD(Coyote_Asset, TotalSize)
 	ACLASSBD(Coyote_Asset, CurrentSize);
+	
+	py::class_<Coyote_AssetMetadata>(ModObj, "Coyote_AssetMetadata")
+	.def(py::init<>())
+	ACLASSBD(Coyote_AssetMetadata, FullPath)
+	ACLASSBD(Coyote_AssetMetadata, AssetSize)
+	ACLASSBD(Coyote_AssetMetadata, TRT)
+	ACLASSBD(Coyote_AssetMetadata, Width)
+	ACLASSBD(Coyote_AssetMetadata, Height)
+	ACLASSBD(Coyote_AssetMetadata, FPS)
+	ACLASSBD(Coyote_AssetMetadata, NumAudioChannels)
+	ACLASSBD(Coyote_AssetMetadata, AudioSampleRate)
+	ACLASSBD(Coyote_AssetMetadata, VideoCodec)
+	ACLASSBD(Coyote_AssetMetadata, AudioCodec)
+	ACLASSBD(Coyote_AssetMetadata, SupportedVideoCodec)
+	ACLASSBD(Coyote_AssetMetadata, SupportedAudioCodec);
+	
+	py::class_<Coyote::AssetMetadata, Coyote::BaseObject, Coyote_AssetMetadata>(ModObj, "AssetMetadata")
+	.def(py::init<>())
+	.def("__repr__", [] (Coyote::AssetMetadata &Obj) { return std::string{"<AssetMetadata for \""} + Obj.FullPath.GetStdString() + "\">"; });
 	
 	py::class_<Coyote::Asset, Coyote::BaseObject, Coyote_Asset>(ModObj, "Asset")
 	.def(py::init<>())

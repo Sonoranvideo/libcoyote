@@ -371,14 +371,14 @@ Coyote::StatusCode Coyote::Session::End(const int32_t PK)
 	return Status;
 }
 
-Coyote::StatusCode Coyote::Session::DeleteAsset(const std::string &AssetName)
+Coyote::StatusCode Coyote::Session::DeleteAsset(const std::string &FullPath)
 {
 	DEF_SESS;
 
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "AssetName", msgpack::object{AssetName.c_str(), TempZone } } };
+	const std::map<std::string, msgpack::object> Values { { "FullPath", msgpack::object{FullPath.c_str(), TempZone } } };
 	
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	SESS.PerformSyncedCommand("DeleteAsset", TempZone, &Status, &Pass);
@@ -386,14 +386,14 @@ Coyote::StatusCode Coyote::Session::DeleteAsset(const std::string &AssetName)
 	return Status;
 }
 
-Coyote::StatusCode Coyote::Session::InstallAsset(const std::string &AssetPath)
+Coyote::StatusCode Coyote::Session::InstallAsset(const std::string &FullPath)
 {
 	DEF_SESS;
 
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "AssetPath",  msgpack::object{AssetPath.c_str(), TempZone } } };
+	const std::map<std::string, msgpack::object> Values { { "FullPath",  msgpack::object{FullPath.c_str(), TempZone } } };
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
 	SESS.PerformSyncedCommand("InstallAsset", TempZone, &Status, &Pass);
@@ -401,14 +401,14 @@ Coyote::StatusCode Coyote::Session::InstallAsset(const std::string &AssetPath)
 	return Status;
 }
 
-Coyote::StatusCode Coyote::Session::RenameAsset(const std::string &CurrentName, const std::string &NewName)
+Coyote::StatusCode Coyote::Session::RenameAsset(const std::string &FullPath, const std::string &NewName)
 {
 	DEF_SESS;
 
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "CurrentName", msgpack::object{CurrentName.c_str(), TempZone } }, { "NewName", msgpack::object{NewName.c_str(), TempZone} } };
+	const std::map<std::string, msgpack::object> Values { { "FullPath", msgpack::object{FullPath.c_str(), TempZone } }, { "NewName", msgpack::object{NewName.c_str(), TempZone} } };
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
 	SESS.PerformSyncedCommand("RenameAsset", TempZone, &Status, &Pass);
@@ -867,6 +867,26 @@ Coyote::StatusCode Coyote::Session::GetIP(const int32_t AdapterID, Coyote::Netwo
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
 	std::unique_ptr<Coyote::NetworkInfo> Ptr { static_cast<Coyote::NetworkInfo*>(MsgpackProc::UnpackCoyoteObject(Msg.at("Data"), typeid(Coyote::NetworkInfo))) };
+	
+	Out = std::move(*Ptr);
+	
+	return Status;
+}
+Coyote::StatusCode Coyote::Session::ReadAssetMetadata(const std::string &FullPath, Coyote::AssetMetadata &Out)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	const std::map<std::string, msgpack::object> Values { MAPARG(FullPath) };
+	
+	Coyote::StatusCode Status{};
+	
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("ReadAssetMetadata", TempZone, &Status, &Pass) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	std::unique_ptr<Coyote::AssetMetadata> Ptr { static_cast<Coyote::AssetMetadata*>(MsgpackProc::UnpackCoyoteObject(Msg.at("Data"), typeid(Coyote::AssetMetadata))) };
 	
 	Out = std::move(*Ptr);
 	

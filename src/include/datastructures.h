@@ -53,6 +53,11 @@ namespace Coyote
 		Asset(void) : BaseObject(), Coyote_Asset() {}
 	};
 	
+	struct AssetMetadata : public BaseObject, public Coyote_AssetMetadata
+	{
+		AssetMetadata(void) : BaseObject(), Coyote_AssetMetadata() {}
+	};
+	
 	struct Output : public BaseObject, public Coyote_Output
 	{
 		Output(void) : BaseObject(), Coyote_Output() {}

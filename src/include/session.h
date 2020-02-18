@@ -53,13 +53,14 @@ namespace Coyote
 		StatusCode Pause(const int32_t PK = 0);
 		StatusCode End(const int32_t PK = 0);
 		StatusCode SeekTo(const int32_t PK, const uint32_t TimeIndex);
-		StatusCode InstallAsset(const std::string &AssetPath);
-		StatusCode DeleteAsset(const std::string &AssetName);
-		StatusCode RenameAsset(const std::string &CurrentName, const std::string &NewName);
+		StatusCode InstallAsset(const std::string &FullPath);
+		StatusCode DeleteAsset(const std::string &FullPath);
+		StatusCode RenameAsset(const std::string &FullPath, const std::string &NewName);
 		StatusCode ReorderPresets(const int32_t PK1, const int32_t PK2);
 		StatusCode DeletePreset(const int32_t PK);
 		StatusCode CreatePreset(const Preset &Ref);
 		StatusCode UpdatePreset(const Preset &Ref);
+		StatusCode ReadAssetMetadata(const std::string &FullPath, AssetMetadata &Out);
 		StatusCode BeginUpdate(void);
 		StatusCode GetDisks(std::vector<std::string> &Out);
 		StatusCode EjectDisk(const std::string &DriveLetter);

@@ -116,6 +116,24 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			{ "CurrentSize", msgpack::object{ (int64_t)AssetObj->CurrentSize, TempZone } },
 		};
 	}
+	else if 		(OurType == typeid(Coyote::AssetMetadata))
+	{
+		const Coyote::AssetMetadata *DataObj = static_cast<const Coyote::AssetMetadata*>(Object);
+		
+		Values = new std::map<std::string, msgpack::object>
+		{
+			{ "FullPath", msgpack::object{ DataObj->FullPath.GetCString(), TempZone } },
+			{ "AssetSize", msgpack::object{ (int64_t)DataObj->AssetSize, TempZone } },
+			{ "TRT", msgpack::object{ (int32_t)DataObj->TRT, TempZone } },
+			{ "Width", msgpack::object{ (int32_t)DataObj->Width, TempZone } },
+			{ "Height", msgpack::object{ (int32_t)DataObj->Height, TempZone } },
+			{ "FPS", msgpack::object{ DataObj->FPS.GetCString(), TempZone } },
+			{ "NumAudioChannels", msgpack::object{ (int32_t)DataObj->NumAudioChannels, TempZone } },
+			{ "AudioSampleRate", msgpack::object{ (int32_t)DataObj->AudioSampleRate, TempZone } },
+			{ "SupportedVideoCodec", msgpack::object{ DataObj->SupportedVideoCodec, TempZone } },
+			{ "SupportedAudioCodec", msgpack::object{ DataObj->SupportedAudioCodec, TempZone } },
+		};
+	}
 	else if (OurType == typeid(Coyote::HardwareState))
 	{
 		const Coyote::HardwareState *HWStateObj = static_cast<const Coyote::HardwareState*>(Object);
@@ -378,6 +396,27 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		AssetObj->Status = (Coyote::AssetState)Fields["Status"].as<int>();
 		AssetObj->TotalSize = Fields["TotalSize"].as<int64_t>();
 		AssetObj->CurrentSize = Fields["CurrentSize"].as<int64_t>();
+	}
+	else if (Expected == typeid(Coyote::AssetMetadata))
+	{
+		LDEBUG_MSG("Debugging AssetMetadata");
+		
+		Result = new Coyote::AssetMetadata{};
+		
+		Coyote::AssetMetadata *Obj = static_cast<Coyote::AssetMetadata*>(Result);
+				
+		Obj->FullPath = Fields["FullPath"].as<std::string>();
+		Obj->AssetSize = Fields["AssetSize"].as<int64_t>();
+		Obj->TRT = Fields["TRT"].as<int32_t>();
+		Obj->Width = Fields["Width"].as<int32_t>();
+		Obj->Height = Fields["Height"].as<int32_t>();
+		Obj->FPS = Fields["FPS"].as<std::string>();
+		Obj->NumAudioChannels = Fields["NumAudioChannels"].as<int32_t>();
+		Obj->AudioSampleRate = Fields["AudioSampleRate"].as<int32_t>();
+		Obj->VideoCodec = Fields["VideoCodec"].as<std::string>();
+		Obj->AudioCodec = Fields["AudioCodec"].as<std::string>();
+		Obj->SupportedVideoCodec = Fields["SupportedVideoCodec"].as<int>();
+		Obj->SupportedAudioCodec = Fields["SupportedAudioCodec"].as<int>();
 	}
 	else if (Expected == typeid(Coyote::TimeCode))
 	{
