@@ -687,6 +687,51 @@ Coyote::StatusCode Coyote::Session::AddMirror(const std::string &MirrorIP)
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::StartSpoke(const std::string &SpokeName)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	Coyote::StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values { { "SpokeName",  msgpack::object{SpokeName.c_str(), TempZone } } };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+	
+	SESS.PerformSyncedCommand("StartSpoke", TempZone, &Status, &Pass);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::KillSpoke(const std::string &SpokeName)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	Coyote::StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values { { "SpokeName",  msgpack::object{SpokeName.c_str(), TempZone } } };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+	
+	SESS.PerformSyncedCommand("KillSpoke", TempZone, &Status, &Pass);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::RestartSpoke(const std::string &SpokeName)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	Coyote::StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values { { "SpokeName",  msgpack::object{SpokeName.c_str(), TempZone } } };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+	
+	SESS.PerformSyncedCommand("RestartSpoke", TempZone, &Status, &Pass);
+	
+	return Status;
+}
+
 Coyote::StatusCode Coyote::Session::GetDisks(std::vector<std::string> &Out)
 {
 	DEF_SESS;
