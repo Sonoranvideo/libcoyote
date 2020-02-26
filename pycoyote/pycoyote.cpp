@@ -397,7 +397,6 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, DetectUpdate)
 	ACLASSF(Session, EjectDisk)
 	ACLASSF(Session, SetIP)
-	ACLASSF(Session, SetHardwareMode)
 	ACLASSF(Session, SelectPreset)
 	ACLASSF(Session, AddMirror)
 	ACLASSF(Session, DeconfigureSync)
@@ -421,7 +420,13 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, SetUnitNickname)
 	ACLASSF(Session, SetCommandTimeoutSecs)
 	ACLASSF(Session, GetCommandTimeoutSecs)
-	ACLASSF(Session, HasConnectionError);
+	ACLASSF(Session, HasConnectionError)
+	.def("SetHardwareMode", &Coyote::Session::SetHardwareMode, py::call_guard<py::gil_scoped_release>(),
+	py::arg("Resolution"),
+	py::arg("RefreshRate"),
+	py::arg("HDRMode") = Coyote::COYOTE_HDR_DISABLED,
+	py::arg("EOTFSetting") = Coyote::COYOTE_EOTF_NORMAL,
+	py::arg("ConstLumin") = false);
 	
 
 	py::class_<Coyote_Output>(ModObj, "Coyote_Output")
