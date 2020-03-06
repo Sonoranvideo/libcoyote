@@ -226,6 +226,7 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			{ "Busy", msgpack::object{ MirrorInfo->Busy, TempZone } },
 			{ "SupportsS12G", msgpack::object{ MirrorInfo->SupportsS12G, TempZone } },
 			{ "UnitID", msgpack::object{ MirrorInfo->UnitID.GetCString(), TempZone } },
+			{ "IsAlive", msgpack::object{ MirrorInfo->IsAlive, TempZone } },
 		};
 	}
 	else if (OurType == typeid(Coyote::Output))
@@ -580,6 +581,7 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		
 		InfoObj->IP = Fields["IP"].as<std::string>();
 		InfoObj->UnitID = Fields["UnitID"].as<std::string>();
+		InfoObj->IsAlive = Fields["IsAlive"].as<int>();
 		InfoObj->Busy = Fields["Busy"].as<int>();
 		InfoObj->SupportsS12G = Fields["SupportsS12G"].as<int>();
 	}

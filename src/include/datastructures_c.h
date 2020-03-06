@@ -227,6 +227,7 @@ struct Coyote_Mirror
 	COYOTESTRING IP;
 	bool Busy;
 	bool SupportsS12G;
+	bool IsAlive;
 };
 
 struct Coyote_PresetMarkArray

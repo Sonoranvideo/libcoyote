@@ -546,7 +546,8 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSBD(Coyote_Mirror, UnitID)
 	ACLASSBD(Coyote_Mirror, IP)
 	ACLASSBD(Coyote_Mirror, Busy)
-	ACLASSBD(Coyote_Mirror, SupportsS12G);
+	ACLASSBD(Coyote_Mirror, SupportsS12G)
+	ACLASSBD(Coyote_Mirror, IsAlive);
 	
 	py::class_<Coyote::Mirror, Coyote::BaseObject, Coyote_Mirror>(ModObj, "Mirror")
 	.def(py::init<>());
