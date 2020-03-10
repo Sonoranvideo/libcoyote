@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 project("pycoyote")
 cmake_policy(SET CMP0003 NEW)
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../src ${CMAKE_CURRENT_LIST_DIR}/../build)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../src ${CMAKE_CURRENT_BINARY_DIR}/libcoyote)
 
 #This CMake config will only work on MinGW or POSIX. Don't bother trying to build with MSVC.
 
