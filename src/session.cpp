@@ -987,14 +987,14 @@ Coyote::StatusCode Coyote::Session::GetMediaState(Coyote::MediaState &Out)
 	return Status;
 }
 
-Coyote::StatusCode Coyote::Session::GetGenlockConfig(Coyote::GenlockSettings &Out)
+Coyote::StatusCode Coyote::Session::GetGenlockSettings(Coyote::GenlockSettings &Out)
 {
 	DEF_SESS;
 
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetGenlockConfig", TempZone, &Status) };
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetGenlockSettings", TempZone, &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	

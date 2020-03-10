@@ -106,7 +106,7 @@ namespace Coyote
 		StatusCode RestartSpoke(const std::string &SpokeName);
 		StatusCode KillSpoke(const std::string &SpokeName);
 		StatusCode StartSpoke(const std::string &SpokeName);
-		StatusCode GetGenlockConfig(Coyote::GenlockSettings &Out);
+		StatusCode GetGenlockSettings(Coyote::GenlockSettings &Out);
 		StatusCode SetHorzGenlock(int32_t HorzValue);
 		StatusCode SetVertGenlock(int32_t HorzValue);
 		

@@ -378,12 +378,12 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		
 		return std::make_tuple(Status, Mirrors);
 	}, py::call_guard<py::gil_scoped_release>())
-	.def("GetGenlockConfig",
+	.def("GetGenlockSettings",
 	[] (Coyote::Session &Obj)
 	{
 		Coyote::GenlockSettings Cfg{};
 		
-		const Coyote::StatusCode Status = Obj.GetGenlockConfig(Cfg);
+		const Coyote::StatusCode Status = Obj.GetGenlockSettings(Cfg);
 		
 		return std::make_tuple(Status, Cfg);
 	}, py::call_guard<py::gil_scoped_release>())
