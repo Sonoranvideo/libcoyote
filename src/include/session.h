@@ -81,6 +81,8 @@ namespace Coyote
 		StatusCode GetCurrentRole(UnitRole &RoleOut);
 		StatusCode AddMirror(const std::string &MirrorIP);
 		StatusCode GetMirrors(std::vector<Mirror> &Out);
+		StatusCode GetEffectivePrimary(Mirror &Out);
+		StatusCode GetDesignatedPrimary(Mirror &Out);
 		StatusCode SynchronizerBusy(bool &Out);
 		StatusCode DeconfigureSync(void);
 		StatusCode RebootCoyote(void);

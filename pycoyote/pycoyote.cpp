@@ -288,6 +288,24 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		
 		Obj.SetPlaybackEventCallback(PBEventFunc, &Pass);
 	})
+	.def("GetDesignatedPrimary",
+	[] (Coyote::Session &Obj)
+	{
+		Coyote::Mirror Value{};
+		
+		const Coyote::StatusCode Status = Obj.GetDesignatedPrimary(Value);
+		
+		return std::make_tuple(Status, Value);
+	}, py::call_guard<py::gil_scoped_release>())
+	.def("GetEffectivePrimary",
+	[] (Coyote::Session &Obj)
+	{
+		Coyote::Mirror Value{};
+		
+		const Coyote::StatusCode Status = Obj.GetEffectivePrimary(Value);
+		
+		return std::make_tuple(Status, Value);
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetHardwareState",
 	[] (Coyote::Session &Obj)
 	{

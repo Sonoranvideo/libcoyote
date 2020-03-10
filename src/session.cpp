@@ -1160,6 +1160,42 @@ Coyote::StatusCode Coyote::Session::GetMirrors(std::vector<Coyote::Mirror> &Out)
 	return Coyote::COYOTE_STATUS_OK;
 }
 
+Coyote::StatusCode Coyote::Session::GetDesignatedPrimary(Coyote::Mirror &Out)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetDesignatedPrimary", TempZone, &Status) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	std::unique_ptr<Coyote::Mirror> MirrorStruct { static_cast<Coyote::Mirror*>(MsgpackProc::UnpackCoyoteObject(Msg.at("Data"), typeid(Coyote::Mirror))) };
+
+	Out = *MirrorStruct;
+	
+	return Coyote::COYOTE_STATUS_OK;
+}
+
+Coyote::StatusCode Coyote::Session::GetEffectivePrimary(Coyote::Mirror &Out)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetEffectivePrimary", TempZone, &Status) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	std::unique_ptr<Coyote::Mirror> MirrorStruct { static_cast<Coyote::Mirror*>(MsgpackProc::UnpackCoyoteObject(Msg.at("Data"), typeid(Coyote::Mirror))) };
+
+	Out = *MirrorStruct;
+	
+	return Coyote::COYOTE_STATUS_OK;
+}
+
 
 Coyote::StatusCode Coyote::Session::DetectUpdate(bool &DetectedOut, std::string *Out)
 {
