@@ -230,6 +230,14 @@ struct Coyote_Mirror
 	bool IsAlive;
 };
 
+struct Coyote_GenlockSettings
+{
+	COYOTESTRING FormatString;
+	int32_t HorzValue;
+	int32_t VertValue;
+	bool Genlocked;
+};
+
 struct Coyote_PresetMarkArray
 {
 	void *_Handle; //Used internally

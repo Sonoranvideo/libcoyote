@@ -398,6 +398,19 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		AssetObj->TotalSize = Fields["TotalSize"].as<int64_t>();
 		AssetObj->CurrentSize = Fields["CurrentSize"].as<int64_t>();
 	}
+	else if (Expected == typeid(Coyote::GenlockSettings))
+	{
+		LDEBUG_MSG("Debugging GenlockSettings");
+		
+		Result = new Coyote::GenlockSettings{};
+		
+		Coyote::GenlockSettings *GenlockObj = static_cast<Coyote::GenlockSettings*>(Result);
+		
+		GenlockObj->FormatString = Fields["FormatString"].as<std::string>();
+		GenlockObj->HorzValue = Fields["HorzValue"].as<int32_t>();
+		GenlockObj->VertValue = Fields["VertValue"].as<int32_t>();
+		GenlockObj->Genlocked = Fields["Genlocked"].as<int>();
+	}
 	else if (Expected == typeid(Coyote::AssetMetadata))
 	{
 		LDEBUG_MSG("Debugging AssetMetadata");

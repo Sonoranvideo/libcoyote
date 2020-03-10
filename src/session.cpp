@@ -987,6 +987,59 @@ Coyote::StatusCode Coyote::Session::GetMediaState(Coyote::MediaState &Out)
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::GetGenlockConfig(Coyote::GenlockSettings &Out)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetGenlockConfig", TempZone, &Status) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	
+	std::unique_ptr<Coyote::GenlockSettings> Ptr { static_cast<Coyote::GenlockSettings*>(MsgpackProc::UnpackCoyoteObject(Msg.at("Data"), typeid(Coyote::GenlockSettings))) };
+	
+	Out = *Ptr;
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::SetVertGenlock(int32_t VertValue)
+{
+	DEF_SESS;
+	
+	msgpack::zone TempZone;
+	
+	StatusCode Status = COYOTE_STATUS_INVALID;
+	
+	const std::map<std::string, msgpack::object> Values { MAPARG(VertValue) };
+
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+	
+	SESS.PerformSyncedCommand("SetVertGenlock", TempZone, &Status, &Pass);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::SetHorzGenlock(int32_t HorzValue)
+{
+	DEF_SESS;
+	
+	msgpack::zone TempZone;
+	
+	StatusCode Status = COYOTE_STATUS_INVALID;
+	
+	const std::map<std::string, msgpack::object> Values { MAPARG(HorzValue) };
+
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+	
+	SESS.PerformSyncedCommand("SetHorzGenlock", TempZone, &Status, &Pass);
+	
+	return Status;
+}
+
 Coyote::StatusCode Coyote::Session::SetHardwareMode(const ResolutionMode Resolution,
 													const RefreshMode RefreshRate,
 													const HDRMode HDRMode,

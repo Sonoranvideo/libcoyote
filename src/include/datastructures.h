@@ -96,6 +96,11 @@ namespace Coyote
 	{
 		Mirror(void) : BaseObject(), Coyote_Mirror() {}
 	};
+	
+	struct GenlockSettings : public BaseObject, public Coyote_GenlockSettings
+	{
+		GenlockSettings(void) : BaseObject(), Coyote_GenlockSettings() {}
+	};
 		
 	struct MediaState : public BaseObject, public Coyote_MediaState
 	{

@@ -378,6 +378,17 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		
 		return std::make_tuple(Status, Mirrors);
 	}, py::call_guard<py::gil_scoped_release>())
+	.def("GetGenlockConfig",
+	[] (Coyote::Session &Obj)
+	{
+		Coyote::GenlockSettings Cfg{};
+		
+		const Coyote::StatusCode Status = Obj.GetGenlockConfig(Cfg);
+		
+		return std::make_tuple(Status, Cfg);
+	}, py::call_guard<py::gil_scoped_release>())
+	ACLASSF(Session, SetHorzGenlock)
+	ACLASSF(Session, SetVertGenlock)
 	ACLASSF(Session, Take)
 	ACLASSF(Session, End)
 	ACLASSF(Session, Pause)
@@ -541,6 +552,23 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	.def(py::init<>())
 	.def("__repr__", [] (Coyote::TimeCode &Obj) { return std::string{"<TimeCode for PK "} + std::to_string(Obj.PresetKey) + " with time " + std::to_string(Obj.Time) + ">"; });
 
+	py::class_<Coyote_GenlockSettings>(ModObj, "Coyote_GenlockSettings")
+	.def(py::init<>())
+	ACLASSBD(Coyote_GenlockSettings, FormatString)
+	ACLASSBD(Coyote_GenlockSettings, HorzValue)
+	ACLASSBD(Coyote_GenlockSettings, VertValue)
+	ACLASSBD(Coyote_GenlockSettings, Genlocked);
+	
+	py::class_<Coyote::GenlockSettings, Coyote::BaseObject, Coyote_GenlockSettings>(ModObj, "GenlockSettings")
+	.def(py::init<>())
+	.def("__repr__", [] (Coyote::GenlockSettings &Obj)
+	{
+		return std::string{"<GenlockSettings, "} +
+						(Obj.Genlocked ? (std::string{"Genlocked at "} + Obj.FormatString.GetStdString()) : "Freerun") +
+						", Horz " + std::to_string(Obj.HorzValue) +
+						", Vert " + std::to_string(Obj.VertValue) + ">";
+	});
+	
 	py::class_<Coyote_Mirror>(ModObj, "Coyote_Mirror")
 	.def(py::init<>())
 	ACLASSBD(Coyote_Mirror, UnitID)
@@ -550,7 +578,14 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSBD(Coyote_Mirror, IsAlive);
 	
 	py::class_<Coyote::Mirror, Coyote::BaseObject, Coyote_Mirror>(ModObj, "Mirror")
-	.def(py::init<>());
+	.def(py::init<>())
+	.def("__repr__", [] (Coyote::Mirror &Obj)
+	{
+		return std::string{"<Mirror "} + Obj.UnitID.GetStdString() +
+							" at IP " + Obj.IP.GetStdString() +
+							", Busy: " + (Obj.Busy ? "True" : "False") +
+							", IsAlive: " + (Obj.IsAlive ? "True" : "False") + ">";
+	});
 	
 	py::class_<Coyote_MediaState>(ModObj, "Coyote_MediaState")
 	.def(py::init<>())
