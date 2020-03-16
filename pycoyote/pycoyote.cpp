@@ -99,6 +99,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_ASSETSTATE_READY)
 	EMEMDEF(COYOTE_ASSETSTATE_INGESTING)
 	EMEMDEF(COYOTE_ASSETSTATE_ERROR)
+	EMEMDEF(COYOTE_ASSETSTATE_PROCESSING)
 	EMEMDEF(COYOTE_ASSETSTATE_MAX)
 	.export_values();
 	
@@ -627,9 +628,11 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	py::class_<Coyote_Asset>(ModObj, "Coyote_Asset")
 	.def(py::init<>())
 	ACLASSBD(Coyote_Asset, FullPath)
-	ACLASSBD(Coyote_Asset, Status)
+	ACLASSBD(Coyote_Asset, Checksum)
+	ACLASSBD(Coyote_Asset, LastModified)
 	ACLASSBD(Coyote_Asset, TotalSize)
-	ACLASSBD(Coyote_Asset, CurrentSize);
+	ACLASSBD(Coyote_Asset, CurrentSize)
+	ACLASSBD(Coyote_Asset, Status);
 	
 	py::class_<Coyote_AssetMetadata>(ModObj, "Coyote_AssetMetadata")
 	.def(py::init<>())

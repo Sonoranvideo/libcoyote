@@ -82,9 +82,11 @@ struct Coyote_TimeCode
 struct Coyote_Asset
 {
 	COYOTESTRING FullPath; ///The part we care about most
-	COYOTEASSETSTATE Status;
+	COYOTESTRING Checksum;
+	int64_t LastModified;
 	int64_t TotalSize;
 	int64_t CurrentSize;
+	COYOTEASSETSTATE Status;
 };
 
 struct Coyote_AssetMetadata

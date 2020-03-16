@@ -111,9 +111,12 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 		Values = new std::map<std::string, msgpack::object>
 		{
 			{ "FullPath", msgpack::object{ AssetObj->FullPath.GetCString(), TempZone } },
-			{ "Status", msgpack::object{ (int)AssetObj->Status, TempZone } },
+			{ "Checksum", msgpack::object{ AssetObj->Checksum.GetCString(), TempZone } },
+			{ "LastModified", msgpack::object{ AssetObj->LastModified, TempZone } },
 			{ "TotalSize", msgpack::object{ (int64_t)AssetObj->TotalSize, TempZone } },
 			{ "CurrentSize", msgpack::object{ (int64_t)AssetObj->CurrentSize, TempZone } },
+			{ "Status", msgpack::object{ (int)AssetObj->Status, TempZone } },
+
 		};
 	}
 	else if 		(OurType == typeid(Coyote::AssetMetadata))
@@ -394,9 +397,12 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		Coyote::Asset *AssetObj = static_cast<Coyote::Asset*>(Result);
 		
 		AssetObj->FullPath = Fields["FullPath"].as<std::string>();
-		AssetObj->Status = (Coyote::AssetState)Fields["Status"].as<int>();
+		AssetObj->Checksum = Fields.count("Checksum") ? Fields["Checksum"].as<std::string>() : std::string{};
+		AssetObj->LastModified = Fields.count("LastModified") ? Fields["LastModified"].as<int64_t>() : 0l;
 		AssetObj->TotalSize = Fields["TotalSize"].as<int64_t>();
 		AssetObj->CurrentSize = Fields["CurrentSize"].as<int64_t>();
+		AssetObj->Status = (Coyote::AssetState)Fields["Status"].as<int>();
+
 	}
 	else if (Expected == typeid(Coyote::GenlockSettings))
 	{
