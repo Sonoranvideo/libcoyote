@@ -35,6 +35,8 @@ typedef enum CoyoteHDRMode COYOTEHDRMODE;
 typedef enum CoyoteEOTFMode COYOTEEOTFMODE;
 typedef enum CoyotePlaybackEventType COYOTEPLAYBACKEVENTTYPE;
 typedef enum CoyoteAssetState COYOTEASSETSTATE;
+typedef enum CoyoteStateEventType COYOTESTATEEVENTTYPE;
+
 #else
 #include "coyotestring.h"
 typedef Coyote::CoyoteString COYOTESTRING;
@@ -46,11 +48,13 @@ typedef Coyote::HDRMode COYOTEHDRMODE;
 typedef Coyote::EOTFMode COYOTEEOTFMODE;
 typedef enum Coyote::PlaybackEventType COYOTEPLAYBACKEVENTTYPE;
 typedef enum Coyote::AssetState COYOTEASSETSTATE;
+typedef enum Coyote::StateEventType COYOTESTATEEVENTTYPE;
 
 extern "C" {
 #endif
 
 typedef void (*PBEventCallback)(const COYOTEPLAYBACKEVENTTYPE EType, const int32_t PK, const int32_t Time, void *UserData);
+typedef void (*StateEventCallback)(const COYOTESTATEEVENTTYPE EventType, void *UserData);
 
 struct Coyote_PresetMark
 {

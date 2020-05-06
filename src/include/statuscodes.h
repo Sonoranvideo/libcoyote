@@ -190,6 +190,20 @@ namespace Coyote
 		COYOTE_ASSETSTATE_PROCESSING= 4,
 		COYOTE_ASSETSTATE_MAX
 	};
+	
+#ifdef __cplusplus
+	enum StateEventType
+#else
+	enum CoyoteStateEventType
+#endif //__cplusplus
+	{
+		COYOTE_STATE_INVALID 	= 0,
+		COYOTE_STATE_PRESETS 	= 1,
+		COYOTE_STATE_ASSETS 	= 2,
+		COYOTE_STATE_HWSTATE 	= 3,
+		COYOTE_STATE_TIMECODE 	= 4,
+		COYOTE_STATE_MAX
+	};
 
 #ifndef __cplusplus
 	typedef enum CoyoteResolutionMode CoyoteResolutionMode;

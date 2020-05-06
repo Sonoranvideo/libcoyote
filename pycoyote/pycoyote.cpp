@@ -35,6 +35,7 @@ namespace py = pybind11;
 
 #define EMEMDEF(a) .value(#a, Coyote::a)
 static void PBEventFunc(const Coyote::PlaybackEventType EType, const int32_t PK, const int32_t Time, void *const Pass_);
+static void StateEventFunc(const Coyote::StateEventType EType, void *const Pass_);
 	
 PYBIND11_MODULE(pycoyote, ModObj)
 {
@@ -136,6 +137,15 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_ROLE_PRIMARY)
 	EMEMDEF(COYOTE_ROLE_MIRROR)
 	EMEMDEF(COYOTE_ROLE_MAX)
+	.export_values();
+	
+	py::enum_<Coyote::StateEventType>(ModObj, "StateEventType")
+	EMEMDEF(COYOTE_STATE_INVALID) 
+	EMEMDEF(COYOTE_STATE_PRESETS)
+	EMEMDEF(COYOTE_STATE_ASSETS)
+	EMEMDEF(COYOTE_STATE_HWSTATE)
+	EMEMDEF(COYOTE_STATE_TIMECODE)
+	EMEMDEF(COYOTE_STATE_MAX)
 	.export_values();
 
 	
@@ -273,21 +283,52 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		return std::make_tuple(Status, Version);
 	})
 	.def("SetPlaybackEventCallback", 
-	[] (Coyote::Session &Obj, py::function Func, py::object PyUserData)
+	[] (Coyote::Session &Obj, py::object Func, py::object PyUserData)
 	{
-		static std::pair<py::function, py::object> Pass;
+		static std::map<Coyote::Session*, std::pair<py::object, py::object> > Pass;
+
+		if (Func.ptr() == Py_None)
+		{
+			Obj.SetPlaybackEventCallback(nullptr, nullptr);
+			return;
+		}
 		
 		Func.inc_ref();
 		Func.inc_ref();
 		PyUserData.inc_ref();
 		PyUserData.inc_ref();
 		
-		Pass =	{
-					std::move(Func),
-					std::move(PyUserData)
-				};
+
+		Pass[&Obj]	=	{
+							std::move(Func),
+							std::move(PyUserData)
+						};
 		
-		Obj.SetPlaybackEventCallback(PBEventFunc, &Pass);
+		Obj.SetPlaybackEventCallback(PBEventFunc, &Pass[&Obj]);
+	})
+	.def("SetStateEventCallback", 
+	[] (Coyote::Session &Obj, Coyote::StateEventType EType, py::object Func, py::object PyUserData)
+	{
+		static std::map<Coyote::Session*, std::pair<py::object, py::object> > Pass;
+
+		if (Func.ptr() == Py_None)
+		{
+			Pass.erase(&Obj);
+			Obj.SetStateEventCallback(EType, nullptr, nullptr);
+			return;
+		}
+		
+		Func.inc_ref();
+		Func.inc_ref();
+		PyUserData.inc_ref();
+		PyUserData.inc_ref();
+		
+		Pass[&Obj] =	{
+							std::move(Func),
+							std::move(PyUserData)
+						};
+		
+		Obj.SetStateEventCallback(EType, StateEventFunc, &Pass[&Obj]);
 	})
 	.def("GetDesignatedPrimary",
 	[] (Coyote::Session &Obj)
@@ -664,7 +705,7 @@ static void PBEventFunc(const Coyote::PlaybackEventType EType, const int32_t PK,
 {
 	py::gil_scoped_acquire GILLock;
 	
-	std::pair<py::function, py::object> *const Pass = (decltype(Pass))Pass_;
+	std::pair<py::object, py::object> *const Pass = (decltype(Pass))Pass_;
 
 	if (!Pass || !Pass->first || !PyCallable_Check(Pass->first.ptr()))
 	{
@@ -673,4 +714,19 @@ static void PBEventFunc(const Coyote::PlaybackEventType EType, const int32_t PK,
 	}
 	
 	Pass->first(EType, PK, Time, Pass->second);
+}
+
+static void StateEventFunc(const Coyote::StateEventType EType, void *const Pass_)
+{
+	py::gil_scoped_acquire GILLock;
+	
+	std::pair<py::object, py::object> *const Pass = (decltype(Pass))Pass_;
+
+	if (!Pass || !Pass->first || !PyCallable_Check(Pass->first.ptr()))
+	{
+		LDEBUG_MSG("No pass");
+		return;
+	}
+	
+	Pass->first(EType, Pass->second);
 }

@@ -1252,7 +1252,13 @@ void Coyote::Session::SetPlaybackEventCallback(const PBEventCallback CB, void *c
 	SESS.ASyncSess.SetPlaybackEventCallback(CB, UserData);
 }
 
-
+void Coyote::Session::SetStateEventCallback(const StateEventType EType, const StateEventCallback CB, void *const UserData)
+{
+	DEF_SESS;
+	
+	SESS.ASyncSess.SetStateEventCallback(EType, CB, UserData);
+}
+	
 Coyote::StatusCode Coyote::Session::ReadLog(const std::string &SpokeName, const int Year, const int Month, const int Day, std::string &LogOut)
 {
 	DEF_SESS;

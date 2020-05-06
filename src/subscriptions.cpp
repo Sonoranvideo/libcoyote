@@ -18,18 +18,33 @@
 #include "msgpackproc.h"
 #include <mutex>
 
-
+static const std::map<std::string, Coyote::StateEventType> CBMap
+{
+	{ "Presets", Coyote::COYOTE_STATE_PRESETS },
+	{ "TimeCode", Coyote::COYOTE_STATE_TIMECODE },
+	{ "AssetSync", Coyote::COYOTE_STATE_ASSETS },
+	{ "AssetPost", Coyote::COYOTE_STATE_ASSETS },
+	{ "AssetDelete", Coyote::COYOTE_STATE_ASSETS },
+	{ "HardwareState", Coyote::COYOTE_STATE_HWSTATE }
+};
+	
 bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::string, msgpack::object> &Values)
 {
 	if (!Values.count("SubscriptionEvent") || !Values.count("Data")) return false; //Not a subscription event
 
 	const std::string &EventName = Values.at("SubscriptionEvent").as<std::string>();
 	
+	bool RetVal = false;
+	
 	if 		(EventName == "TimeCode")
 	{
 		std::unique_ptr<Coyote::TimeCode> TC { static_cast<Coyote::TimeCode*>(MsgpackProc::UnpackCoyoteObject(Values.at("Data"), typeid(Coyote::TimeCode))) };
 		
-		if (!TC) return false;
+		if (!TC)
+		{
+			RetVal = true;
+			goto End;
+		}
 		
 		std::lock_guard<std::mutex> G { this->TimeCodesLock };
 		
@@ -40,7 +55,7 @@ bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::str
 			this->TimeCodes[0] = *TC;
 		}
 		
-		return true;
+		RetVal = true;
 	}
 	else if (EventName == "Presets")
 	{
@@ -59,7 +74,7 @@ bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::str
 			this->Presets.emplace(Item->PK, std::move(*Item));
 		}
 		
-		return true;
+		RetVal = true;
 	}
 	else if (EventName == "AssetSync")
 	{
@@ -79,7 +94,7 @@ bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::str
 			this->Assets.emplace(Item->FullPath.GetStdString(), std::move(*Item));
 		}
 		
-		return true;
+		RetVal = true;
 	}
 	else if (EventName == "AssetDelete")
 	{
@@ -96,7 +111,7 @@ bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::str
 			this->Assets.erase(FullPath);
 		}
 		
-		return true;
+		RetVal = true;
 	}
 	else if (EventName == "AssetPost")
 	{
@@ -108,9 +123,9 @@ bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::str
 		
 		this->Assets[Ptr->FullPath] = std::move(*Ptr);
 		
-		LDEBUG_MSG("Found asset " << FullPath << " to add/update.");
+		LDEBUG_MSG("Found asset " << Ptr->FullPath << " to add/update.");
 		
-		return true;
+		RetVal = true;
 	}
 	else if (EventName == "HardwareState")
 	{
@@ -120,7 +135,7 @@ bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::str
 		
 		this->HWState = std::move(*Ptr);
 		
-		return true;
+		RetVal = true;
 	}
 	else if (EventName == "PlaybackEvent")
 	{
@@ -137,10 +152,26 @@ bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::str
 			this->UserPBEventCallback(EType, PK, NewTime, this->UserPBEventData);
 		}
 		
-		return true;
+		RetVal = true;
+	}
+End:
+
+	if (CBMap.count(EventName))
+	{
+		const auto &Struct { this->StateCallbacks[CBMap.at(EventName) - 1] };
+		
+		if (Struct.CB != nullptr)
+		{
+			LDEBUG_MSG("Invoking callback for EType " << EventName);
+			Struct.CB(CBMap.at(EventName), Struct.UserData);
+		}
+	}
+	else
+	{
+		LDEBUG_MSG("Invalid EventName " << EventName);
 	}
 	
-	return false;
+	return RetVal;
 }
 
 Coyote::TimeCode *Subs::SubscriptionSession::GetTimeCode(const int32_t PK)
@@ -173,6 +204,19 @@ Coyote::HardwareState *Subs::SubscriptionSession::GetHardwareState(void)
 	return new Coyote::HardwareState { this->HWState }; //Call copy constructor
 }
 
+
+void Subs::SubscriptionSession::SetStateEventCallback(const Coyote::StateEventType EType, const StateEventCallback CB, void *const UserData)
+{
+	if (EType > Coyote::COYOTE_STATE_MAX || !EType)
+	{
+		LDEBUG_MSG("ERROR, state event type value " << (int)EType << " is greater than max value " << Coyote::COYOTE_STATE_MAX - 1);
+		return;
+	}
+	
+	LDEBUG_MSG("Setting state event callback for EType " << EType);
+	
+	this->StateCallbacks[EType - 1] = { CB, UserData };
+}
 
 void Subs::SubscriptionSession::SetPlaybackEventCallback(const PBEventCallback CB, void *const UserData)
 {

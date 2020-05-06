@@ -35,6 +35,10 @@ namespace AsyncMsgs
 		
 		AsynchronousSession(void) {}
 		
+		inline void SetStateEventCallback(const Coyote::StateEventType EType, const StateEventCallback CB, void *const UserData)
+		{
+			SubSession.SetStateEventCallback(EType, CB, UserData);
+		}
 		inline void SetPlaybackEventCallback(const PBEventCallback CB, void *const UserData)
 		{
 			SubSession.SetPlaybackEventCallback(CB, UserData);

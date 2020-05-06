@@ -26,6 +26,12 @@
 
 namespace Subs
 {
+	struct StateEventCBSettings
+	{
+		StateEventCallback CB;
+		void *UserData;
+	};
+	
 	class SubscriptionSession
 	{
 	private:
@@ -39,6 +45,9 @@ namespace Subs
 		Coyote::HardwareState HWState;
 		PBEventCallback UserPBEventCallback;
 		void *UserPBEventData;
+		
+		StateEventCBSettings StateCallbacks[Coyote::COYOTE_STATE_MAX - 1];
+		
 	public:
 		bool ProcessSubscriptionEvent(const std::map<std::string, msgpack::object> &Values);
 		Coyote::TimeCode *GetTimeCode(const int32_t PK = 0);
@@ -46,8 +55,9 @@ namespace Subs
 		std::map<std::string, Coyote::Asset> *GetAssets(void);
 		Coyote::HardwareState *GetHardwareState(void);
 		void SetPlaybackEventCallback(const PBEventCallback, void *const UserData = nullptr);
+		void SetStateEventCallback(const Coyote::StateEventType EType, const StateEventCallback CB, void *const UserData);
 		
-		SubscriptionSession() : HWState(), UserPBEventCallback(), UserPBEventData() { }
+		SubscriptionSession() : HWState(), UserPBEventCallback(), UserPBEventData(), StateCallbacks() { }
 	};
 }
 #endif //__LIBCOYOTE_SUBSCRIPTIONS_H__

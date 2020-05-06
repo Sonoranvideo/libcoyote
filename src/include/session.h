@@ -117,7 +117,11 @@ namespace Coyote
 		void SetCommandTimeoutSecs(const time_t TimeoutSecs = DefaultCommandTimeoutSecs);
 		time_t GetCommandTimeoutSecs(void) const;
 		bool HasConnectionError(void) const;
-		void SetPlaybackEventCallback(const PBEventCallback CB, void *const UserData = nullptr); //WARNING: The callback will execute in a different thread than the thread calling this method!
+		
+		///WARNING: All callbacks will execute in a different thread than the thread calling the setter method!
+		
+		void SetPlaybackEventCallback(const PBEventCallback CB, void *const UserData = nullptr); 
+		void SetStateEventCallback(const StateEventType EType, const StateEventCallback CB, void *const UserData = nullptr);
 		
 		StatusCode _SVS_WriteCytLog_(const std::string &Param1, const std::string &Param2); //Users: DO NOT use this method.
 		
