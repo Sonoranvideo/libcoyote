@@ -285,7 +285,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	.def("SetPlaybackEventCallback", 
 	[] (Coyote::Session &Obj, py::object Func, py::object PyUserData)
 	{
-		static std::map<Coyote::Session*, std::pair<py::object, py::object> > Pass;
+		static auto &Pass = *new std::map<Coyote::Session*, std::pair<py::object, py::object> >; //Prevents the destructor from being called on program exit, because we don't care and it could segfault.
 
 		if (Func.ptr() == Py_None)
 		{
@@ -293,12 +293,6 @@ PYBIND11_MODULE(pycoyote, ModObj)
 			return;
 		}
 		
-		Func.inc_ref();
-		Func.inc_ref();
-		PyUserData.inc_ref();
-		PyUserData.inc_ref();
-		
-
 		Pass[&Obj]	=	{
 							std::move(Func),
 							std::move(PyUserData)
@@ -309,7 +303,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	.def("SetStateEventCallback", 
 	[] (Coyote::Session &Obj, Coyote::StateEventType EType, py::object Func, py::object PyUserData)
 	{
-		static std::map<Coyote::Session*, std::pair<py::object, py::object> > Pass;
+		static auto &Pass = *new std::map<Coyote::Session*, std::pair<py::object, py::object> >;
 
 		if (Func.ptr() == Py_None)
 		{
@@ -317,12 +311,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 			Obj.SetStateEventCallback(EType, nullptr, nullptr);
 			return;
 		}
-		
-		Func.inc_ref();
-		Func.inc_ref();
-		PyUserData.inc_ref();
-		PyUserData.inc_ref();
-		
+
 		Pass[&Obj] =	{
 							std::move(Func),
 							std::move(PyUserData)
