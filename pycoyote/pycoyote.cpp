@@ -210,7 +210,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	
 	
 	py::class_<Coyote::Session>(ModObj, "Session")
-	.def(py::init<const std::string &>())
+	.def(py::init<const std::string &>(), py::call_guard<py::gil_scoped_release>())
 	.def("SynchronizerBusy",
 	[] (Coyote::Session &Obj)
 	{
@@ -281,7 +281,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		const Coyote::StatusCode Status = Obj.GetServerVersion(Version);
 		
 		return std::make_tuple(Status, Version);
-	})
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("SetPlaybackEventCallback", 
 	[] (Coyote::Session &Obj, py::object Func, py::object PyUserData)
 	{

@@ -28,7 +28,7 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=10
+current_page=12
 FILE_NAME_0=2672;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fdatastructures.h;0;4
 FILE_NAME_1=646;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Flibcoyote.h;0;4
 FILE_NAME_2=863;C;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fstatuscodes.h;0;4
@@ -36,12 +36,12 @@ FILE_NAME_3=3271;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2
 FILE_NAME_4=2036;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fdatastructures_c.h;0;4
 FILE_NAME_5=541;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2FCMakeLists.txt;0;4
 FILE_NAME_6=18548;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fmsgpackproc.cpp;0;4
-FILE_NAME_7=8428;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fnative_ws.cpp;0;4
+FILE_NAME_7=10181;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fnative_ws.cpp;0;4
 FILE_NAME_8=1748;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fasynctosync.cpp;0;4
 FILE_NAME_9=1002;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fasyncmsgs.cpp;0;4
-FILE_NAME_10=840;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fpycoyote%2FCMakeLists.txt;0;4
+FILE_NAME_10=712;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fpycoyote%2FCMakeLists.txt;0;4
 FILE_NAME_11=863;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fcoyotestring.h;0;4
-FILE_NAME_12=21039;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fpycoyote%2Fpycoyote.cpp;0;4
+FILE_NAME_12=12644;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fpycoyote%2Fpycoyote.cpp;0;4
 FILE_NAME_13=1108;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fsubscriptions.h;0;4
 FILE_NAME_14=1178;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fnative_ws.h;0;4
 FILE_NAME_15=994;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fmtevent.h;0;4
