@@ -210,7 +210,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	
 	
 	py::class_<Coyote::Session>(ModObj, "Session")
-	.def(py::init<const std::string &>(), py::call_guard<py::gil_scoped_release>())
+	.def(py::init<const std::string &, const int>(), py::call_guard<py::gil_scoped_release>(), py::arg("IP"), py::arg("NumAttempts") = -1)
 	.def("SynchronizerBusy",
 	[] (Coyote::Session &Obj)
 	{

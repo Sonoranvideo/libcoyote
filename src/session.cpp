@@ -76,6 +76,7 @@ struct InternalSession
 	WS::WSConnection *Connection;
 	std::string Host;
 	time_t TimeoutSecs;
+	int NumAttempts;
 	
 	const std::map<std::string, msgpack::object> PerformSyncedCommand(const std::string &CommandName, msgpack::zone &TempZone, Coyote::StatusCode *StatusOut = nullptr, const msgpack::object *Values = nullptr);
 	Coyote::StatusCode CreatePreset_Multi(const Coyote::Preset &Ref, const std::string &Cmd);
@@ -94,6 +95,8 @@ struct InternalSession
 		
 		this->SyncSess.DestroyAllTickets();
 
+		if (!this->Connection) return false;
+		
 		msgpack::zone TempZone;
 		
 		this->PerformSyncedCommand("SubscribeTC", TempZone);
@@ -105,12 +108,18 @@ struct InternalSession
 		return true;
 	}
 	
-	inline InternalSession(const std::string &Host = "")
+	inline InternalSession(const std::string &Host = "", const int NumAttempts = -1)
 		: Connection(),
 		Host(Host),
-		TimeoutSecs(Coyote::Session::DefaultCommandTimeoutSecs) //10 second default operation timeout
+		TimeoutSecs(Coyote::Session::DefaultCommandTimeoutSecs), //10 second default operation timeout
+		NumAttempts(NumAttempts)
 	{
-		this->ConfigConnection();
+		for (int TryCount = 0; this->NumAttempts == -1 || TryCount < this->NumAttempts; ++TryCount)
+		{
+			std::cout << "libcoyote: Attempting to connect new session, attempt " << TryCount + 1 << " of " << (this->NumAttempts == -1 ? "infinite" : std::to_string(this->NumAttempts)) << std::endl;
+			
+			if (this->ConfigConnection()) break;
+		}
 	}
 	inline ~InternalSession(void)
 	{
@@ -181,15 +190,24 @@ const std::map<std::string, msgpack::object> InternalSession::PerformSyncedComma
 	//Pack our values into a msgpack buffer
 	MsgpackProc::InitOutgoingMsg(Pack, CommandName, MsgID, Values);
 	
-	if (this->Connection->HasError())
+	if (!this->Connection || this->Connection->HasError())
 	{
 		//Try to reconnect
-		this->ConfigConnection();
+		for (int TryCount = 0; (this->NumAttempts == -1 || TryCount < this->NumAttempts); ++TryCount)
+		{
+			std::cout << "libcoyote: Attempting to reconnect, attempt " << TryCount + 1 << " of " << (this->NumAttempts == -1 ? "infinite" : std::to_string(this->NumAttempts)) << std::endl;
+
+			if (this->ConfigConnection())
+			{
+				return PerformSyncedCommand(CommandName, TempZone, StatusOut, Values);
+			}
+		}
 		
-		return PerformSyncedCommand(CommandName, TempZone, StatusOut, Values);
+		if (StatusOut) *StatusOut = Coyote::COYOTE_STATUS_NETWORKERROR;
+		
+		return {};
 	}
 	
-
 	//Create the ticket BEFORE we send it.
 	AsyncToSync::MessageTicket *Ticket = this->SyncSess.NewTicket(MsgID);
 
@@ -218,7 +236,7 @@ const std::map<std::string, msgpack::object> InternalSession::PerformSyncedComma
 	return Results;
 }
 
-Coyote::Session::Session(const std::string &Host) : Internal(new InternalSession{Host})
+Coyote::Session::Session(const std::string &Host, const int NumAttempts) : Internal(new InternalSession{Host, NumAttempts})
 {
 	InternalSession &Sess = *static_cast<InternalSession*>(this->Internal);
 	

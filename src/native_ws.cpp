@@ -161,13 +161,13 @@ void WS::WSCore::ProcessNewConnections(void)
 		const ConnStruct *Struct = Event->Peek();
 		
 		WSConnection *Conn = new WSConnection(this->RecvCallback, Struct->UserData);
-		Conn->EstablishConnection(Struct->URI);
+		const bool Connected = Conn->EstablishConnection(Struct->URI);
 		
 		std::unique_lock<std::mutex> G { this->ConnectionsLock };
 		
 		this->Connections.push_back(Conn);
 
-		Event->Post(ConnStruct { Struct->URI, Struct->UserData, Conn });
+		Event->Post(ConnStruct { Struct->URI, Struct->UserData, Connected ? Conn : nullptr });
 		
 		this->ConnectionQueue.pop();
 	}

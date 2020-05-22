@@ -36,7 +36,7 @@ namespace Coyote
 	public:
 		static constexpr size_t DefaultCommandTimeoutSecs = 10;
 		
-		Session(const std::string &Host);
+		Session(const std::string &Host, const int NumAttempts = -1);
 		Session(Session &&In);
 		Session &operator=(Session &&In);
 		
