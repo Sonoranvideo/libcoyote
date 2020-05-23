@@ -436,6 +436,9 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		
 		return std::make_tuple(Status, Cfg);
 	}, py::call_guard<py::gil_scoped_release>())
+	.def("Reconnect", &Coyote::Session::Reconnect, py::call_guard<py::gil_scoped_release>(),
+		py::arg("Host") = std::string{})
+	ACLASSF(Session, Connected)
 	ACLASSF(Session, SetHorzGenlock)
 	ACLASSF(Session, SetVertGenlock)
 	ACLASSF(Session, Take)

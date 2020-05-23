@@ -27,6 +27,7 @@
 #include <mutex>
 
 #define DEF_SESS InternalSession &SESS = *static_cast<InternalSession*>(this->Internal)
+#define DEF_CONST_SESS const InternalSession &SESS = *static_cast<const InternalSession*>(this->Internal)
 #define MAPARG(x) { #x, msgpack::object{ x, TempZone } }
 
 extern EXPFUNC const std::map<Coyote::RefreshMode, std::string> RefreshMap
@@ -913,6 +914,33 @@ Coyote::StatusCode Coyote::Session::GetHardwareState(Coyote::HardwareState &Out)
 	Out = std::move(*Ptr);
 	
 	return Coyote::COYOTE_STATUS_OK;
+}
+
+
+bool Coyote::Session::Connected(void) const
+{
+	DEF_CONST_SESS;
+	
+	return SESS.Connection && !this->HasConnectionError();
+}
+
+bool Coyote::Session::Reconnect(const std::string &Host)
+{
+	DEF_SESS;
+
+	if (!Host.empty())
+	{
+		SESS.Host = Host;
+	}
+	
+	for (int TryCount = 0; (SESS.NumAttempts == -1 || TryCount < SESS.NumAttempts); ++TryCount)
+	{
+		std::cout << "libcoyote: Manually attempting to reconnect, attempt " << TryCount + 1 << " of " << (SESS.NumAttempts == -1 ? "infinite" : std::to_string(SESS.NumAttempts)) << std::endl;
+
+		if (SESS.ConfigConnection()) return true;
+	}
+	
+	return false;
 }
 
 Coyote::StatusCode Coyote::Session::GetIP(const int32_t AdapterID, Coyote::NetworkInfo &Out)

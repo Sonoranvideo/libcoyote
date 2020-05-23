@@ -118,6 +118,9 @@ namespace Coyote
 		time_t GetCommandTimeoutSecs(void) const;
 		bool HasConnectionError(void) const;
 		
+		bool Connected(void) const;
+		bool Reconnect(const std::string &Host = {});
+		
 		///WARNING: All callbacks will execute in a different thread than the thread calling the setter method!
 		
 		void SetPlaybackEventCallback(const PBEventCallback CB, void *const UserData = nullptr); 
