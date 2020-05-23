@@ -943,6 +943,13 @@ bool Coyote::Session::Reconnect(const std::string &Host)
 	return false;
 }
 
+std::string Coyote::Session::GetHost(void) const
+{
+	DEF_CONST_SESS;
+	
+	return SESS.Host;
+}
+
 Coyote::StatusCode Coyote::Session::GetIP(const int32_t AdapterID, Coyote::NetworkInfo &Out)
 {
 	DEF_SESS;

@@ -120,7 +120,8 @@ namespace Coyote
 		
 		bool Connected(void) const;
 		bool Reconnect(const std::string &Host = {});
-		
+		std::string GetHost(void) const;
+			
 		///WARNING: All callbacks will execute in a different thread than the thread calling the setter method!
 		
 		void SetPlaybackEventCallback(const PBEventCallback CB, void *const UserData = nullptr); 
