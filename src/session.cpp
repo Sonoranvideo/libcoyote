@@ -751,7 +751,7 @@ Coyote::StatusCode Coyote::Session::RestartSpoke(const std::string &SpokeName)
 	return Status;
 }
 
-Coyote::StatusCode Coyote::Session::GetDisks(std::vector<std::string> &Out)
+Coyote::StatusCode Coyote::Session::GetDisks(std::vector<Coyote::Drive> &Out)
 {
 	DEF_SESS;
 
@@ -776,10 +776,11 @@ Coyote::StatusCode Coyote::Session::GetDisks(std::vector<std::string> &Out)
 
 	for (msgpack::object &Item : Disks)
 	{
-		std::map<std::string, std::string> Map;
-		Item.convert(Map);
+		std::unique_ptr<Coyote::Drive> Obj { static_cast<Coyote::Drive*>(MsgpackProc::UnpackCoyoteObject(Item, typeid(Coyote::Drive))) };
+	
+		assert(Obj.get() != nullptr);
 		
-		Out.push_back(Map.at("DriveLetter"));
+		Out.push_back(std::move(*Obj));
 	}
 	
 	return Status;

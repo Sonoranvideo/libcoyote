@@ -352,7 +352,7 @@ EXPFUNC Coyote::StatusCode Coyote_GetDisks(Coyote::Session *Sess, const char **O
 {
 	assert(Sess != nullptr);
 
-	std::vector<std::string> Disks;
+	std::vector<Coyote::Drive> Disks;
 	
 	const Coyote::StatusCode Status = Sess->GetDisks(Disks);
 	
@@ -361,9 +361,9 @@ EXPFUNC Coyote::StatusCode Coyote_GetDisks(Coyote::Session *Sess, const char **O
 	std::string TempString;
 	TempString.reserve(Disks.size() * 2);
 	
-	for (const std::string &String : Disks)
+	for (const Coyote::Drive &Obj : Disks)
 	{
-		TempString += String + ',';
+		TempString += Obj.DriveLetter + ',';
 	}
 	
 	TempString.pop_back(); //Delete trailing comma.

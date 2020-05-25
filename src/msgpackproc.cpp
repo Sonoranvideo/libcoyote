@@ -119,6 +119,19 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 
 		};
 	}
+	else if 		(OurType == typeid(Coyote::Drive))
+	{
+		const Coyote::Drive *DataObj = static_cast<const Coyote::Drive*>(Object);
+		
+		Values = new std::map<std::string, msgpack::object>
+		{
+			{ "DriveLetter", msgpack::object{ DataObj->DriveLetter.GetCString(), TempZone } },
+			{ "Total", msgpack::object{ DataObj->Total, TempZone } },
+			{ "Used", msgpack::object{ DataObj->Used, TempZone } },
+			{ "Free", msgpack::object{ DataObj->Free, TempZone } },
+			{ "IsExternal", msgpack::object{ DataObj->IsExternal, TempZone } },
+		};
+	}
 	else if 		(OurType == typeid(Coyote::AssetMetadata))
 	{
 		const Coyote::AssetMetadata *DataObj = static_cast<const Coyote::AssetMetadata*>(Object);
@@ -403,6 +416,24 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		AssetObj->CurrentSize = Fields["CurrentSize"].as<int64_t>();
 		AssetObj->Status = (Coyote::AssetState)Fields["Status"].as<int>();
 
+	}
+	else if (Expected == typeid(Coyote::Drive))
+	{
+		LDEBUG_MSG("Debugging Drive");
+		
+		Result = new Coyote::Drive{};
+		
+		Coyote::Drive *DriveObj = static_cast<Coyote::Drive*>(Result);
+		
+		DriveObj->DriveLetter = Fields["DriveLetter"].as<std::string>();
+		
+		if (Fields.count("Total"))
+		{
+			DriveObj->Total = Fields["Total"].as<int64_t>();
+			DriveObj->Used = Fields["Used"].as<int64_t>();
+			DriveObj->Free = Fields["Free"].as<int64_t>();
+			DriveObj->IsExternal = Fields["IsExternal"].as<int>();
+		}
 	}
 	else if (Expected == typeid(Coyote::GenlockSettings))
 	{

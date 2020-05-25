@@ -62,7 +62,8 @@ namespace Coyote
 		StatusCode UpdatePreset(const Preset &Ref);
 		StatusCode ReadAssetMetadata(const std::string &FullPath, AssetMetadata &Out);
 		StatusCode BeginUpdate(void);
-		StatusCode GetDisks(std::vector<std::string> &Out);
+		StatusCode GetDisks(std::vector<Drive> &Out);
+		inline StatusCode GetDrives(std::vector<Drive> &Out) { return this->GetDisks(Out); }
 		StatusCode EjectDisk(const std::string &DriveLetter);
 		StatusCode GetUnitID(std::string &UnitIDOut, std::string &NicknameOut);
 		StatusCode GetHardwareState(HardwareState &Out);

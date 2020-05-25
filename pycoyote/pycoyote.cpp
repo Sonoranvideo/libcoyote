@@ -193,6 +193,18 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	py::class_<Coyote::NetworkInfo, Coyote::BaseObject, Coyote_NetworkInfo>(ModObj, "NetworkInfo")
 	.def("__repr__", [] (Coyote::NetworkInfo &Obj) { return std::string{"<NetworkInfo, IP "} + Obj.IP.GetStdString() + ", subnet " + Obj.Subnet.GetStdString() + ">"; })
 	.def(py::init<>());
+
+	py::class_<Coyote_Drive>(ModObj, "Coyote_Drive")
+	.def(py::init<>())
+	ACLASSBD(Coyote_Drive, DriveLetter)
+	ACLASSBD(Coyote_Drive, Total)
+	ACLASSBD(Coyote_Drive, Used)
+	ACLASSBD(Coyote_Drive, Free)
+	ACLASSBD(Coyote_Drive, IsExternal);
+	
+	py::class_<Coyote::Drive, Coyote::BaseObject, Coyote_Drive>(ModObj, "Drive")
+	.def("__repr__", [] (Coyote::Drive &Obj) { return std::string{"<Drive "} + Obj.DriveLetter.GetStdString() + ":\\, " + std::to_string(Obj.Free / (1024ll * 1024ll * 1024ll)) + "/" + std::to_string(Obj.Total / (1024ll * 1024ll * 1024ll)) + " GiB free>"; })
+	.def(py::init<>());
 	
 	py::class_<Coyote_HardwareState>(ModObj, "Coyote_HardwareState")
 	.def(py::init<>())
@@ -394,7 +406,16 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	.def("GetDisks",
 	[] (Coyote::Session &Obj)
 	{
-		std::vector<std::string> Disks;
+		std::vector<Coyote::Drive> Disks;
+		
+		const Coyote::StatusCode Status = Obj.GetDisks(Disks);
+		
+		return std::make_tuple(Status, Disks);
+	}, py::call_guard<py::gil_scoped_release>())
+	.def("GetDrives", //Alias for GetDisks
+	[] (Coyote::Session &Obj)
+	{
+		std::vector<Coyote::Drive> Disks;
 		
 		const Coyote::StatusCode Status = Obj.GetDisks(Disks);
 		
@@ -629,6 +650,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSBD(Coyote_Mirror, Busy)
 	ACLASSBD(Coyote_Mirror, SupportsS12G)
 	ACLASSBD(Coyote_Mirror, IsAlive);
+	
 	
 	py::class_<Coyote::Mirror, Coyote::BaseObject, Coyote_Mirror>(ModObj, "Mirror")
 	.def(py::init<>())

@@ -82,6 +82,11 @@ namespace Coyote
 		}
 	};
 	
+	struct Drive : public BaseObject, public Coyote_Drive
+	{
+		Drive(void) : BaseObject(), Coyote_Drive() {}
+	};
+	
 	struct HardwareState : public BaseObject, public Coyote_HardwareState
 	{
 		HardwareState(void) : Coyote_HardwareState() { }

@@ -83,6 +83,13 @@ struct Coyote_TimeCode
 	bool Selected;
 };
 
+struct Coyote_Drive
+{
+	COYOTESTRING DriveLetter;
+	int64_t Total, Used, Free;
+	bool IsExternal;
+};
+
 struct Coyote_Asset
 {
 	COYOTESTRING FullPath; ///The part we care about most
