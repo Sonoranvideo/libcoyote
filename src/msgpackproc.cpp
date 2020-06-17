@@ -201,6 +201,17 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			
 		};
 	}
+	else if (OurType == typeid(Coyote::TabOrdering))
+	{
+		const Coyote::TabOrdering *TabObj = static_cast<const Coyote::TabOrdering*>(Object);
+		
+		Values = new std::map<std::string, msgpack::object>
+		{
+			{ "TabID", msgpack::object { TabObj->TabID, TempZone } },
+			{ "Index", msgpack::object { TabObj->Index, TempZone } },
+			
+		};
+	}
 	else if (OurType == typeid(Coyote::MediaState))
 	{
 		const Coyote::MediaState *MediaStateObj = static_cast<const Coyote::MediaState*>(Object);
@@ -306,6 +317,14 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			GotoArray.emplace_back(PackCoyoteObject(&Mark, TempZone));
 		}
 		
+		std::vector<msgpack::object> TabOrderingArray;
+		TabOrderingArray.reserve(PresetObj->TabDisplayOrder.size());
+		
+		for (auto &Pair : PresetObj->TabDisplayOrder)
+		{
+			TabOrderingArray.emplace_back(PackCoyoteObject(&Pair.second, TempZone));
+		}
+		
 		
 		Values = new std::map<std::string, msgpack::object>
 		{
@@ -341,6 +360,7 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 			{ "tcColor", msgpack::object{ PresetObj->tcColor.GetCString(), TempZone } },
 			{ "gotoMarks", STLArrayToMsgpackArray(GotoArray, TempZone) },
 			{ "countDowns", STLArrayToMsgpackArray(CountdownArray, TempZone) },
+			{ "TabDisplayOrder", STLArrayToMsgpackArray(TabOrderingArray, TempZone) },
 		};
 	}
 
@@ -492,6 +512,15 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		TCObj->Player4LeftVolume = Fields["Player4LeftVolume"].as<int32_t>();
 		TCObj->Player4RightVolume = Fields["Player4RightVolume"].as<int32_t>();
 	}
+	else if (Expected == typeid(Coyote::TabOrdering))
+	{
+		LDEBUG_MSG("Debugging TabOrdering");
+		Result = new Coyote::TabOrdering{};
+		Coyote::TabOrdering *TabObj = static_cast<Coyote::TabOrdering*>(Result);
+		
+		TabObj->TabID = Fields["TabID"].as<int32_t>();
+		TabObj->Index = Fields["Index"].as<int32_t>();
+	}
 	else if (Expected == typeid(Coyote::PresetMark))
 	{
 		LDEBUG_MSG("Debugging PresetMark");
@@ -544,10 +573,15 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		
 		std::vector<msgpack::object> Gotos;
 		std::vector<msgpack::object> Countdowns;
+		std::vector<msgpack::object> TabOrderings;
 		
 		Fields["gotoMarks"].convert(Gotos);
 		Fields["countDowns"].convert(Countdowns);
 		
+		if (Fields.count("TabDisplayOrder"))
+		{ //Might not be here.
+			Fields["TabDisplayOrder"].convert(TabOrderings);
+		}		
 		
 		PresetObj->gotoMarks.reserve(Gotos.size());
 		PresetObj->countDowns.reserve(Countdowns.size());
@@ -569,6 +603,14 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 			PresetObj->countDowns.emplace_back(std::move(*static_cast<Coyote::PresetMark*>(Temp.get())));
 		}
 		
+		LDEBUG_MSG("Decoding tab orderings");
+		
+		for (msgpack::object &Obj : TabOrderings)
+		{
+			const std::unique_ptr<Coyote::TabOrdering> Temp { static_cast<Coyote::TabOrdering*>(UnpackCoyoteObject(Obj, typeid(Coyote::TabOrdering))) };
+	
+			PresetObj->TabDisplayOrder.emplace(Temp->TabID, *Temp);
+		}
 	}
 	else if (Expected == typeid(Coyote::HardwareState))
 	{

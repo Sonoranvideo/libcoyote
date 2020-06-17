@@ -116,6 +116,12 @@ struct Coyote_AssetMetadata
 	bool SupportedAudioCodec;
 };
 
+struct Coyote_TabOrdering
+{
+	int32_t TabID;
+	int32_t Index;
+};
+
 struct Coyote_Output
 {
 	COYOTESTRING Filename;

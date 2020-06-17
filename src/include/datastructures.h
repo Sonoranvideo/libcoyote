@@ -58,6 +58,11 @@ namespace Coyote
 		AssetMetadata(void) : BaseObject(), Coyote_AssetMetadata() {}
 	};
 	
+	struct TabOrdering : public BaseObject, public Coyote_TabOrdering
+	{
+		TabOrdering(void) : BaseObject(), Coyote_TabOrdering() {}
+	};
+	
 	struct Output : public BaseObject, public Coyote_Output
 	{
 		Output(void) : BaseObject(), Coyote_Output() {}
@@ -71,6 +76,7 @@ namespace Coyote
 		Output Output4;
 		std::vector<PresetMark> gotoMarks;
 		std::vector<PresetMark> countDowns;
+		std::unordered_map<int32_t, TabOrdering> TabDisplayOrder;
 		
 		inline operator int32_t(void) const { return this->PK; }
 		inline Preset(void) : BaseObject(), Coyote_Preset()

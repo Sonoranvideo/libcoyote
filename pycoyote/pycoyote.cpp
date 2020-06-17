@@ -582,16 +582,14 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSBD(Coyote_Preset, DisplayOrderIndex)
 	ACLASSBD(Coyote_Preset, Dissolve);
 
-	
-	py::class_<Coyote::Preset, Coyote::BaseObject, Coyote_Preset>(ModObj, "Preset")
+	py::class_<Coyote_TabOrdering>(ModObj, "Coyote_TabOrdering")
 	.def(py::init<>())
-	.def("__repr__", [] (Coyote::Preset &Obj) { return std::string{"<Preset \""} + Obj.Name.GetStdString() + "\", PK " + std::to_string(Obj.PK) + ", TRT " + std::to_string(Obj.TRT) + ">"; })
-	ACLASSD(Preset, Output1)
-	ACLASSD(Preset, Output2)
-	ACLASSD(Preset, Output3)
-	ACLASSD(Preset, Output4)
-	ACLASSD(Preset, gotoMarks)
-	ACLASSD(Preset, countDowns);
+	ACLASSBD(Coyote_TabOrdering, TabID)
+	ACLASSBD(Coyote_TabOrdering, Index);
+
+	py::class_<Coyote::TabOrdering, Coyote::BaseObject, Coyote_TabOrdering>(ModObj, "TabOrdering")
+	.def(py::init<>())
+	.def("__repr__", [] (Coyote::TabOrdering &Obj) { return std::string{"<TabOrdering for tab ID "} + std::to_string(Obj.TabID) + " with index " + std::to_string(Obj.Index) + ">"; });
 	
 	py::class_<Coyote_PresetMark>(ModObj, "Coyote_PresetMark")
 	.def(py::init<>())
@@ -603,6 +601,18 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	py::class_<Coyote::PresetMark, Coyote::BaseObject, Coyote_PresetMark>(ModObj, "PresetMark")
 	.def(py::init<>())
 	.def("__repr__", [] (Coyote::PresetMark &Obj) { return std::string{"<PresetMark \""} + Obj.MarkName.GetStdString() + "\", time " + std::to_string(Obj.MarkTime) + ">"; });
+	
+	
+	py::class_<Coyote::Preset, Coyote::BaseObject, Coyote_Preset>(ModObj, "Preset")
+	.def(py::init<>())
+	.def("__repr__", [] (Coyote::Preset &Obj) { return std::string{"<Preset \""} + Obj.Name.GetStdString() + "\", PK " + std::to_string(Obj.PK) + ", TRT " + std::to_string(Obj.TRT) + ">"; })
+	ACLASSD(Preset, Output1)
+	ACLASSD(Preset, Output2)
+	ACLASSD(Preset, Output3)
+	ACLASSD(Preset, Output4)
+	ACLASSD(Preset, gotoMarks)
+	ACLASSD(Preset, countDowns)
+	ACLASSD(Preset, TabDisplayOrder);
 	
 	py::class_<Coyote_TimeCode>(ModObj, "Coyote_TimeCode")
 	.def(py::init<>())
