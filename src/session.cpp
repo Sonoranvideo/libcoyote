@@ -815,6 +815,21 @@ Coyote::StatusCode Coyote::Session::ReorderPresets(const int32_t PK1, const int3
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::MovePreset(const int32_t PK, const int32_t TabID, const uint32_t NewIndex)
+{
+
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	Coyote::StatusCode Status{};
+	const std::map<std::string, msgpack::object> Values { MAPARG(PK), MAPARG(TabID), MAPARG(NewIndex) };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+
+	SESS.PerformSyncedCommand("MovePreset", TempZone, &Status, &Pass);
+	
+	return Status;
+}
+
 Coyote::StatusCode Coyote::Session::DeletePreset(const int32_t PK)
 {
 	DEF_SESS;

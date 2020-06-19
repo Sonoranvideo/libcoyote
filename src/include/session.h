@@ -76,6 +76,7 @@ namespace Coyote
 									const bool ConstLumin = false);
 		StatusCode SelectPreset(const int32_t PK);
 		StatusCode GetMediaState(MediaState &Out);
+		StatusCode MovePreset(const int32_t PK, const int32_t TabID, const uint32_t NewIndex);
 		StatusCode GetServerVersion(std::string &Out);
 		StatusCode DetectUpdate(bool &ValueOut, std::string *NewVersionOut = nullptr);
 		StatusCode IsMirror(bool &ValueOut);
