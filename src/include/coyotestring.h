@@ -77,6 +77,16 @@ namespace Coyote
 			Ref.Buffer = nullptr;
 			return *this;
 		}
+		
+		inline bool operator==(const CoyoteString &Other) const
+		{
+			return !strcmp(this->Buffer, Other.Buffer);
+		}
+		
+		inline bool operator!=(const CoyoteString &Other) const
+		{
+			return !this->operator==(Other);
+		}
 	};
 }
 
