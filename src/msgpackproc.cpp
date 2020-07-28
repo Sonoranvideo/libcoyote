@@ -398,6 +398,7 @@ Coyote::BaseObject *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Objec
 		OutputObj->MediaId = Fields["MediaId"].as<int32_t>();
 		OutputObj->FadeOut = Fields["FadeOut"].as<double>();
 		OutputObj->Delay = Fields["Delay"].as<double>();
+		OutputObj->Audio = Fields["Audio"].as<int>();
 		OutputObj->Active = Fields["Active"].as<int>();
 		OutputObj->EnableTimeCode = Fields["EnableTimeCode"].as<int>();
 		OutputObj->JustifyTop = Fields["JustifyTop"].as<int>();
