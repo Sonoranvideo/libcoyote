@@ -314,7 +314,7 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::BaseObject *Object, 
 		
 		for (const Coyote::PresetMark &Mark : PresetObj->countDowns)
 		{
-			GotoArray.emplace_back(PackCoyoteObject(&Mark, TempZone));
+			CountdownArray.emplace_back(PackCoyoteObject(&Mark, TempZone));
 		}
 		
 		std::vector<msgpack::object> TabOrderingArray;
