@@ -1012,7 +1012,7 @@ Coyote::StatusCode Coyote::Session::SetIP(const Coyote::NetworkInfo &Input)
 	DEF_SESS;
 
 	msgpack::zone TempZone;	
-	const std::map<std::string, msgpack::object> Values { { "AdapterID", msgpack::object{Input.AdapterID} }, { "Subnet", msgpack::object{Input.Subnet.GetCString()} }, { "IP", msgpack::object{Input.IP.GetCString()} } };
+	const std::map<std::string, msgpack::object> Values { { "AdapterID", msgpack::object{Input.AdapterID} }, { "Subnet", msgpack::object{Input.Subnet.c_str()} }, { "IP", msgpack::object{Input.IP.c_str()} } };
 	
 	Coyote::StatusCode Status{};
 

@@ -91,7 +91,7 @@ bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::str
 		{
 			std::unique_ptr<Coyote::Asset> Item { static_cast<Coyote::Asset*>(MsgpackProc::UnpackCoyoteObject(*Iter, typeid(Coyote::Asset))) };
 			
-			this->Assets.emplace(Item->FullPath.GetStdString(), std::move(*Item));
+			this->Assets.emplace(Item->FullPath, std::move(*Item));
 		}
 		
 		RetVal = true;
@@ -205,7 +205,7 @@ Coyote::HardwareState *Subs::SubscriptionSession::GetHardwareState(void)
 }
 
 
-void Subs::SubscriptionSession::SetStateEventCallback(const Coyote::StateEventType EType, const StateEventCallback CB, void *const UserData)
+void Subs::SubscriptionSession::SetStateEventCallback(const Coyote::StateEventType EType, const Coyote::StateEventCallback CB, void *const UserData)
 {
 	if (EType > Coyote::COYOTE_STATE_MAX || !EType)
 	{
@@ -218,7 +218,7 @@ void Subs::SubscriptionSession::SetStateEventCallback(const Coyote::StateEventTy
 	this->StateCallbacks[EType - 1] = { CB, UserData };
 }
 
-void Subs::SubscriptionSession::SetPlaybackEventCallback(const PBEventCallback CB, void *const UserData)
+void Subs::SubscriptionSession::SetPlaybackEventCallback(const Coyote::PBEventCallback CB, void *const UserData)
 {
 	this->UserPBEventCallback = CB;
 	this->UserPBEventData = UserData;

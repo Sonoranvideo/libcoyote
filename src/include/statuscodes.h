@@ -19,13 +19,9 @@
 
 #include "common.h"
 
-#ifdef __cplusplus
 namespace Coyote
 {
 	enum StatusCode
-#else
-	enum CoyoteStatusCode
-#endif //__cplusplus
 	{
 		COYOTE_STATUS_INVALID 				= -1,
 		COYOTE_STATUS_OK 					= 0,
@@ -36,12 +32,8 @@ namespace Coyote
 		COYOTE_STATUS_NETWORKERROR 			= 5,
 		COYOTE_STATUS_MAX
 	};
-#ifdef __cplusplus
 
 	enum HardwareMode
-#else
-	enum CoyoteHardwareMode
-#endif //__cplusplus
 	{
 		COYOTE_MODE_INVALID = -1,
 		COYOTE_MODE_Q3G 	= 0,
@@ -49,11 +41,7 @@ namespace Coyote
 		COYOTE_MODE_MAX
 	};
 
-#ifdef __cplusplus
 	enum ResolutionMode
-#else
-	enum CoyoteResolutionMode
-#endif //__cplusplus
 	{
 		COYOTE_RES_INVALID = 0,
 		COYOTE_RES_1080P = 1,
@@ -62,11 +50,7 @@ namespace Coyote
 		COYOTE_RES_MAX
 	};
 	
-#ifdef __cplusplus
 	enum UnitRole
-#else
-	enum CoyoteUnitRole
-#endif //__cplusplus
 	{
 		COYOTE_ROLE_INVALID = 0,
 		COYOTE_ROLE_SINGLE = 1,
@@ -74,11 +58,8 @@ namespace Coyote
 		COYOTE_ROLE_MIRROR = 3,
 		COYOTE_ROLE_MAX
 	};
-#ifdef __cplusplus
+	
 	enum RefreshMode
-#else
-	enum CoyoteRefreshMode
-#endif //__cplusplus
 	{
 		COYOTE_REFRESH_INVALID 	= 0,
 		COYOTE_REFRESH_23_98 	= 1,
@@ -91,11 +72,8 @@ namespace Coyote
 		COYOTE_REFRESH_60 		= 8,
 		COYOTE_REFRESH_MAX
 	};
-#ifdef __cplusplus
+	
 	enum PresetLayout
-#else
-	enum CoyotePresetLayout
-#endif //__cplusplus
 	{ //Out of order because support is being added incrementally for different layouts
 		COYOTE_PSLAYOUT_INVALID = 0,
 		COYOTE_PSLAYOUT_A		= 1,
@@ -110,11 +88,7 @@ namespace Coyote
 		COYOTE_PSLAYOUT_MAX
 	};
 
-#ifdef __cplusplus
 	enum SDIOutput
-#else
-	enum CoyoteSDIOutput
-#endif //__cplusplus
 	{
 		COYOTE_SDI_INVALID = 0,
 		COYOTE_SDI_1 = 1 << 0,
@@ -124,11 +98,7 @@ namespace Coyote
 		COYOTE_SDI_MAXVALUE = COYOTE_SDI_4
 	};
 	
-#ifdef __cplusplus
 	enum HDRMode
-#else
-	enum CoyoteHDRMode
-#endif //__cplusplus
 	{
 		COYOTE_HDR_DISABLED = 0,
 		COYOTE_HDR_BT2020,
@@ -137,11 +107,7 @@ namespace Coyote
 		COYOTE_HDR_MAX
 	};
 	
-#ifdef __cplusplus
 	enum EOTFMode
-#else
-	enum CoyoteEOTFMode
-#endif //__cplusplus
 	{
 		COYOTE_EOTF_NORMAL = 0,
 		COYOTE_EOTF_HLG = 1,
@@ -150,11 +116,7 @@ namespace Coyote
 		COYOTE_EOTF_MAX
 	};
 		
-#ifdef __cplusplus
 	enum Player
-#else
-	enum CoyotePlayer
-#endif //__cplusplus
 	{
 		COYOTE_PLAYER_INVALID = 0,
 		COYOTE_PLAYER_1 = 1 << 0,
@@ -164,11 +126,7 @@ namespace Coyote
 		COYOTE_PLAYER_MAXVALUE = COYOTE_PLAYER_4
 	};
 	
-#ifdef __cplusplus
 	enum PlaybackEventType
-#else
-	enum CoyotePlaybackEventType
-#endif //__cplusplus
 	{
 		COYOTE_PBEVENT_END = 0,
 		COYOTE_PBEVENT_TAKE = 1,
@@ -177,11 +135,7 @@ namespace Coyote
 		COYOTE_PBEVENT_SEEK = 4
 	};
 	
-#ifdef __cplusplus
 	enum AssetState
-#else
-	enum CoyoteAssetState
-#endif //__cplusplus
 	{
 		COYOTE_ASSETSTATE_INVALID	= 0,
 		COYOTE_ASSETSTATE_READY		= 1,
@@ -191,11 +145,7 @@ namespace Coyote
 		COYOTE_ASSETSTATE_MAX
 	};
 	
-#ifdef __cplusplus
 	enum StateEventType
-#else
-	enum CoyoteStateEventType
-#endif //__cplusplus
 	{
 		COYOTE_STATE_INVALID 	= 0,
 		COYOTE_STATE_PRESETS 	= 1,
@@ -205,18 +155,22 @@ namespace Coyote
 		COYOTE_STATE_MAX
 	};
 
-#ifndef __cplusplus
-	typedef enum CoyoteResolutionMode CoyoteResolutionMode;
-	typedef enum CoyoteRefreshMode CoyoteRefreshMode;
-	typedef enum CoyoteHardwareMode CoyoteHardwareMode;
-	typedef enum CoyoteStatusCode CoyoteStatusCode;
-	typedef enum CoyotePresetLayout CoyotePresetLayout;
-	typedef enum CoyoteSDIOutput CoyoteSDIOutput;
-	typedef enum CoyoteEOTFMode CoyoteEOTFMode;
-	typedef enum CoyoteHDRMode CoyoteHDRMode;
-#else
+
 }
-#endif // !__cplusplus
+
+MSGPACK_ADD_ENUM(Coyote::StatusCode)
+MSGPACK_ADD_ENUM(Coyote::HardwareMode)
+MSGPACK_ADD_ENUM(Coyote::ResolutionMode)
+MSGPACK_ADD_ENUM(Coyote::UnitRole)
+MSGPACK_ADD_ENUM(Coyote::RefreshMode)
+MSGPACK_ADD_ENUM(Coyote::PresetLayout)
+MSGPACK_ADD_ENUM(Coyote::SDIOutput)
+MSGPACK_ADD_ENUM(Coyote::HDRMode)
+MSGPACK_ADD_ENUM(Coyote::EOTFMode)
+MSGPACK_ADD_ENUM(Coyote::Player)
+MSGPACK_ADD_ENUM(Coyote::PlaybackEventType)
+MSGPACK_ADD_ENUM(Coyote::AssetState)
+MSGPACK_ADD_ENUM(Coyote::StateEventType)
 
 
 #endif //__LIBCOYOTE_STATUSCODES_H__

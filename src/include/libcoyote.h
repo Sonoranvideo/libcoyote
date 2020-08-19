@@ -17,14 +17,14 @@
 #define __LIBCOYOTE_H__
 
 #ifndef __cplusplus
-#error "This is the C++ set of bindings, you're looking for c/libcoyote_c.h"
+#error "This library requires C++. You could also use the Python bindings, if you prefer, or generate your own bindings to libcoyote."
 #endif //__cplusplus
 
-#include "macros.h"
+#include "statuscodes.h"
 #include "datastructures.h"
+#include "macros.h"
 #include "session.h"
 #include "layouts.h"
-#include "statuscodes.h"
 
 namespace Coyote
 { //Empty cuz everything else is in different headers

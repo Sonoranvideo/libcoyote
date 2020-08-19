@@ -28,7 +28,7 @@ namespace Subs
 {
 	struct StateEventCBSettings
 	{
-		StateEventCallback CB;
+		Coyote::StateEventCallback CB;
 		void *UserData;
 	};
 	
@@ -43,7 +43,7 @@ namespace Subs
 		std::map<int32_t, Coyote::Preset> Presets;
 		std::map<std::string, Coyote::Asset> Assets;
 		Coyote::HardwareState HWState;
-		PBEventCallback UserPBEventCallback;
+		Coyote::PBEventCallback UserPBEventCallback;
 		void *UserPBEventData;
 		
 		StateEventCBSettings StateCallbacks[Coyote::COYOTE_STATE_MAX - 1];
@@ -54,8 +54,8 @@ namespace Subs
 		std::map<int32_t, Coyote::Preset> *GetPresets(void);
 		std::map<std::string, Coyote::Asset> *GetAssets(void);
 		Coyote::HardwareState *GetHardwareState(void);
-		void SetPlaybackEventCallback(const PBEventCallback, void *const UserData = nullptr);
-		void SetStateEventCallback(const Coyote::StateEventType EType, const StateEventCallback CB, void *const UserData);
+		void SetPlaybackEventCallback(const Coyote::PBEventCallback, void *const UserData = nullptr);
+		void SetStateEventCallback(const Coyote::StateEventType EType, const Coyote::StateEventCallback CB, void *const UserData);
 		
 		SubscriptionSession() : HWState(), UserPBEventCallback(), UserPBEventData(), StateCallbacks() { }
 	};

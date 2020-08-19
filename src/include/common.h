@@ -24,7 +24,6 @@
 #include <string.h>
 #include <assert.h>
 
-#ifdef __cplusplus
 #include <iostream>
 #include <vector>
 #include <map>
@@ -37,6 +36,14 @@
 #include <chrono>
 #include <thread>
 #include <type_traits>
+
+#ifndef MSGPACK_DEFINE
+#define MSGPACK_DEFINE(...)
+#define MSGPACK_DEFINE_MAP(...)
+#define MSGPACK_DEFINE_ARRAY(...)
+#define MSGPACK_ADD_ENUM(...)
+#endif //MSGPACK_DEFINE
+
 
 #ifdef LCVERBOSE //Only usable for C++
 #define LDEBUG (std::cerr << "THREAD " << std::this_thread::get_id() << " Executing " << __func__ << "() line number " << __LINE__ << " in file " << __FILE__ << std::endl)
@@ -63,10 +70,6 @@ auto RebuildMapBackwards(const MapType &Original)
 	return RetVal;
 }
 #endif //__cplusplus >= 201300
-
-#else
-#include <stdbool.h>
-#endif //__cplusplus
 
 #ifdef WIN32
 #include <winsock2.h>

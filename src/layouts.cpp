@@ -16,7 +16,6 @@
 
 ///This file should have never needed to exist in the first place.
 
-#include "include/common.h"
 #include "include/layouts.h"
 #include "include/statuscodes.h"
 #include "include/datastructures.h"
@@ -161,7 +160,7 @@ Coyote::Player Coyote::GetPresetPlayers(const Coyote::Preset &Input)
 	{
 		const Coyote::Output *const OutputObj = &(Input.*OutputPtr);
 		
-		if ((Info->Players & Inc) != 0 && OutputObj->Filename.GetLength() > 0)
+		if ((Info->Players & Inc) != 0 && OutputObj->Filename.length() > 0)
 		{
 			RetVal = (Player)(RetVal | Inc);
 		}
@@ -195,7 +194,7 @@ Coyote::SDIOutput Coyote::GetPresetSDIOutputs(const Coyote::Preset &Input)
 	{
 		const Coyote::Output *const OutputObj = &(Input.*OutputPtr);
 		
-		if ((Info->Players & Inc) != 0 && Info->SDIOuts.count(Inc) && OutputObj->Filename.GetLength() > 0)
+		if ((Info->Players & Inc) != 0 && Info->SDIOuts.count(Inc) && OutputObj->Filename.length() > 0)
 		{
 			RetVal = (SDIOutput)(RetVal | Info->SDIOuts.at(Inc));
 		}
