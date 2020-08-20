@@ -15,10 +15,19 @@
 */
 #include <QtWebSockets>
 #include <QCoreApplication>
+#ifdef MSGPACK_DEFAULT_API_VERSION
+#undef MSGPACK_DEFAULT_API_VERSION
+#endif
+
+#define MSGPACK_DEFAULT_API_VERSION 2
+
+#include <msgpack.hpp>
+
 #include "include/common.h"
 #include "msgpackproc.h"
 #include "native_ws.h"
-#include <msgpack.hpp>
+
+
 #define qs2cs(s) (s.toUtf8().constData()) //Irritating enough to type without caps
 
 /**

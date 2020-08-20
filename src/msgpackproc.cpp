@@ -17,13 +17,6 @@
 #include "include/libcoyote.h"
 #include "include/layouts.h"
 
-#ifdef MSGPACK_DEFAULT_API_VERSION
-#undef MSGPACK_DEFAULT_API_VERSION
-#endif
-
-#define MSGPACK_DEFAULT_API_VERSION 2
-
-#include <msgpack.hpp>
 
 #include <typeinfo>
 #include <typeindex>
@@ -58,6 +51,97 @@ Coyote::Object *CoyoteGenericUnpack(const msgpack::object &Obj)
 	return Ptr;
 }
 
+static Coyote::Object *CoyotePresetUnpack(const msgpack::object &Obj)
+{ //This is a bit expensive, internal work will eventually be done to set it as an enum by default.
+	Coyote::Preset *const PObj = static_cast<Coyote::Preset*>(CoyoteGenericUnpack<Coyote::Preset>(Obj));
+	
+	if (!PObj) return nullptr;
+
+	std::unordered_map<std::string, msgpack::object> Mappy;
+	
+	Obj.convert(Mappy);
+	
+	std::vector<Coyote::TabOrdering> Tabs;
+	
+	Mappy["TabDisplayOrder"].convert(Tabs);
+	
+	for (Coyote::TabOrdering &Tab : Tabs)
+	{
+		PObj->TabDisplayOrder.emplace(Tab.TabID, std::move(Tab));
+	}
+	
+	const std::string PresetName { Mappy["Layout"].as<std::string>() };
+	
+	const Coyote::LayoutInfo *const L = Coyote::LookupPresetLayoutByString(PresetName);
+	
+	PObj->Layout = ((L != nullptr) ? L->ID : Coyote::COYOTE_PSLAYOUT_INVALID);
+	
+	return PObj;
+}
+
+static void CoyotePresetPack(const Coyote::Object *const Obj, msgpack::object *const Out, msgpack::zone &TempZone)
+{
+	const Coyote::Preset *const PObj = static_cast<const Coyote::Preset*>(Obj);
+	
+	msgpack::object ConvObj { *PObj, TempZone };
+	
+	std::unordered_map<std::string, msgpack::object> Mappy;
+	
+	ConvObj.convert(Mappy);
+	
+	const Coyote::LayoutInfo *const Layout = Coyote::LookupPresetLayoutByID(PObj->Layout);
+	
+	if (Layout)
+	{
+		Mappy.emplace("Layout", msgpack::object{ Layout->TextName, TempZone });
+	}
+	
+	std::vector<Coyote::TabOrdering> Tabs;
+	
+	Tabs.reserve(PObj->TabDisplayOrder.size());
+	
+	for (auto &Pair : PObj->TabDisplayOrder)
+	{
+		Tabs.emplace_back(std::move(Pair.second));
+	}
+	
+	Mappy.emplace("TabDisplayOrder", msgpack::object { Tabs, TempZone });
+	
+	*Out = msgpack::object{ std::move(Mappy), TempZone };
+}
+
+static void CoyoteHWStatePack(const Coyote::Object *const Obj, msgpack::object *const Out, msgpack::zone &TempZone)
+{
+	const Coyote::HardwareState *const HWObj = static_cast<const Coyote::HardwareState*>(Obj);
+	
+	msgpack::object ConvObj { *HWObj, TempZone };
+
+	std::unordered_map<std::string, msgpack::object> Mappy;
+	
+	ConvObj.convert(Mappy);
+	
+	Mappy.emplace("Resolution", msgpack::object{ ResolutionMap.at(HWObj->Resolution), TempZone });
+	Mappy.emplace("RefreshRate", msgpack::object{ RefreshMap.at(HWObj->RefreshRate), TempZone });
+	
+	*Out = msgpack::object { std::move(Mappy), TempZone };
+}
+
+static Coyote::Object *CoyoteHWStateUnpack(const msgpack::object &Obj)
+{
+	Coyote::HardwareState *const HWObj = static_cast<Coyote::HardwareState*>(CoyoteGenericUnpack<Coyote::HardwareState>(Obj));
+	
+	if (!HWObj) return nullptr;
+
+	std::unordered_map<std::string, msgpack::object> Mappy;
+	
+	Obj.convert(Mappy);
+	
+	HWObj->Resolution = ReverseResolutionMap(Mappy.at("Resolution").as<std::string>());
+	HWObj->RefreshRate = ReverseRefreshMap(Mappy.at("RefreshRate").as<std::string>());
+	
+	return HWObj;
+}
+	
 //Definitions
 void MsgpackProc::InitOutgoingMsg(msgpack::packer<msgpack::sbuffer> &Pack, const std::string &CommandName, const uint64_t MsgID, const msgpack::object *Values)
 {
@@ -128,7 +212,7 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::Object *Object, msgp
 		{ std::type_index(typeid(Coyote::ExternalAsset)), &CoyoteGenericPack<Coyote::ExternalAsset> },
 		{ std::type_index(typeid(Coyote::Drive)), &CoyoteGenericPack<Coyote::Drive> },
 		{ std::type_index(typeid(Coyote::AssetMetadata)), &CoyoteGenericPack<Coyote::AssetMetadata> },
-		{ std::type_index(typeid(Coyote::HardwareState)), &CoyoteGenericPack<Coyote::HardwareState> },
+		{ std::type_index(typeid(Coyote::HardwareState)), &CoyoteHWStatePack },
 		{ std::type_index(typeid(Coyote::TimeCode)), &CoyoteGenericPack<Coyote::TimeCode> },
 		{ std::type_index(typeid(Coyote::PresetMark)), &CoyoteGenericPack<Coyote::PresetMark> },
 		{ std::type_index(typeid(Coyote::TabOrdering)), &CoyoteGenericPack<Coyote::TabOrdering> },
@@ -136,7 +220,7 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::Object *Object, msgp
 		{ std::type_index(typeid(Coyote::NetworkInfo)), &CoyoteGenericPack<Coyote::NetworkInfo> },
 		{ std::type_index(typeid(Coyote::Mirror)), &CoyoteGenericPack<Coyote::Mirror> },
 		{ std::type_index(typeid(Coyote::Output)), &CoyoteGenericPack<Coyote::Output> },
-		{ std::type_index(typeid(Coyote::Preset)), &CoyoteGenericPack<Coyote::Preset> },
+		{ std::type_index(typeid(Coyote::Preset)), &CoyotePresetPack },
 	};
 
 	assert(Lookup.count(OurType));
@@ -160,7 +244,7 @@ Coyote::Object *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Obj, cons
 		{ std::type_index(typeid(Coyote::ExternalAsset)), &CoyoteGenericUnpack<Coyote::ExternalAsset> },
 		{ std::type_index(typeid(Coyote::Drive)), &CoyoteGenericUnpack<Coyote::Drive> },
 		{ std::type_index(typeid(Coyote::AssetMetadata)), &CoyoteGenericUnpack<Coyote::AssetMetadata> },
-		{ std::type_index(typeid(Coyote::HardwareState)), &CoyoteGenericUnpack<Coyote::HardwareState> },
+		{ std::type_index(typeid(Coyote::HardwareState)), &CoyoteHWStateUnpack },
 		{ std::type_index(typeid(Coyote::TimeCode)), &CoyoteGenericUnpack<Coyote::TimeCode> },
 		{ std::type_index(typeid(Coyote::PresetMark)), &CoyoteGenericUnpack<Coyote::PresetMark> },
 		{ std::type_index(typeid(Coyote::TabOrdering)), &CoyoteGenericUnpack<Coyote::TabOrdering> },
@@ -168,7 +252,7 @@ Coyote::Object *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Obj, cons
 		{ std::type_index(typeid(Coyote::NetworkInfo)), &CoyoteGenericUnpack<Coyote::NetworkInfo> },
 		{ std::type_index(typeid(Coyote::Mirror)), &CoyoteGenericUnpack<Coyote::Mirror> },
 		{ std::type_index(typeid(Coyote::Output)), &CoyoteGenericUnpack<Coyote::Output> },
-		{ std::type_index(typeid(Coyote::Preset)), &CoyoteGenericUnpack<Coyote::Preset> },
+		{ std::type_index(typeid(Coyote::Preset)), &CoyotePresetUnpack },
 	};
 	
 	assert(Lookup.count(OurType));

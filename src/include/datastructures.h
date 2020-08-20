@@ -250,9 +250,10 @@ namespace Coyote
 		Output Output2;
 		Output Output3;
 		Output Output4;
+		
 		std::vector<PresetMark> gotoMarks;
 		std::vector<PresetMark> countDowns;
-		std::unordered_map<int32_t, TabOrdering> TabDisplayOrder;
+		std::map<int32_t, TabOrdering> TabDisplayOrder;
 		int32_t PK;
 		int32_t TRT;
 		int32_t Index;
@@ -276,7 +277,7 @@ namespace Coyote
 		
 		MSGPACK_DEFINE_MAP(
 			Name,
-			Layout,
+			//Layout, !! Purposefully excluded, we have to convert it from a string to an enum. !!
 			Notes,
 			Color,
 			timeCodeUpdate,
@@ -284,10 +285,10 @@ namespace Coyote
 			Output1,
 			Output2,
 			Output3,
-			Output4,		
+			Output4,
 			gotoMarks,
 			countDowns,
-			TabDisplayOrder,
+			//TabDisplayOrder, !! Also handled custom !!
 			PK,
 			TRT,
 			Index,
@@ -322,8 +323,8 @@ namespace Coyote
 		bool ConstLumin;
 		
 		MSGPACK_DEFINE_MAP(
-			Resolution,
-			RefreshRate,
+			//Resolution, !! Handled custom !!
+			//RefreshRate, !! Handled custom !!
 			CurrentMode,
 			HDRMode,
 			EOTFSetting,

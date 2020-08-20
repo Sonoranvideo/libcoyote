@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-
+#include <stdexcept>
 #include <iostream>
 #include <vector>
 #include <map>
