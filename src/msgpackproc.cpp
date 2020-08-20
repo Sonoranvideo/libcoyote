@@ -195,6 +195,14 @@ std::map<std::string, msgpack::object> MsgpackProc::InitIncomingMsg(const void *
 	//malformed message?
 	assert(HasValidIncomingHeaders(Values));
 	
+	const std::string RemoteAPIVersion { Values.at("CoyoteAPIVersion").as<std::string>() };
+	
+	if (RemoteAPIVersion != COYOTE_API_VERSION)
+	{
+		std::cerr << "libcoyote: Invalid remote API version " << RemoteAPIVersion << ", this libcoyote requires API version " COYOTE_API_VERSION " in order to function." << std::endl;
+		Values["StatusInt"] = msgpack::object{Coyote::COYOTE_STATUS_NETWORKERROR, TempZone};
+	}
+	
 	//Easy way to get the event ID
 	if (MsgIDOut && Values.count("MsgID")) *MsgIDOut = Values["MsgID"].as<uint64_t>();
 	

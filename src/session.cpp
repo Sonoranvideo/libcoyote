@@ -85,7 +85,7 @@ struct InternalSession
 	static bool OnMessageReady(WS::WSConnection *Conn, WSMessage *Msg);
 	bool CheckWSInit(void);
 	
-	inline bool ConfigConnection(void)
+	inline bool ConfigConnection(bool *SeriousError = nullptr)
 	{
 		this->CheckWSInit();
 		
@@ -100,11 +100,28 @@ struct InternalSession
 		
 		msgpack::zone TempZone;
 		
-		this->PerformSyncedCommand("SubscribeTC", TempZone);
-		this->PerformSyncedCommand("SubscribeAssets", TempZone);
-		this->PerformSyncedCommand("SubscribePresets", TempZone);
-		this->PerformSyncedCommand("SubscribeHWState", TempZone);
-		this->PerformSyncedCommand("SubscribePlaybackEvents", TempZone);
+		static const char *const SubCommands[] = { "SubscribeTC", "SubscribeAssets", "SubscribePresets", "SubscribeHWState", "SubscribePlaybackEvents", nullptr };
+		
+		for (const char *const *Cmd = SubCommands; *Cmd; ++Cmd)
+		{
+			Coyote::StatusCode S = Coyote::COYOTE_STATUS_INVALID;
+			
+			this->PerformSyncedCommand(*Cmd, TempZone, &S);
+			
+			if (S != Coyote::COYOTE_STATUS_OK)
+			{
+				std::cerr << "libcoyote: Connection registration command \"" << *Cmd << "\" for host " << this->Host << " has failed." << std::endl;
+				
+				Core->ForgetConnection(this->Connection);
+				this->Connection = nullptr;
+				
+				this->SyncSess.DestroyAllTickets();
+				
+				if (SeriousError) *SeriousError = true;
+				
+				return false;
+			}
+		}
 		
 		return true;
 	}
@@ -119,7 +136,15 @@ struct InternalSession
 		{
 			std::cout << "libcoyote: Attempting to connect new session, attempt " << TryCount + 1 << " of " << (this->NumAttempts == -1 ? "infinite" : std::to_string(this->NumAttempts)) << std::endl;
 			
-			if (this->ConfigConnection()) break;
+			bool SeriousError{};
+			
+			if (this->ConfigConnection(&SeriousError)) break;
+			
+			if (SeriousError)
+			{
+				std::cerr << "libcoyote: Connection to host " << this->Host << " encountered a serious error that prevents another automatic reconnection attempt." << std::endl;
+				break;
+			}
 		}
 	}
 	inline ~InternalSession(void)
@@ -197,10 +222,18 @@ const std::map<std::string, msgpack::object> InternalSession::PerformSyncedComma
 		for (int TryCount = 0; (this->NumAttempts == -1 || TryCount < this->NumAttempts); ++TryCount)
 		{
 			std::cout << "libcoyote: Attempting to reconnect, attempt " << TryCount + 1 << " of " << (this->NumAttempts == -1 ? "infinite" : std::to_string(this->NumAttempts)) << std::endl;
-
-			if (this->ConfigConnection())
+			
+			bool SeriousError{};
+			
+			if (this->ConfigConnection(&SeriousError))
 			{
 				return PerformSyncedCommand(CommandName, TempZone, StatusOut, Values);
+			}
+			
+			if (SeriousError)
+			{
+				std::cerr << "libcoyote: Cannot automatically reconnect, encountered a serious error." << std::endl;
+				return {};
 			}
 		}
 		
@@ -952,8 +985,16 @@ bool Coyote::Session::Reconnect(const std::string &Host)
 	for (int TryCount = 0; (SESS.NumAttempts == -1 || TryCount < SESS.NumAttempts); ++TryCount)
 	{
 		std::cout << "libcoyote: Manually attempting to reconnect, attempt " << TryCount + 1 << " of " << (SESS.NumAttempts == -1 ? "infinite" : std::to_string(SESS.NumAttempts)) << std::endl;
-
-		if (SESS.ConfigConnection()) return true;
+		
+		bool SeriousError{};
+		
+		if (SESS.ConfigConnection(&SeriousError)) return true;
+		
+		if (SeriousError)
+		{
+			std::cerr << "libcoyote: Manual reconnection attempt failed due to a serious error during negotiation." << std::endl;
+			return false;
+		}
 	}
 	
 	return false;
