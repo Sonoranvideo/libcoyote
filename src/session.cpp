@@ -685,7 +685,7 @@ Coyote::StatusCode Coyote::Session::IsMirror(bool &ValueOut)
 	
 	Response.at("Data").convert(DataField);
 		
-	ValueOut = DataField[CmdName].as<int>();
+	ValueOut = DataField[CmdName].as<bool>();
 	
 	return Status;
 }
@@ -707,7 +707,7 @@ Coyote::StatusCode Coyote::Session::SynchronizerBusy(bool &ValueOut)
 	
 	Response.at("Data").convert(DataField);
 		
-	ValueOut = DataField["Busy"].as<int>();
+	ValueOut = DataField["Busy"].as<bool>();
 	
 	return Status;
 }
@@ -1350,7 +1350,7 @@ Coyote::StatusCode Coyote::Session::DetectUpdate(bool &DetectedOut, std::string 
 	std::map<std::string, msgpack::object> Data;
 	Msg.at("Data").convert(Data);
 	
-	DetectedOut = Data.at("IsUpdateDetected").as<int>();
+	DetectedOut = Data.at("IsUpdateDetected").as<bool>();
 	
 	if (Out) *Out = Data.at("Version").as<std::string>();
 	

@@ -228,6 +228,7 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::Object *Object, msgp
 		{ std::type_index(typeid(Coyote::NetworkInfo)), &CoyoteGenericPack<Coyote::NetworkInfo> },
 		{ std::type_index(typeid(Coyote::Mirror)), &CoyoteGenericPack<Coyote::Mirror> },
 		{ std::type_index(typeid(Coyote::Output)), &CoyoteGenericPack<Coyote::Output> },
+		{ std::type_index(typeid(Coyote::GenlockSettings)), &CoyoteGenericPack<Coyote::GenlockSettings> },
 		{ std::type_index(typeid(Coyote::Preset)), &CoyotePresetPack },
 	};
 
@@ -260,6 +261,7 @@ Coyote::Object *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Obj, cons
 		{ std::type_index(typeid(Coyote::NetworkInfo)), &CoyoteGenericUnpack<Coyote::NetworkInfo> },
 		{ std::type_index(typeid(Coyote::Mirror)), &CoyoteGenericUnpack<Coyote::Mirror> },
 		{ std::type_index(typeid(Coyote::Output)), &CoyoteGenericUnpack<Coyote::Output> },
+		{ std::type_index(typeid(Coyote::GenlockSettings)), &CoyoteGenericUnpack<Coyote::GenlockSettings> },
 		{ std::type_index(typeid(Coyote::Preset)), &CoyotePresetUnpack },
 	};
 	
