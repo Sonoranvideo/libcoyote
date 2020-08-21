@@ -64,6 +64,7 @@ namespace Coyote
 		StatusCode BeginUpdate(void);
 		StatusCode GetDisks(std::vector<Drive> &Out);
 		inline StatusCode GetDrives(std::vector<Drive> &Out) { return this->GetDisks(Out); }
+		StatusCode GetDiskAssets(std::vector<ExternalAsset> &Out, const std::string &DriveName, const std::string &Subpath = "");
 		StatusCode EjectDisk(const std::string &DriveLetter);
 		StatusCode GetUnitID(std::string &UnitIDOut, std::string &NicknameOut);
 		StatusCode GetHardwareState(HardwareState &Out);

@@ -1243,6 +1243,35 @@ Coyote::StatusCode Coyote::Session::GetServerVersion(std::string &Out)
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::GetDiskAssets(std::vector<ExternalAsset> &Out, const std::string &DriveName, const std::string &Subpath)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values { MAPARG(DriveName), MAPARG(Subpath) };
+	
+	const msgpack::object &Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+	
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetDiskAssets", TempZone, &Status, &Pass) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	std::vector<msgpack::object> Data;
+
+	Msg.at("Data").convert(Data);
+	
+	for (msgpack::object &Obj : Data)
+	{
+		std::unique_ptr<Coyote::ExternalAsset> DAStruct { static_cast<Coyote::ExternalAsset*>(MsgpackProc::UnpackCoyoteObject(Obj, typeid(Coyote::ExternalAsset))) };
+		
+		Out.emplace_back(std::move(*DAStruct));
+	}
+
+	return Coyote::COYOTE_STATUS_OK;
+}
+
 Coyote::StatusCode Coyote::Session::GetMirrors(std::vector<Coyote::Mirror> &Out)
 {
 	DEF_SESS;
