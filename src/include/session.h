@@ -115,7 +115,7 @@ namespace Coyote
 		StatusCode SetHorzGenlock(int32_t HorzValue);
 		StatusCode SetVertGenlock(int32_t HorzValue);
 		
-		std::vector<LANCoyote> GetLANCoyotes(void);
+		static std::vector<LANCoyote> GetLANCoyotes(void);
 		
 		virtual ~Session(void);
 		

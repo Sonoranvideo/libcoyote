@@ -84,7 +84,7 @@ struct InternalSession
 	Coyote::StatusCode CreatePreset_Multi(const Coyote::Preset &Ref, const std::string &Cmd);
 	
 	static bool OnMessageReady(WS::WSConnection *Conn, WSMessage *Msg);
-	bool CheckWSInit(void);
+	static bool CheckWSInit(void);
 	
 	inline bool ConfigConnection(bool *SeriousError = nullptr)
 	{
@@ -1005,6 +1005,8 @@ bool Coyote::Session::Reconnect(const std::string &Host)
 
 std::vector<Coyote::LANCoyote> Coyote::Session::GetLANCoyotes(void)
 {
+	InternalSession::CheckWSInit();
+	
 	return Discovery::DiscoverySession::CheckInit()->GetLANCoyotes();
 }
 
