@@ -199,6 +199,15 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSD(HardwareState, EOTFSetting)
 	ACLASSD(HardwareState, SupportsS12G)
 	ACLASSD(HardwareState, ConstLumin);
+	
+	py::class_<Coyote::LANCoyote, Coyote::Object>(ModObj, "LANCoyote")
+	.def(py::init<>())
+	.def("__repr__", [] (Coyote::LANCoyote &Obj) { return std::string{"<LANCoyote with GUID "} + Obj.GUID + (Obj.GUID == Obj.Nickname ? std::string{""} : (std::string{" and nick \""} + Obj.Nickname + "\" ")) + "at IP " + Obj.IP + " running version " + Obj.CommunicatorVersion + ">"; })
+	ACLASSD(LANCoyote, APIVersion)
+	ACLASSD(LANCoyote, CommunicatorVersion)
+	ACLASSD(LANCoyote, GUID)
+	ACLASSD(LANCoyote, Nickname)
+	ACLASSD(LANCoyote, CurrentRole);
 		
 
 	py::class_<Coyote::Output, Coyote::Object>(ModObj, "Output")
@@ -679,6 +688,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, StartSpoke)
 	ACLASSF(Session, RestartSpoke)
 	ACLASSF(Session, KillSpoke)
+	ACLASSF(Session, GetLANCoyotes)
 	ACLASSF(Session, ExportLogsZip)
 	ACLASSF(Session, SetUnitNickname)
 	ACLASSF(Session, SetCommandTimeoutSecs)

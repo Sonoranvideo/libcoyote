@@ -21,6 +21,7 @@
 #include "asyncmsgs.h"
 #include "msgpackproc.h"
 #include "subscriptions.h"
+#include "discovery.h"
 #include "include/statuscodes.h"
 #include "include/datastructures.h"
 #include "include/session.h"
@@ -88,6 +89,8 @@ struct InternalSession
 	inline bool ConfigConnection(bool *SeriousError = nullptr)
 	{
 		this->CheckWSInit();
+		
+		Discovery::DiscoverySession::CheckInit();
 		
 		WS::WSCore *Core =  WS::WSCore::GetInstance();
 		
@@ -998,6 +1001,11 @@ bool Coyote::Session::Reconnect(const std::string &Host)
 	}
 	
 	return false;
+}
+
+std::vector<Coyote::LANCoyote> Coyote::Session::GetLANCoyotes(void)
+{
+	return Discovery::DiscoverySession::CheckInit()->GetLANCoyotes();
 }
 
 std::string Coyote::Session::GetHost(void) const

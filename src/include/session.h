@@ -115,6 +115,8 @@ namespace Coyote
 		StatusCode SetHorzGenlock(int32_t HorzValue);
 		StatusCode SetVertGenlock(int32_t HorzValue);
 		
+		std::vector<LANCoyote> GetLANCoyotes(void);
+		
 		virtual ~Session(void);
 		
 		void SetCommandTimeoutSecs(const time_t TimeoutSecs = DefaultCommandTimeoutSecs);

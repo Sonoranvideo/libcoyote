@@ -35,6 +35,7 @@
 #include <typeinfo>
 #include <chrono>
 #include <thread>
+#include <mutex>
 #include <type_traits>
 
 #ifndef MSGPACK_DEFINE

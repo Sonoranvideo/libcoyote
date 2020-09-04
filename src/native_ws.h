@@ -27,6 +27,7 @@
 #include <QtCore>
 #include <QtWebSockets>
 
+#define qs2cs(s) (s.toUtf8().constData()) //Irritating enough to type without caps
 
 #define EYEBLEED_NOW_MS() (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count())
 

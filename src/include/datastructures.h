@@ -57,6 +57,18 @@ namespace Coyote
 		MSGPACK_DEFINE_MAP(MarkNumber, MarkName, MarkDisplayTime, MarkTime)
 	};
 	
+	struct LANCoyote : public Object
+	{
+		std::string APIVersion;
+		std::string CommunicatorVersion;
+		std::string GUID;
+		std::string Nickname;
+		std::string IP;
+		UnitRole CurrentRole;
+		
+		MSGPACK_DEFINE_MAP(APIVersion, CommunicatorVersion, GUID, Nickname, CurrentRole)
+	};
+	
 	struct TimeCode : public Object
 	{
 		double ScrubBar;

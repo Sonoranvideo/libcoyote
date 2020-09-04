@@ -34,7 +34,7 @@ find_package(Qt5 COMPONENTS WebSockets Core)
 
 message("== Ok, found Qt5WebSockets")
 
-set(sourcefiles msgpackproc.cpp session.cpp asyncmsgs.cpp asynctosync.cpp subscriptions.cpp layouts.cpp native_ws.cpp)
+set(sourcefiles msgpackproc.cpp session.cpp asyncmsgs.cpp asynctosync.cpp subscriptions.cpp layouts.cpp native_ws.cpp discovery.cpp)
 
 add_library(coyote SHARED ${sourcefiles})
 add_library(coyote_static STATIC EXCLUDE_FROM_ALL ${sourcefiles})

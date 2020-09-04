@@ -27,9 +27,6 @@
 #include "msgpackproc.h"
 #include "native_ws.h"
 
-
-#define qs2cs(s) (s.toUtf8().constData()) //Irritating enough to type without caps
-
 /**
  * By the time you are done with this code, you will have developed a deep, seething hatred for WebSockets, libwebsockets, and forced asynchronous network programming.
  **/
