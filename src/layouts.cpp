@@ -22,7 +22,7 @@
 
 using namespace Coyote;
 
-static const std::map<Coyote::PresetLayout, Coyote::LayoutInfo> Layouts
+static const std::unordered_map<Coyote::PresetLayout, Coyote::LayoutInfo> Layouts
 {
 	{
 		COYOTE_PSLAYOUT_A,
@@ -33,6 +33,18 @@ static const std::map<Coyote::PresetLayout, Coyote::LayoutInfo> Layouts
 				{ COYOTE_PLAYER_2, COYOTE_SDI_2 },
 				{ COYOTE_PLAYER_3, COYOTE_SDI_3 },
 				{ COYOTE_PLAYER_4, COYOTE_SDI_4 }
+			},
+			{
+				{ COYOTE_SDI_1, { 0, 0 } }, //Grid layout isn't too relevant for layout A, so I just went with what you'll see on most multiviews.
+				{ COYOTE_SDI_2, { 1, 0 } },
+				{ COYOTE_SDI_3, { 0, 1 } },
+				{ COYOTE_SDI_4, { 1, 1 } },
+			},
+			{
+				{ COYOTE_PLAYER_1, { 1920, 1080 } },
+				{ COYOTE_PLAYER_2, { 1920, 1080 } },
+				{ COYOTE_PLAYER_3, { 1920, 1080 } },
+				{ COYOTE_PLAYER_4, { 1920, 1080 } },
 			}
 		}
 	},
@@ -44,6 +56,16 @@ static const std::map<Coyote::PresetLayout, Coyote::LayoutInfo> Layouts
 				{ COYOTE_PLAYER_1, (SDIOutput)(COYOTE_SDI_1 | COYOTE_SDI_2) },
 				{ COYOTE_PLAYER_3, (SDIOutput)(COYOTE_SDI_3 | COYOTE_SDI_4) },
 				
+			},
+			{
+				{ COYOTE_SDI_1, { 0, 0 } },
+				{ COYOTE_SDI_2, { 1, 0 } },
+				{ COYOTE_SDI_3, { 2, 0 } },
+				{ COYOTE_SDI_4, { 3, 0 } },
+			},
+			{
+				{ COYOTE_PLAYER_1, { 3840, 1080 } },
+				{ COYOTE_PLAYER_3, { 3840, 1080 } },
 			}
 		}
 	},
@@ -55,6 +77,17 @@ static const std::map<Coyote::PresetLayout, Coyote::LayoutInfo> Layouts
 				{ COYOTE_PLAYER_1, (SDIOutput)(COYOTE_SDI_1 | COYOTE_SDI_2) },
 				{ COYOTE_PLAYER_3, COYOTE_SDI_3 },
 				{ COYOTE_PLAYER_4, COYOTE_SDI_4 },
+			},
+			{
+				{ COYOTE_SDI_1, { 0, 0 } },
+				{ COYOTE_SDI_2, { 1, 0 } },
+				{ COYOTE_SDI_3, { 2, 0 } },
+				{ COYOTE_SDI_4, { 3, 0 } },
+			},
+			{
+				{ COYOTE_PLAYER_1, { 3840, 1080 } },
+				{ COYOTE_PLAYER_3, { 1920, 1080 } },
+				{ COYOTE_PLAYER_4, { 1920, 1080 } },
 			}
 		}
 	},
@@ -66,6 +99,17 @@ static const std::map<Coyote::PresetLayout, Coyote::LayoutInfo> Layouts
 				{ COYOTE_PLAYER_1, COYOTE_SDI_1 },
 				{ COYOTE_PLAYER_2, (SDIOutput)(COYOTE_SDI_2 | COYOTE_SDI_3) },
 				{ COYOTE_PLAYER_4, COYOTE_SDI_4 },
+			},
+			{
+				{ COYOTE_SDI_1, { 0, 0 } },
+				{ COYOTE_SDI_2, { 1, 0 } },
+				{ COYOTE_SDI_3, { 2, 0 } },
+				{ COYOTE_SDI_4, { 3, 0 } },
+			},
+			{
+				{ COYOTE_PLAYER_1, { 1920, 1080 } },
+				{ COYOTE_PLAYER_2, { 3840, 1080 } },
+				{ COYOTE_PLAYER_4, { 1920, 1080 } },
 			}
 		}
 	},
@@ -77,6 +121,17 @@ static const std::map<Coyote::PresetLayout, Coyote::LayoutInfo> Layouts
 				{ COYOTE_PLAYER_1, COYOTE_SDI_1 },
 				{ COYOTE_PLAYER_2, COYOTE_SDI_2 },
 				{ COYOTE_PLAYER_3, (SDIOutput)(COYOTE_SDI_3 | COYOTE_SDI_4) },
+			},
+			{
+				{ COYOTE_SDI_1, { 0, 0 } },
+				{ COYOTE_SDI_2, { 1, 0 } },
+				{ COYOTE_SDI_3, { 2, 0 } },
+				{ COYOTE_SDI_4, { 3, 0 } },
+			},
+			{
+				{ COYOTE_PLAYER_1, { 1920, 1080 } },
+				{ COYOTE_PLAYER_2, { 1920, 1080 } },
+				{ COYOTE_PLAYER_3, { 3840, 1080 } },
 			}
 		}
 	},
@@ -86,6 +141,15 @@ static const std::map<Coyote::PresetLayout, Coyote::LayoutInfo> Layouts
 			"F", COYOTE_PSLAYOUT_F, COYOTE_PLAYER_1,
 			{
 				{ COYOTE_PLAYER_1, (SDIOutput)(COYOTE_SDI_1 | COYOTE_SDI_2 | COYOTE_SDI_3 | COYOTE_SDI_4) },
+			},
+			{
+				{ COYOTE_SDI_1, { 0, 0 } },
+				{ COYOTE_SDI_2, { 1, 0 } },
+				{ COYOTE_SDI_3, { 0, 1 } },
+				{ COYOTE_SDI_4, { 1, 1 } },
+			},
+			{
+				{ COYOTE_PLAYER_1, { 3840, 2160 } },
 			}
 		}
 	},
@@ -95,6 +159,15 @@ static const std::map<Coyote::PresetLayout, Coyote::LayoutInfo> Layouts
 			"E", COYOTE_PSLAYOUT_E, COYOTE_PLAYER_1,
 			{
 				{ COYOTE_PLAYER_1, (SDIOutput)(COYOTE_SDI_1 | COYOTE_SDI_2 | COYOTE_SDI_3 | COYOTE_SDI_4) },
+			},
+			{
+				{ COYOTE_SDI_1, { 0, 0 } },
+				{ COYOTE_SDI_2, { 1, 0 } },
+				{ COYOTE_SDI_3, { 2, 0 } },
+				{ COYOTE_SDI_4, { 3, 0 } },
+			},
+			{
+				{ COYOTE_PLAYER_1, { 7680, 1080 } },
 			}
 		}
 		
@@ -106,6 +179,16 @@ static const std::map<Coyote::PresetLayout, Coyote::LayoutInfo> Layouts
 			{
 				{ COYOTE_PLAYER_1, (SDIOutput)(COYOTE_SDI_1 | COYOTE_SDI_2 | COYOTE_SDI_3) },
 				{ COYOTE_PLAYER_4, COYOTE_SDI_4 },
+			},
+			{
+				{ COYOTE_SDI_1, { 0, 0 } },
+				{ COYOTE_SDI_2, { 1, 0 } },
+				{ COYOTE_SDI_3, { 2, 0 } },
+				{ COYOTE_SDI_4, { 3, 0 } },
+			},
+			{
+				{ COYOTE_PLAYER_1, { 5760, 1080 } },
+				{ COYOTE_PLAYER_4, { 1920, 1080 } },
 			}
 		}
 	},
@@ -116,6 +199,16 @@ static const std::map<Coyote::PresetLayout, Coyote::LayoutInfo> Layouts
 			{
 				{ COYOTE_PLAYER_1, COYOTE_SDI_1 },
 				{ COYOTE_PLAYER_4, (SDIOutput)(COYOTE_SDI_2 | COYOTE_SDI_3 | COYOTE_SDI_4) },
+			},
+			{
+				{ COYOTE_SDI_1, { 0, 0 } },
+				{ COYOTE_SDI_2, { 1, 0 } },
+				{ COYOTE_SDI_3, { 2, 0 } },
+				{ COYOTE_SDI_4, { 3, 0 } },
+			},
+			{
+				{ COYOTE_PLAYER_1, { 1920, 1080 } },
+				{ COYOTE_PLAYER_2, { 5760, 1080 } },
 			}
 		}
 	},
@@ -125,7 +218,7 @@ static const auto &LayoutNameMap
 {
 	[] (void)
 	{
-		std::map<std::string, Coyote::PresetLayout> RetVal;
+		std::unordered_map<std::string, Coyote::PresetLayout> RetVal;
 		
 		for (auto &Pair : Layouts)
 		{

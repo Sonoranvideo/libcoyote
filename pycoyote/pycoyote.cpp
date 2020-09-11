@@ -172,6 +172,14 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_PLAYER_MAXVALUE)
 	.export_values();
 
+
+	py::class_<Coyote::Layout2D>(ModObj, "Layout2D")
+	.def("__repr__", [] (Coyote::Layout2D &Obj) { return std::string{"<Layout2D X:"} + std::to_string(Obj.X) + ", Y:" + std::to_string(Obj.Y) + ">"; })
+	.def(py::init<>())
+	.def(py::self == py::self)
+	.def(py::self < py::self)
+	ACLASSD(Layout2D, X)
+	ACLASSD(Layout2D, Y);
 	
 	py::class_<Coyote::NetworkInfo, Coyote::Object>(ModObj, "NetworkInfo")
 	.def("__repr__", [] (Coyote::NetworkInfo &Obj) { return std::string{"<NetworkInfo, IP "} + Obj.IP.c_str() + ", subnet " + Obj.Subnet.c_str() + ">"; })
@@ -369,7 +377,9 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSD(LayoutInfo, TextName)
 	ACLASSD(LayoutInfo, ID)
 	ACLASSD(LayoutInfo, Players)
-	ACLASSD(LayoutInfo, SDIOuts);
+	ACLASSD(LayoutInfo, SDIOuts)
+	ACLASSD(LayoutInfo, GridOrientation)
+	ACLASSD(LayoutInfo, PlayerResolutions);
 	
 	py::class_<Coyote::Asset, Coyote::Object>(ModObj, "Asset")
 	.def(py::init<>())

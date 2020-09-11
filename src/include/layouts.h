@@ -26,12 +26,31 @@
 
 namespace Coyote
 {
+	struct Layout2D
+	{
+		uint32_t X, Y;
+		
+		bool operator==(const Layout2D &Other) const
+		{
+			return Other.X == this->X && Other.Y == this->Y;
+		}
+		
+		bool operator<(const Layout2D &RHS) const
+		{ //Only used for sorting into maps.
+			return this->X < RHS.X && this->Y < RHS.Y;
+		}
+		
+		Layout2D(const uint32_t X = 0, const uint32_t Y = 0) : X(X), Y(Y) {}
+	};
+		
 	struct LayoutInfo
 	{
 		std::string TextName;
 		Coyote::PresetLayout ID;
 		Coyote::Player Players;
-		std::map<Coyote::Player, Coyote::SDIOutput> SDIOuts;
+		std::unordered_map<Coyote::Player, Coyote::SDIOutput> SDIOuts;
+		std::unordered_map<Coyote::SDIOutput, Coyote::Layout2D> GridOrientation;
+		std::unordered_map<Coyote::Player, Coyote::Layout2D> PlayerResolutions;
 	};
 	
 	EXPFUNC Coyote::SDIOutput GetPresetSDIOutputs(const Coyote::Preset &Input);
