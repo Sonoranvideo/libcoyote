@@ -198,7 +198,7 @@ static const std::unordered_map<Coyote::PresetLayout, Coyote::LayoutInfo> Layout
 			"D2", COYOTE_PSLAYOUT_D2, (Player)(COYOTE_PLAYER_1 | COYOTE_PLAYER_2),
 			{
 				{ COYOTE_PLAYER_1, COYOTE_SDI_1 },
-				{ COYOTE_PLAYER_4, (SDIOutput)(COYOTE_SDI_2 | COYOTE_SDI_3 | COYOTE_SDI_4) },
+				{ COYOTE_PLAYER_2, (SDIOutput)(COYOTE_SDI_2 | COYOTE_SDI_3 | COYOTE_SDI_4) },
 			},
 			{
 				{ COYOTE_SDI_1, { 0, 0 } },
