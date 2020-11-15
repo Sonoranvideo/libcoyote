@@ -220,26 +220,7 @@ const std::map<std::string, msgpack::object> InternalSession::PerformSyncedComma
 	MsgpackProc::InitOutgoingMsg(Pack, CommandName, MsgID, Values);
 	
 	if (!this->Connection || this->Connection->HasError())
-	{
-		//Try to reconnect
-		for (int TryCount = 0; (this->NumAttempts == -1 || TryCount < this->NumAttempts); ++TryCount)
-		{
-			std::cout << "libcoyote: Attempting to reconnect, attempt " << TryCount + 1 << " of " << (this->NumAttempts == -1 ? "infinite" : std::to_string(this->NumAttempts)) << std::endl;
-			
-			bool SeriousError{};
-			
-			if (this->ConfigConnection(&SeriousError))
-			{
-				return PerformSyncedCommand(CommandName, TempZone, StatusOut, Values);
-			}
-			
-			if (SeriousError)
-			{
-				std::cerr << "libcoyote: Cannot automatically reconnect, encountered a serious error." << std::endl;
-				return {};
-			}
-		}
-		
+	{	
 		if (StatusOut) *StatusOut = Coyote::COYOTE_STATUS_NETWORKERROR;
 		
 		return {};
