@@ -215,6 +215,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSD(LANCoyote, CommunicatorVersion)
 	ACLASSD(LANCoyote, GUID)
 	ACLASSD(LANCoyote, Nickname)
+	ACLASSD(LANCoyote, IP)
 	ACLASSD(LANCoyote, CurrentRole);
 		
 
