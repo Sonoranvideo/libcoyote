@@ -76,7 +76,7 @@ namespace WS
 
 		//No copying or moving
 		WSConnection(const WSConnection &) = delete;
-		WSConnection( WSConnection &&) = delete;
+		WSConnection(WSConnection &&) = delete;
 		WSConnection &operator=(const WSConnection &) = delete;
 		WSConnection &operator=(WSConnection &&) = delete;
 		

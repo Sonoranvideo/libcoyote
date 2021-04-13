@@ -90,8 +90,6 @@ struct InternalSession
 	{
 		this->CheckWSInit();
 		
-		Discovery::DiscoverySession::CheckInit();
-		
 		WS::WSCore *Core =  WS::WSCore::GetInstance();
 		
 		if (this->Connection) Core->ForgetConnection(this->Connection);
@@ -103,7 +101,7 @@ struct InternalSession
 		
 		msgpack::zone TempZone;
 		
-		static const char *const SubCommands[] = { "SubscribeTC", "SubscribeAssets", "SubscribePresets", "SubscribeHWState", "SubscribePlaybackEvents", nullptr };
+		static const char *const SubCommands[] = { "SubscribeTC", "SubscribeAssets", "SubscribePresetStates", "SubscribePresets", "SubscribeHWState", "SubscribePlaybackEvents", nullptr };
 		
 		for (const char *const *Cmd = SubCommands; *Cmd; ++Cmd)
 		{
@@ -570,7 +568,7 @@ Coyote::StatusCode Coyote::Session::CreateCountdown(const int32_t PK, const int3
 	const std::map<std::string, msgpack::object> Values
 	{
 		{ "PK", msgpack::object{PK, TempZone} },
-		{ "Time", msgpack::object{Time, TempZone} },
+		{ "TimeMS", msgpack::object{Time, TempZone} },
 		{ "Name", msgpack::object{Name.c_str(), TempZone} }
 	};
 	
@@ -591,7 +589,7 @@ Coyote::StatusCode Coyote::Session::CreateGoto(const int32_t PK, const int32_t T
 	const std::map<std::string, msgpack::object> Values
 	{
 		{ "PK", msgpack::object{PK, TempZone} },
-		{ "Time", msgpack::object{Time, TempZone} },
+		{ "TimeMS", msgpack::object{Time, TempZone} },
 		{ "Name", msgpack::object{Name.c_str(), TempZone} }
 	};
 	
@@ -670,6 +668,49 @@ Coyote::StatusCode Coyote::Session::IsMirror(bool &ValueOut)
 	Response.at("Data").convert(DataField);
 		
 	ValueOut = DataField[CmdName].as<bool>();
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::GetIsServerUnit(bool &ValueOut)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	const char *CmdName = "GetIsServerUnit";
+	
+	Coyote::StatusCode Status{};
+
+	const std::map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand(CmdName, TempZone, &Status) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;	
+	
+	std::map<std::string, msgpack::object> DataField;
+	
+	Response.at("Data").convert(DataField);
+		
+	ValueOut = DataField["IsServerUnit"].as<bool>();
+	
+	return Status;
+}
+Coyote::StatusCode Coyote::Session::GetSupportsS12G(bool &ValueOut)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	const char *CmdName = "GetSupportsS12G";
+	
+	Coyote::StatusCode Status{};
+
+	const std::map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand(CmdName, TempZone, &Status) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;	
+	
+	std::map<std::string, msgpack::object> DataField;
+	
+	Response.at("Data").convert(DataField);
+		
+	ValueOut = DataField["SupportsS12G"].as<bool>();
 	
 	return Status;
 }
@@ -768,6 +809,34 @@ Coyote::StatusCode Coyote::Session::RestartSpoke(const std::string &SpokeName)
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::GetSupportedSinks(std::vector<std::string> &Out)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	const char *CmdName = "GetSupportedSinks";
+	
+	Coyote::StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand(CmdName, TempZone, &Status) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	const msgpack::object &Results = Response.at("Data");
+
+	std::map<std::string, msgpack::object> DataField;
+	
+	Results.convert(DataField);
+	
+	std::vector<std::string> Sinks;
+	
+	DataField["SupportedSinks"].convert(Sinks);
+	
+	Out = std::move(Sinks);
+	
+	return Status;
+}
+
 Coyote::StatusCode Coyote::Session::GetDisks(std::vector<Coyote::Drive> &Out)
 {
 	DEF_SESS;
@@ -803,14 +872,14 @@ Coyote::StatusCode Coyote::Session::GetDisks(std::vector<Coyote::Drive> &Out)
 	return Status;
 }
 
-Coyote::StatusCode Coyote::Session::EjectDisk(const std::string &DriveLetter)
+Coyote::StatusCode Coyote::Session::EjectDisk(const std::string &Mountpoint)
 {
 	DEF_SESS;
 
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "DriveLetter", msgpack::object{DriveLetter.c_str()} } };
+	const std::map<std::string, msgpack::object> Values { { "Mountpoint", msgpack::object{Mountpoint.c_str()} } };
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 
 	const std::map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand("EjectDisk", TempZone, &Status, &Pass) };
@@ -928,21 +997,21 @@ Coyote::StatusCode Coyote::Session::GetAssets(std::vector<Coyote::Asset> &Out)
 	return Coyote::COYOTE_STATUS_OK;
 }
 
-Coyote::StatusCode Coyote::Session::GetHardwareState(Coyote::HardwareState &Out)
+Coyote::StatusCode Coyote::Session::GetKonaHardwareState(Coyote::KonaHardwareState &Out)
 {
 	DEF_SESS;
 
-	std::unique_ptr<Coyote::HardwareState> Ptr;
+	std::unique_ptr<Coyote::KonaHardwareState> Ptr;
 	try
 	{
-		Ptr.reset(SESS.ASyncSess.SubSession.GetHardwareState());
+		Ptr.reset(SESS.ASyncSess.SubSession.GetKonaHardwareState());
 	}
 	catch (...)
 	{
 		return Coyote::COYOTE_STATUS_FAILED;
 	}
 	
-	if (!Ptr || Ptr->Resolution == Coyote::COYOTE_RES_INVALID) return Coyote::COYOTE_STATUS_FAILED;
+	if (!Ptr) return Coyote::COYOTE_STATUS_FAILED;
 	
 	Out = std::move(*Ptr);
 	
@@ -984,10 +1053,10 @@ bool Coyote::Session::Reconnect(const std::string &Host)
 	return false;
 }
 
-std::vector<Coyote::LANCoyote> Coyote::Session::GetLANCoyotes(void)
+std::vector<Coyote::LANCoyote> Coyote::GetLANCoyotes(void)
 {
 	InternalSession::CheckWSInit();
-	
+
 	return Discovery::DiscoverySession::CheckInit()->GetLANCoyotes();
 }
 
@@ -1069,24 +1138,6 @@ Coyote::StatusCode Coyote::Session::SelectPreset(const int32_t PK)
 	return Status;
 }
 
-Coyote::StatusCode Coyote::Session::GetMediaState(Coyote::MediaState &Out)
-{
-	DEF_SESS;
-
-	msgpack::zone TempZone;	
-	StatusCode Status{};
-	
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetMediaState", TempZone, &Status) };
-	
-	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
-	
-	
-	std::unique_ptr<Coyote::MediaState> Ptr { static_cast<Coyote::MediaState*>(MsgpackProc::UnpackCoyoteObject(Msg.at("Data"), typeid(Coyote::MediaState))) };
-	
-	Out = *Ptr;
-	
-	return Status;
-}
 
 Coyote::StatusCode Coyote::Session::GetGenlockSettings(Coyote::GenlockSettings &Out)
 {
@@ -1141,31 +1192,40 @@ Coyote::StatusCode Coyote::Session::SetHorzGenlock(int32_t HorzValue)
 	return Status;
 }
 
-Coyote::StatusCode Coyote::Session::SetHardwareMode(const ResolutionMode Resolution,
-													const RefreshMode RefreshRate,
-													const HDRMode HDRMode,
-													const EOTFMode EOTFSetting,
-													const bool ConstLumin)
+Coyote::StatusCode Coyote::Session::SetKonaHardwareMode(const std::array<ResolutionMode, NUM_KONA_OUTS> &Resolutions,
+														const RefreshMode RefreshRate,
+														const HDRMode HDRMode,
+														const EOTFMode EOTFSetting,
+														const bool ConstLumin)
 {
 	DEF_SESS;
 
 	msgpack::zone TempZone;	
 	assert(RefreshMap.count(RefreshRate));
-	assert(ResolutionMap.count(Resolution));
 	
 	StatusCode Status{};
 	
+	std::vector<msgpack::object> ResolutionStrings;
+	
+	ResolutionStrings.reserve(NUM_KONA_OUTS);
+	
+	for (size_t Inc = 0u; Inc < NUM_KONA_OUTS; ++Inc)
+	{
+		ResolutionStrings.emplace_back(ResolutionMap.at(Resolutions[Inc]).c_str());
+	}
+	
 	const std::map<std::string, msgpack::object> Values
 	{
-		{ "Resolution", msgpack::object{ResolutionMap.at(Resolution).c_str()} },
-		{ "Refresh", msgpack::object{RefreshMap.at(RefreshRate).c_str()} },
+		{ "Resolutions", msgpack::object{MsgpackProc::STLArrayToMsgpackArray(ResolutionStrings, TempZone)} },
+		{ "RefreshRate", msgpack::object{RefreshMap.at(RefreshRate).c_str()} },
 		{ "HDRMode", msgpack::object{ (int)HDRMode } },
 		{ "EOTFSetting", msgpack::object{ (int)EOTFSetting } },
 		{ "ConstLumin", msgpack::object{ ConstLumin } },
 	};
+	
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 
-	SESS.PerformSyncedCommand("SetHardwareMode", TempZone, &Status, &Pass);
+	SESS.PerformSyncedCommand("SetKonaHardwareMode", TempZone, &Status, &Pass);
 	
 	return Status;
 }
@@ -1327,6 +1387,25 @@ Coyote::StatusCode Coyote::Session::GetEffectivePrimary(Coyote::Mirror &Out)
 }
 
 
+Coyote::StatusCode Coyote::Session::GetUnitType(UnitType &Out)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetUnitType", TempZone, &Status) };
+
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	std::map<std::string, msgpack::object> Data;
+	Msg.at("Data").convert(Data);
+	
+	Out = static_cast<UnitType>(Data.at("UnitType").as<int>());
+	
+	return Status;
+}
+
 Coyote::StatusCode Coyote::Session::DetectUpdate(bool &DetectedOut, std::string *Out)
 {
 	DEF_SESS;
@@ -1437,7 +1516,7 @@ Coyote::StatusCode Coyote::Session::SetUnitNickname(const std::string &Nickname)
 	return Status;
 }
 
-Coyote::StatusCode Coyote::Session::ExportLogsZip(const std::string &DriveLetter)
+Coyote::StatusCode Coyote::Session::ExportLogsZip(const std::string &Mountpoint)
 {
 	DEF_SESS;
 
@@ -1445,7 +1524,7 @@ Coyote::StatusCode Coyote::Session::ExportLogsZip(const std::string &DriveLetter
 
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "DriveLetter", msgpack::object{DriveLetter.c_str()} } };
+	const std::map<std::string, msgpack::object> Values { { "Mountpoint", msgpack::object{Mountpoint.c_str()} } };
 	
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 

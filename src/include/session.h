@@ -65,18 +65,17 @@ namespace Coyote
 		StatusCode GetDisks(std::vector<Drive> &Out);
 		inline StatusCode GetDrives(std::vector<Drive> &Out) { return this->GetDisks(Out); }
 		StatusCode GetDiskAssets(std::vector<ExternalAsset> &Out, const std::string &DriveName, const std::string &Subpath = "");
-		StatusCode EjectDisk(const std::string &DriveLetter);
+		StatusCode EjectDisk(const std::string &Mountpoint);
 		StatusCode GetUnitID(std::string &UnitIDOut, std::string &NicknameOut);
-		StatusCode GetHardwareState(HardwareState &Out);
+		StatusCode GetKonaHardwareState(KonaHardwareState &Out);
 		StatusCode GetIP(const int32_t AdapterID, NetworkInfo &Out);
 		StatusCode SetIP(const NetworkInfo &Input);
-		StatusCode SetHardwareMode(	const ResolutionMode Resolution,
-									const RefreshMode RefreshRate,
-									const HDRMode HDRMode = Coyote::COYOTE_HDR_DISABLED,
-									const EOTFMode EOTFSetting = Coyote::COYOTE_EOTF_NORMAL,
-									const bool ConstLumin = false);
+		StatusCode SetKonaHardwareMode(	const std::array<ResolutionMode, NUM_KONA_OUTS> &Resolutions,
+										const RefreshMode RefreshRate,
+										const HDRMode HDRMode = Coyote::COYOTE_HDR_DISABLED,
+										const EOTFMode EOTFSetting = Coyote::COYOTE_EOTF_NORMAL,
+										const bool ConstLumin = false);
 		StatusCode SelectPreset(const int32_t PK);
-		StatusCode GetMediaState(MediaState &Out);
 		StatusCode MovePreset(const int32_t PK, const int32_t TabID, const uint32_t NewIndex);
 		StatusCode GetServerVersion(std::string &Out);
 		StatusCode DetectUpdate(bool &ValueOut, std::string *NewVersionOut = nullptr);
@@ -84,6 +83,7 @@ namespace Coyote
 		StatusCode GetCurrentRole(UnitRole &RoleOut);
 		StatusCode AddMirror(const std::string &MirrorIP);
 		StatusCode GetMirrors(std::vector<Mirror> &Out);
+		StatusCode GetUnitType(UnitType &Out);
 		StatusCode GetEffectivePrimary(Mirror &Out);
 		StatusCode GetDesignatedPrimary(Mirror &Out);
 		StatusCode SynchronizerBusy(bool &Out);
@@ -103,7 +103,7 @@ namespace Coyote
 		StatusCode CreateCountdown(const int32_t PK, const int32_t Time, const std::string &Name);
 		StatusCode GetLogsZip(std::vector<uint8_t> &OutBuffer);
 		StatusCode ReadLog(const std::string &SpokeName, const int Year, const int Month, const int Day, std::string &LogOut);
-		StatusCode ExportLogsZip(const std::string &DriveLetter);
+		StatusCode ExportLogsZip(const std::string &Mountpoint);
 		StatusCode SetPausedState(const int32_t PK, const bool Value);
 		StatusCode SetPause(const int32_t PK);
 		StatusCode UnsetPause(const int32_t PK);
@@ -114,9 +114,10 @@ namespace Coyote
 		StatusCode GetGenlockSettings(Coyote::GenlockSettings &Out);
 		StatusCode SetHorzGenlock(int32_t HorzValue);
 		StatusCode SetVertGenlock(int32_t HorzValue);
-		
-		static std::vector<LANCoyote> GetLANCoyotes(void);
-		
+		StatusCode GetSupportedSinks(std::vector<std::string> &Out);
+		StatusCode GetSupportsS12G(bool &ValueOut);
+		StatusCode GetIsServerUnit(bool &ValueOut);
+
 		virtual ~Session(void);
 		
 		void SetCommandTimeoutSecs(const time_t TimeoutSecs = DefaultCommandTimeoutSecs);
@@ -136,5 +137,6 @@ namespace Coyote
 		
 	};
 	
+	std::vector<LANCoyote> GetLANCoyotes(void);
 }
 #endif //__LIBCOYOTE_SESSION_H__

@@ -13,6 +13,7 @@ namespace Discovery
 		char GUID[64];
 		char Nickname[128];
 		uint8_t CurrentRole;
+		uint8_t Type;
 		
 		inline Coyote::LANCoyote ToPublicStruct(const std::string &IP)
 		{
@@ -23,6 +24,7 @@ namespace Discovery
 			R.GUID = GUID;
 			R.Nickname = Nickname;
 			R.CurrentRole = static_cast<Coyote::UnitRole>(CurrentRole);
+			R.Type = static_cast<Coyote::UnitType>(Type);
 			R.IP = IP;
 			return R;
 		}

@@ -37,12 +37,14 @@ namespace Subs
 	private:
 		std::mutex TimeCodesLock;
 		std::mutex PresetsLock;
+		std::mutex PresetStatesLock;
 		std::mutex AssetsLock;
 		std::mutex HWStateLock;
 		std::map<int32_t, Coyote::TimeCode> TimeCodes;
 		std::map<int32_t, Coyote::Preset> Presets;
+		std::map<int32_t, Coyote::PresetState> PresetStates;
 		std::map<std::string, Coyote::Asset> Assets;
-		Coyote::HardwareState HWState;
+		Coyote::KonaHardwareState HWState;
 		Coyote::PBEventCallback UserPBEventCallback;
 		void *UserPBEventData;
 		
@@ -50,10 +52,10 @@ namespace Subs
 		
 	public:
 		bool ProcessSubscriptionEvent(const std::map<std::string, msgpack::object> &Values);
-		Coyote::TimeCode *GetTimeCode(const int32_t PK = 0);
+		Coyote::TimeCode *GetTimeCode(const int32_t PK);
 		std::map<int32_t, Coyote::Preset> *GetPresets(void);
 		std::map<std::string, Coyote::Asset> *GetAssets(void);
-		Coyote::HardwareState *GetHardwareState(void);
+		Coyote::KonaHardwareState *GetKonaHardwareState(void);
 		void SetPlaybackEventCallback(const Coyote::PBEventCallback, void *const UserData = nullptr);
 		void SetStateEventCallback(const Coyote::StateEventType EType, const Coyote::StateEventCallback CB, void *const UserData);
 		

@@ -17,7 +17,6 @@
 #include "../src/include/common.h"
 #include "../src/include/datastructures.h"
 #include "../src/include/session.h"
-#include "../src/include/layouts.h"
 #include <stddef.h>
 #include <stdint.h>
 #include "pybind11/include/pybind11/pybind11.h"
@@ -33,17 +32,13 @@ namespace py = pybind11;
 #define ACLASSD(a, b) .def_readwrite(#b, &Coyote::a::b)
 
 #define EMEMDEF(a) .value(#a, Coyote::a)
+#define ECMEMDEF(a, b) .value(#b, Coyote::a::b)
+
 static void PBEventFunc(const Coyote::PlaybackEventType EType, const int32_t PK, const int32_t Time, void *const Pass_);
 static void StateEventFunc(const Coyote::StateEventType EType, void *const Pass_);
 	
 PYBIND11_MODULE(pycoyote, ModObj)
 {
-	ModObj.def("LookupPresetLayoutByID", Coyote::LookupPresetLayoutByID);
-	ModObj.def("LookupPresetLayoutByString", Coyote::LookupPresetLayoutByString);
-	ModObj.def("GetPresetPlayers", Coyote::GetPresetPlayers);
-	ModObj.def("GetPresetSDIOutputs", Coyote::GetPresetSDIOutputs);
-	ModObj.def("GetPlayerSDIOutputs", Coyote::GetPlayerSDIOutputs);
-	
 	py::class_<Coyote::Object>(ModObj, "Object")
 	.def(py::init<>());
 	
@@ -62,6 +57,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	
 	py::enum_<Coyote::ResolutionMode>(ModObj, "ResolutionMode")
 	EMEMDEF(COYOTE_RES_INVALID)
+	EMEMDEF(COYOTE_RES_720P)
 	EMEMDEF(COYOTE_RES_1080P)
 	EMEMDEF(COYOTE_RES_2160P)
 	EMEMDEF(COYOTE_RES_1080I)
@@ -100,15 +96,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_PBEVENT_UNPAUSE)
 	EMEMDEF(COYOTE_PBEVENT_SEEK)
 	.export_values();
-		
-	
-	py::enum_<Coyote::HardwareMode>(ModObj, "HardwareMode")
-	EMEMDEF(COYOTE_MODE_INVALID)
-	EMEMDEF(COYOTE_MODE_Q3G)
-	EMEMDEF(COYOTE_MODE_S12G)
-	EMEMDEF(COYOTE_MODE_MAX)
-	.export_values();
-	
+
 	py::enum_<Coyote::StatusCode>(ModObj, "StatusCode")
 	EMEMDEF(COYOTE_STATUS_INVALID)
 	EMEMDEF(COYOTE_STATUS_OK)
@@ -117,6 +105,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_STATUS_INTERNALERROR)
 	EMEMDEF(COYOTE_STATUS_MISUSED)
 	EMEMDEF(COYOTE_STATUS_NETWORKERROR)
+	EMEMDEF(COYOTE_STATUS_UNSUPPORTED)
 	EMEMDEF(COYOTE_STATUS_MAX)
 	.export_values();
 	
@@ -128,59 +117,41 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_ROLE_MAX)
 	.export_values();
 	
+	py::enum_<Coyote::UnitType>(ModObj, "UnitType")
+	EMEMDEF(COYOTE_UTYPE_INVALID)
+	EMEMDEF(COYOTE_UTYPE_SERVER_K4)
+	EMEMDEF(COYOTE_UTYPE_SERVER_K5)
+	EMEMDEF(COYOTE_UTYPE_FLEX)
+	EMEMDEF(COYOTE_UTYPE_MAX)
+	.export_values();
+	
+	py::enum_<Coyote::SinkType>(ModObj, "SinkType")
+	EMEMDEF(COYOTE_SINK_INVALID)
+	EMEMDEF(COYOTE_SINK_DEMO)
+	EMEMDEF(COYOTE_SINK_KONA)
+	EMEMDEF(COYOTE_SINK_NDI)
+	EMEMDEF(COYOTE_SINK_MAXVALUE)
+	.export_values();
+	
 	py::enum_<Coyote::StateEventType>(ModObj, "StateEventType")
 	EMEMDEF(COYOTE_STATE_INVALID) 
 	EMEMDEF(COYOTE_STATE_PRESETS)
+	EMEMDEF(COYOTE_STATE_PRESETSTATES)
 	EMEMDEF(COYOTE_STATE_ASSETS)
 	EMEMDEF(COYOTE_STATE_HWSTATE)
 	EMEMDEF(COYOTE_STATE_TIMECODE)
 	EMEMDEF(COYOTE_STATE_MAX)
 	.export_values();
-
 	
-	py::enum_<Coyote::PresetLayout>(ModObj, "PresetLayout")
-	EMEMDEF(COYOTE_PSLAYOUT_INVALID)
-	EMEMDEF(COYOTE_PSLAYOUT_A)
-	EMEMDEF(COYOTE_PSLAYOUT_B)
-	EMEMDEF(COYOTE_PSLAYOUT_C1)
-	EMEMDEF(COYOTE_PSLAYOUT_C2)
-	EMEMDEF(COYOTE_PSLAYOUT_C3)
-	EMEMDEF(COYOTE_PSLAYOUT_F)
-	EMEMDEF(COYOTE_PSLAYOUT_E)
-	EMEMDEF(COYOTE_PSLAYOUT_D1)
-	EMEMDEF(COYOTE_PSLAYOUT_D2)
-	EMEMDEF(COYOTE_PSLAYOUT_MAX)
+	py::enum_<Coyote::CanvasOrientationEnum>(ModObj, "CanvasOrientationEnum")
+	ECMEMDEF(CanvasOrientationEnum, Invalid)
+	ECMEMDEF(CanvasOrientationEnum, Landscape)
+	ECMEMDEF(CanvasOrientationEnum, Portrait)
+	ECMEMDEF(CanvasOrientationEnum, Single)
+	ECMEMDEF(CanvasOrientationEnum, Standard)
+	ECMEMDEF(CanvasOrientationEnum, Custom)
 	.export_values();
 
-	
-	py::enum_<Coyote::SDIOutput>(ModObj, "SDIOutput", py::arithmetic())
-	EMEMDEF(COYOTE_SDI_INVALID)
-	EMEMDEF(COYOTE_SDI_1)
-	EMEMDEF(COYOTE_SDI_2)
-	EMEMDEF(COYOTE_SDI_3)
-	EMEMDEF(COYOTE_SDI_4)
-	EMEMDEF(COYOTE_SDI_MAXVALUE)
-	.export_values();
-
-	
-	py::enum_<Coyote::Player>(ModObj, "Player", py::arithmetic())
-	EMEMDEF(COYOTE_PLAYER_INVALID)
-	EMEMDEF(COYOTE_PLAYER_1)
-	EMEMDEF(COYOTE_PLAYER_2)
-	EMEMDEF(COYOTE_PLAYER_3)
-	EMEMDEF(COYOTE_PLAYER_4)
-	EMEMDEF(COYOTE_PLAYER_MAXVALUE)
-	.export_values();
-
-
-	py::class_<Coyote::Layout2D>(ModObj, "Layout2D")
-	.def("__repr__", [] (Coyote::Layout2D &Obj) { return std::string{"<Layout2D X:"} + std::to_string(Obj.X) + ", Y:" + std::to_string(Obj.Y) + ">"; })
-	.def(py::init<>())
-	.def(py::self == py::self)
-	.def(py::self < py::self)
-	ACLASSD(Layout2D, X)
-	ACLASSD(Layout2D, Y);
-	
 	py::class_<Coyote::NetworkInfo, Coyote::Object>(ModObj, "NetworkInfo")
 	.def("__repr__", [] (Coyote::NetworkInfo &Obj) { return std::string{"<NetworkInfo, IP "} + Obj.IP.c_str() + ", subnet " + Obj.Subnet.c_str() + ">"; })
 	.def(py::init<>())
@@ -189,24 +160,38 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSD(NetworkInfo, AdapterID);
 
 	py::class_<Coyote::Drive, Coyote::Object>(ModObj, "Drive")
-	.def("__repr__", [] (Coyote::Drive &Obj) { return std::string{"<Drive "} + Obj.DriveLetter.c_str() + ":\\, " + std::to_string(Obj.Free / (1024ll * 1024ll * 1024ll)) + "/" + std::to_string(Obj.Total / (1024ll * 1024ll * 1024ll)) + " GiB free>"; })
+	.def("__repr__", [] (Coyote::Drive &Obj) { return std::string{"<Drive "} + Obj.Mountpoint.c_str() + ", " + std::to_string(Obj.Free / (1024ll * 1024ll * 1024ll)) + "/" + std::to_string(Obj.Total / (1024ll * 1024ll * 1024ll)) + " GiB free>"; })
 	.def(py::init<>())
-	ACLASSD(Drive, DriveLetter)
+	ACLASSD(Drive, Mountpoint)
 	ACLASSD(Drive, Total)
 	ACLASSD(Drive, Used)
 	ACLASSD(Drive, Free)
 	ACLASSD(Drive, IsExternal);
 	
-	py::class_<Coyote::HardwareState, Coyote::Object>(ModObj, "HardwareState")
+	py::class_<Coyote::KonaHardwareState, Coyote::Object>(ModObj, "KonaHardwareState")
 	.def(py::init<>())
-	.def("__repr__", [] (Coyote::HardwareState &Obj) { return std::string{"<HardwareState of "} + ResolutionMap.at(Obj.Resolution) + "@" + RefreshMap.at(Obj.RefreshRate) + ">"; })
-	ACLASSD(HardwareState, Resolution)
-	ACLASSD(HardwareState, RefreshRate)
-	ACLASSD(HardwareState, CurrentMode)
-	ACLASSD(HardwareState, HDRMode)
-	ACLASSD(HardwareState, EOTFSetting)
-	ACLASSD(HardwareState, SupportsS12G)
-	ACLASSD(HardwareState, ConstLumin);
+	.def("__repr__", [] (Coyote::KonaHardwareState &Obj)
+	{
+		std::string ResString;
+		
+		ResString.reserve(128);
+		
+		ResString += '[';
+		
+		for (size_t Inc = 0u; Inc < NUM_KONA_OUTS; ++Inc)
+		{
+			ResString += ResolutionMap.at(Obj.Resolutions[Inc]) + ',';
+			
+		}
+		ResString += ']';
+		
+		return std::string{"<KonaHardwareState of "} + ResString + "@" + RefreshMap.at(Obj.RefreshRate) + ">";
+	})
+	ACLASSD(KonaHardwareState, Resolutions)
+	ACLASSD(KonaHardwareState, RefreshRate)
+	ACLASSD(KonaHardwareState, HDRMode)
+	ACLASSD(KonaHardwareState, EOTFSetting)
+	ACLASSD(KonaHardwareState, ConstLumin);
 	
 	py::class_<Coyote::LANCoyote, Coyote::Object>(ModObj, "LANCoyote")
 	.def(py::init<>())
@@ -216,45 +201,9 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSD(LANCoyote, GUID)
 	ACLASSD(LANCoyote, Nickname)
 	ACLASSD(LANCoyote, IP)
-	ACLASSD(LANCoyote, CurrentRole);
+	ACLASSD(LANCoyote, CurrentRole)
+	ACLASSD(LANCoyote, Type);
 		
-
-	py::class_<Coyote::Output, Coyote::Object>(ModObj, "Output")
-	.def(py::init<>())
-	ACLASSD(Output, Filename)
-	ACLASSD(Output, Hue)
-	ACLASSD(Output, Saturation)
-	ACLASSD(Output, Contrast)
-	ACLASSD(Output, Brightness)
-	ACLASSD(Output, MediaId)
-	ACLASSD(Output,	FadeOut)
-	ACLASSD(Output,	Delay)
-	ACLASSD(Output, Active)
-	ACLASSD(Output, Audio)
-	ACLASSD(Output, AudioChannel1)
-	ACLASSD(Output, AudioChannel2)
-	ACLASSD(Output, AudioChannel3)
-	ACLASSD(Output, AudioChannel4)
-	ACLASSD(Output, EnableTimeCode)
-	ACLASSD(Output, OriginalHeight)
-	ACLASSD(Output, OriginalWidth)
-	ACLASSD(Output, CustomDestX)
-	ACLASSD(Output, CustomDestY)
-	ACLASSD(Output, CustHeight)
-	ACLASSD(Output, CustWidth)
-	ACLASSD(Output, JustifyTop)
-	ACLASSD(Output, JustifyBottom)
-	ACLASSD(Output, JustifyRight)
-	ACLASSD(Output, JustifyLeft)
-	ACLASSD(Output, CenterVideo)
-	ACLASSD(Output, NativeSize)
-	ACLASSD(Output, LetterPillarBox)
-	ACLASSD(Output, TempFlag)
-	ACLASSD(Output, Anamorphic)
-	ACLASSD(Output, MultiviewAudio)
-	ACLASSD(Output, HorizontalCrop)
-	ACLASSD(Output, VerticalCrop);
-
 	py::class_<Coyote::TabOrdering, Coyote::Object>(ModObj, "TabOrdering")
 	.def(py::init<>())
 	.def("__repr__", [] (Coyote::TabOrdering &Obj) { return std::string{"<TabOrdering for tab ID "} + std::to_string(Obj.TabID) + " with index " + std::to_string(Obj.Index) + ">"; })
@@ -271,68 +220,41 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	
 	py::class_<Coyote::PresetMark, Coyote::Object>(ModObj, "PresetMark")
 	.def(py::init<>())
-	ACLASSD(PresetMark, MarkNumber)
-	ACLASSD(PresetMark,	MarkName)
-	ACLASSD(PresetMark, MarkDisplayTime)
-	ACLASSD(PresetMark, MarkTime)
-	.def("__repr__", [] (Coyote::PresetMark &Obj) { return std::string{"<PresetMark \""} + Obj.MarkName.c_str() + "\", time " + std::to_string(Obj.MarkTime) + ">"; });
+	ACLASSD(PresetMark, ID)
+	ACLASSD(PresetMark,	Name)
+	ACLASSD(PresetMark, TimeMS)
+	.def("__repr__", [] (Coyote::PresetMark &Obj) { return std::string{"<PresetMark \""} + Obj.Name.c_str() + "\", time " + std::to_string(Obj.TimeMS) + ">"; });
 	
 	
 	py::class_<Coyote::Preset, Coyote::Object>(ModObj, "Preset")
 	.def(py::init<>())
 	.def("__repr__", [] (Coyote::Preset &Obj) { return std::string{"<Preset \""} + Obj.Name.c_str() + "\", PK " + std::to_string(Obj.PK) + ", TRT " + std::to_string(Obj.TRT) + ">"; })
 	ACLASSD(Preset, PK)
+	ACLASSD(Preset, Name)
 	ACLASSD(Preset, TRT)
-	ACLASSD(Preset, Index)
+	//~ ACLASSD(Preset, Canvases)
+	ACLASSD(Preset, Notes)
 	ACLASSD(Preset, Loop)
-	ACLASSD(Preset, TotalLoop)
 	ACLASSD(Preset, Link)
-	ACLASSD(Preset, DisplayLink)
-	ACLASSD(Preset, Fade)
-	ACLASSD(Preset, LeftVolume)
-	ACLASSD(Preset, RightVolume)
-	ACLASSD(Preset, ScrubberPosition)
+	ACLASSD(Preset, FadeInMS)
+	ACLASSD(Preset, FadeOutMS)
+	ACLASSD(Preset, Color)
 	ACLASSD(Preset, InPosition)
 	ACLASSD(Preset, OutPosition)
-	ACLASSD(Preset, IsPlaying)
-	ACLASSD(Preset, IsPaused)
-	ACLASSD(Preset, Selected)
-	ACLASSD(Preset, VolumeLinked)
-	ACLASSD(Preset, Name)
-	ACLASSD(Preset, Layout)
-	ACLASSD(Preset, Notes)
-	ACLASSD(Preset, Color)
-	ACLASSD(Preset, timeCodeUpdate)
-	ACLASSD(Preset, tcColor)
+	ACLASSD(Preset, TabDisplayOrder)
+	ACLASSD(Preset, Gotos)
+	ACLASSD(Preset, Countdowns)
 	ACLASSD(Preset, FreezeAtEnd)
-	ACLASSD(Preset, DisplayOrderIndex)
-	ACLASSD(Preset, Dissolve)
-	ACLASSD(Preset, Output1)
-	ACLASSD(Preset, Output2)
-	ACLASSD(Preset, Output3)
-	ACLASSD(Preset, Output4)
-	ACLASSD(Preset, gotoMarks)
-	ACLASSD(Preset, countDowns)
-	ACLASSD(Preset, TabDisplayOrder);
+	ACLASSD(Preset, DissolveInMS)
+	ACLASSD(Preset, DissolveOutMS)
+	ACLASSD(Preset, Volume);
 	
 	py::class_<Coyote::TimeCode, Coyote::Object>(ModObj, "TimeCode")
 	.def(py::init<>())
-	.def("__repr__", [] (Coyote::TimeCode &Obj) { return std::string{"<TimeCode for PK "} + std::to_string(Obj.PresetKey) + " with time " + std::to_string(Obj.Time) + ">"; })
-	ACLASSD(TimeCode, ScrubBar)
+	.def("__repr__", [] (Coyote::TimeCode &Obj) { return std::string{"<TimeCode for PK "} + std::to_string(Obj.PK) + " with time " + std::to_string(Obj.Time) + ">"; })
+	ACLASSD(TimeCode, PK)
 	ACLASSD(TimeCode, Time)
-	ACLASSD(TimeCode, TRT)
-	ACLASSD(TimeCode, PresetKey)
-	ACLASSD(TimeCode, LeftChannelVolume)
-	ACLASSD(TimeCode, RightChannelVolume)
-	ACLASSD(TimeCode, Player1LeftVolume)
-	ACLASSD(TimeCode, Player1RightVolume)
-	ACLASSD(TimeCode, Player2LeftVolume)
-	ACLASSD(TimeCode, Player2RightVolume)
-	ACLASSD(TimeCode, Player3LeftVolume)
-	ACLASSD(TimeCode, Player3RightVolume)
-	ACLASSD(TimeCode, Player4LeftVolume)
-	ACLASSD(TimeCode, Player4RightVolume)
-	ACLASSD(TimeCode, Selected);
+	ACLASSD(TimeCode, VUData);
 
 	py::class_<Coyote::GenlockSettings, Coyote::Object>(ModObj, "GenlockSettings")
 	.def(py::init<>())
@@ -361,27 +283,47 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSD(Mirror, UnitID)
 	ACLASSD(Mirror, IP)
 	ACLASSD(Mirror, Busy)
-	ACLASSD(Mirror, SupportsS12G)
+	ACLASSD(Mirror, Type)
 	ACLASSD(Mirror, IsAlive);
 	
-	py::class_<Coyote::MediaState, Coyote::Object>(ModObj, "MediaState")
+	py::class_<Coyote::Coords2D>(ModObj, "Coords2D")
 	.def(py::init<>())
-	ACLASSD(MediaState, NumPresets)
-	ACLASSD(MediaState, SelectedPreset)
-	ACLASSD(MediaState, PlayingPresets)
-	ACLASSD(MediaState, PausedPresets)
-	ACLASSD(MediaState, TimeCodes);
+	.def("__repr__", [] (Coyote::Coords2D &Obj) { return std::string{"<Coords2D of "} + std::to_string(Obj.X) + ',' + std::to_string(Obj.Y) + ">"; })
+	ACLASSD(Coords2D, X)
+	ACLASSD(Coords2D, Y);
 	
-	py::class_<Coyote::LayoutInfo>(ModObj, "LayoutInfo")
+	py::class_<Coyote::Size2D>(ModObj, "Size2D")
 	.def(py::init<>())
-	.def("__repr__", [] (Coyote::LayoutInfo &Obj) { return std::string{"<LayoutInfo for preset layout "} + Obj.TextName + ">"; })
-	ACLASSD(LayoutInfo, TextName)
-	ACLASSD(LayoutInfo, ID)
-	ACLASSD(LayoutInfo, Players)
-	ACLASSD(LayoutInfo, SDIOuts)
-	ACLASSD(LayoutInfo, GridOrientation)
-	ACLASSD(LayoutInfo, PlayerResolutions);
+	.def("__repr__", [] (Coyote::Size2D &Obj) { return std::string{"<Size2D of "} + std::to_string(Obj.Width) + ',' + std::to_string(Obj.Height) + ">"; })
+	ACLASSD(Size2D, Width)
+	ACLASSD(Size2D, Height);
 	
+	py::class_<Coyote::Rect, Coyote::Size2D, Coyote::Coords2D>(ModObj, "Rect")
+	.def("__repr__", [] (Coyote::Rect &Obj)
+	{
+		return	std::string{"<Rect of "} +
+				"W:" +	std::to_string(Obj.Width) +
+				", H:" + std::to_string(Obj.Height) +
+				", X:" + std::to_string(Obj.X) +
+				", Y:" + std::to_string(Obj.Y) + ">";
+	})
+	.def(py::init<>());
+	
+	py::class_<Coyote::Cube, Coyote::Rect>(ModObj, "Cube")
+	.def("__repr__", [] (Coyote::Cube &Obj)
+	{
+		return	std::string{"<Cube of "} +
+				"W:"   + std::to_string(Obj.Width) +
+				", H:" + std::to_string(Obj.Height) +
+				", X:" + std::to_string(Obj.X) +
+				", Y:" + std::to_string(Obj.Y) +
+				", D:" + std::to_string(Obj.Depth) +
+				", Z:" + std::to_string(Obj.Z) + ">";
+	})
+	ACLASSD(Cube, Depth)
+	ACLASSD(Cube, Z)
+	.def(py::init<>());
+
 	py::class_<Coyote::Asset, Coyote::Object>(ModObj, "Asset")
 	.def(py::init<>())
 	.def("__repr__", [] (Coyote::Asset &Obj) { return std::string{"<Asset \""} + Obj.FullPath + "\">"; })
@@ -394,21 +336,43 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	
 	py::class_<Coyote::AssetMetadata, Coyote::Object>(ModObj, "AssetMetadata")
 	.def(py::init<>())
-	ACLASSD(AssetMetadata, FullPath)
-	ACLASSD(AssetMetadata, AssetSize)
-	ACLASSD(AssetMetadata, TRT)
-	ACLASSD(AssetMetadata, Width)
-	ACLASSD(AssetMetadata, Height)
+	ACLASSD(AssetMetadata, FilePath)
+	ACLASSD(AssetMetadata, VideoFormat)
+	ACLASSD(AssetMetadata, AudioFormat)
+	ACLASSD(AssetMetadata, ContainerFormat)
+	ACLASSD(AssetMetadata, Resolution)
+	ACLASSD(AssetMetadata, TotalSize)
+	ACLASSD(AssetMetadata, VBitrate)
+	ACLASSD(AssetMetadata, ABitrate)
+	ACLASSD(AssetMetadata, ASampleRate)
+	ACLASSD(AssetMetadata, AChannels)
 	ACLASSD(AssetMetadata, FPS)
-	ACLASSD(AssetMetadata, NumAudioChannels)
-	ACLASSD(AssetMetadata, AudioSampleRate)
-	ACLASSD(AssetMetadata, VideoCodec)
-	ACLASSD(AssetMetadata, AudioCodec)
-	ACLASSD(AssetMetadata, SupportedVideoCodec)
-	ACLASSD(AssetMetadata, SupportedAudioCodec)
-	.def("__repr__", [] (Coyote::AssetMetadata &Obj) { return std::string{"<AssetMetadata for \""} + Obj.FullPath.c_str() + "\">"; });
+	ACLASSD(AssetMetadata, Duration)
+	.def("__repr__", [] (Coyote::AssetMetadata &Obj) { return std::string{"<AssetMetadata for \""} + Obj.FilePath.c_str() + "\">"; });
 	
+	py::class_<Coyote::PinnedAsset, Coyote::Object>(ModObj, "PinnedAsset")
+	.def(py::init<>())
+	ACLASSD(PinnedAsset, FullPath)
+	ACLASSD(PinnedAsset, PinnedCoords);
+
+	py::class_<Coyote::CanvasOrientation, Coyote::Object>(ModObj, "CanvasOrientation")
+	.def(py::init<>())
+	ACLASSD(CanvasOrientation, Orientation)
+	ACLASSD(CanvasOrientation, CustomCoords);
 	
+	py::class_<Coyote::ProjectorCanvasConfig, Coyote::Object>(ModObj, "ProjectorCanvasConfig")
+	.def(py::init<>())
+	ACLASSD(ProjectorCanvasConfig, Orientation)
+	ACLASSD(ProjectorCanvasConfig, Dimensions)
+	ACLASSD(ProjectorCanvasConfig, NumOutputs);
+
+	
+	py::class_<Coyote::CanvasInfo, Coyote::Object>(ModObj, "CanvasInfo")
+	.def(py::init<>())
+	ACLASSD(CanvasInfo, CanvasCfg)
+	ACLASSD(CanvasInfo, Assets)
+	ACLASSD(CanvasInfo, SinkTypes);
+
 	py::class_<Coyote::Session>(ModObj, "Session")
 	.def(py::init<const std::string &, const int>(), py::call_guard<py::gil_scoped_release>(), py::arg("IP"), py::arg("NumAttempts") = -1)
 	.def("SynchronizerBusy",
@@ -444,6 +408,22 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		
 		return std::make_tuple(Status, Value);
 	}, py::call_guard<py::gil_scoped_release>())
+	.def("GetSupportsS12G",
+	[] (Coyote::Session &Obj)
+	{
+		bool Value{};
+		const Coyote::StatusCode Status = Obj.GetSupportsS12G(Value);
+		
+		return std::make_tuple(Status, Value);
+	}, py::call_guard<py::gil_scoped_release>())
+	.def("GetIsServerUnit",
+	[] (Coyote::Session &Obj)
+	{
+		bool Value{};
+		const Coyote::StatusCode Status = Obj.GetIsServerUnit(Value);
+		
+		return std::make_tuple(Status, Value);
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("DetectUpdate",
 	[] (Coyote::Session &Obj)
 	{
@@ -452,27 +432,6 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		const Coyote::StatusCode Status = Obj.DetectUpdate(Detected, &Version);
 		
 		return std::make_tuple(Status, Detected, Version);
-	}, py::call_guard<py::gil_scoped_release>())
-	.def("GetMediaState",
-	[] (Coyote::Session &Obj)
-	{
-		Coyote::MediaState State{};
-		
-		const Coyote::StatusCode Status = Obj.GetMediaState(State);
-		
-		int MaxPlayingIndex = 0;
-		int MaxPausedIndex = 0;
-		int MaxTCIndex = 0;
-		
-		while (State.PlayingPresets[MaxPlayingIndex]) ++MaxPlayingIndex;
-		while (State.PausedPresets[MaxPausedIndex]) ++MaxPausedIndex;
-		while (State.TimeCodes[MaxTCIndex].PresetKey) ++MaxTCIndex;
-		
-		State.PausedPresets.resize(MaxPausedIndex);
-		State.PlayingPresets.resize(MaxPlayingIndex);
-		State.TimeCodes.resize(MaxTCIndex);
-		
-		return std::make_tuple(Status, State);
 	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetServerVersion",
 	[] (Coyote::Session &Obj)
@@ -528,6 +487,15 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		
 		return std::make_tuple(Status, Value);
 	}, py::call_guard<py::gil_scoped_release>())
+	.def("GetUnitType",
+	[] (Coyote::Session &Obj)
+	{
+		Coyote::UnitType Value{};
+		
+		const Coyote::StatusCode Status = Obj.GetUnitType(Value);
+		
+		return std::make_tuple(Status, Value);
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetEffectivePrimary",
 	[] (Coyote::Session &Obj)
 	{
@@ -537,12 +505,12 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		
 		return std::make_tuple(Status, Value);
 	}, py::call_guard<py::gil_scoped_release>())
-	.def("GetHardwareState",
+	.def("GetKonaHardwareState",
 	[] (Coyote::Session &Obj)
 	{
-		Coyote::HardwareState Value{};
+		Coyote::KonaHardwareState Value{};
 		
-		const Coyote::StatusCode Status = Obj.GetHardwareState(Value);
+		const Coyote::StatusCode Status = Obj.GetKonaHardwareState(Value);
 		
 		return std::make_tuple(Status, Value);
 	}, py::call_guard<py::gil_scoped_release>())
@@ -600,15 +568,6 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		
 		return std::make_tuple(Status, Disks);
 	}, py::call_guard<py::gil_scoped_release>())
-	.def("GetDrives", //Alias for GetDisks
-	[] (Coyote::Session &Obj)
-	{
-		std::vector<Coyote::Drive> Disks;
-		
-		const Coyote::StatusCode Status = Obj.GetDisks(Disks);
-		
-		return std::make_tuple(Status, Disks);
-	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetDiskAssets",
 	[] (Coyote::Session &Obj, const std::string DriveName, const std::string Subpath)
 	{
@@ -644,6 +603,15 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		const Coyote::StatusCode Status = Obj.GetMirrors(Mirrors);
 		
 		return std::make_tuple(Status, Mirrors);
+	}, py::call_guard<py::gil_scoped_release>())
+	.def("GetSupportedSinks",
+	[] (Coyote::Session &Obj)
+	{
+		std::vector<std::string> Sinks;
+		
+		const Coyote::StatusCode Status = Obj.GetSupportedSinks(Sinks);
+		
+		return std::make_tuple(Status, Sinks);
 	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetGenlockSettings",
 	[] (Coyote::Session &Obj)
@@ -699,20 +667,21 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, StartSpoke)
 	ACLASSF(Session, RestartSpoke)
 	ACLASSF(Session, KillSpoke)
-	ACLASSF(Session, GetLANCoyotes)
 	ACLASSF(Session, ExportLogsZip)
 	ACLASSF(Session, SetUnitNickname)
 	ACLASSF(Session, SetCommandTimeoutSecs)
 	ACLASSF(Session, GetCommandTimeoutSecs)
 	ACLASSF(Session, HasConnectionError)
-	.def("SetHardwareMode", &Coyote::Session::SetHardwareMode, py::call_guard<py::gil_scoped_release>(),
+	.def("SetKonaHardwareMode", &Coyote::Session::SetKonaHardwareMode, py::call_guard<py::gil_scoped_release>(),
 	py::arg("Resolution"),
 	py::arg("RefreshRate"),
 	py::arg("HDRMode") = Coyote::COYOTE_HDR_DISABLED,
 	py::arg("EOTFSetting") = Coyote::COYOTE_EOTF_NORMAL,
 	py::arg("ConstLumin") = false);
+
+	ModObj.def("GetLANCoyotes", Coyote::GetLANCoyotes);	
 	
-	ModObj.doc() = "Interface for controlling Sonoran Video Systems' Coyote playback servers";	
+	ModObj.doc() = "Interface for controlling Sonoran Video Systems' Coyote playback products";	
 }
 
 static void PBEventFunc(const Coyote::PlaybackEventType EType, const int32_t PK, const int32_t Time, void *const Pass_)

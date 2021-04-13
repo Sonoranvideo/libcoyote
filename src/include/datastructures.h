@@ -30,10 +30,9 @@
 #include "statuscodes.h"
 
 
-typedef Coyote::HardwareMode HardwareMode;
 typedef Coyote::ResolutionMode ResolutionMode;
 typedef Coyote::RefreshMode RefreshMode;
-typedef Coyote::PresetLayout PresetLayout;
+//~ typedef Coyote::PresetLayout PresetLayout;
 typedef Coyote::HDRMode HDRMode;
 typedef Coyote::EOTFMode EOTFMode;
 
@@ -42,19 +41,130 @@ namespace Coyote
 	typedef void (*PBEventCallback)(const PlaybackEventType EType, const int32_t PK, const int32_t Time, void *UserData);
 	typedef void (*StateEventCallback)(const StateEventType EventType, void *UserData);
 
+
+	
+	struct Size2D //These don't inherit Object because there's no need and doing so creates a diamond of death.
+	{
+		int32_t Width, Height;
+		
+		inline bool operator==(const Size2D &Other) const { return this->Width == Other.Width && this->Height == Other.Height; }
+		inline bool operator!=(const Size2D &Other) const { return !(*this == Other); }
+		
+		MSGPACK_DEFINE_MAP(Width, Height)
+	};
+	
+	struct Coords2D
+	{
+		int32_t X, Y;
+		
+		inline bool operator==(const Coords2D &Other) const { return this->X == Other.X && this->Y == Other.Y; }
+		inline bool operator!=(const Coords2D &Other) const { return !(*this == Other); }
+
+		MSGPACK_DEFINE_MAP(X, Y)
+	};
+	
+	struct Rect : public Size2D, public Coords2D
+	{
+		inline bool operator==(const Rect &Other) const
+		{
+			return	*static_cast<const Coords2D*>(this) == static_cast<const Coords2D&>(Other) &&
+					*static_cast<const Size2D*>(this) == static_cast<const Size2D&>(Other);
+		}
+		
+		inline bool operator!=(const Rect &Other) const { return !(*this == Other); }
+		MSGPACK_DEFINE_MAP(MSGPACK_BASE_MAP(Size2D), MSGPACK_BASE_MAP(Coords2D))
+	};
+	
+	struct Cube : public Rect
+	{
+		int32_t Z, Depth;
+
+		inline bool operator==(const Cube &Other) const
+		{
+			return	*static_cast<const Rect*>(this) == static_cast<const Rect&>(Other) &&
+					this->Z == Other.Z && this->Depth == Other.Depth;
+		}
+		
+		inline bool operator!=(const Cube &Other) const { return !(*this == Other); }
+		
+		MSGPACK_DEFINE_MAP(MSGPACK_BASE_MAP(Rect), Z, Depth)
+	};
+	
 	struct Object
 	{
 		virtual ~Object(void) = default;
 	};
 	
+	enum class CanvasOrientationEnum
+	{
+		Invalid = 0,
+		Custom = 1,
+		Single = 2,
+		Standard = 3,
+		Landscape = 4,
+		Portrait = 5
+	};
+
+	struct CanvasOrientation : public Object
+	{
+		Coords2D CustomCoords; //Only valid if Orientation == Custom.
+		CanvasOrientationEnum Orientation;
+		
+		inline operator CanvasOrientationEnum(void) const { return this->Orientation; }
+		
+		inline bool operator==(const CanvasOrientation &Other) const
+		{
+			if (this->Orientation == CanvasOrientationEnum::Custom)
+			{
+				return this->Orientation == Other.Orientation && this->CustomCoords == Other.CustomCoords;
+			}
+			
+			return this->Orientation == Other.Orientation;
+		}
+		
+		inline bool operator!=(const CanvasOrientation &Other) const { return !(*this == Other); }
+		inline bool operator==(const CanvasOrientationEnum &Other) const { return this->Orientation == Other; }
+		inline bool operator!=(const CanvasOrientationEnum &Other) const { return this->Orientation != Other; }
+		
+		CanvasOrientation(const CanvasOrientationEnum Input = CanvasOrientationEnum::Invalid, const Coords2D *Coords = nullptr)
+			: CustomCoords(Coords ? *Coords : Coords2D{}), Orientation(Input)
+		{
+		}
+	};
+
+	struct PinnedAsset : public Object
+	{
+		std::string FullPath;
+		Cube PinnedCoords;
+		
+		MSGPACK_DEFINE_MAP(FullPath, PinnedCoords)
+	};
+	
+	struct ProjectorCanvasConfig : public Object
+	{ //This cooresponds to a datatype used in Sonoran's video rendering core, Projector.
+		CanvasOrientation Orientation;
+		Size2D Dimensions;
+		uint32_t NumOutputs;
+		
+		MSGPACK_DEFINE_MAP(Dimensions, NumOutputs)
+	};
+	
+	struct CanvasInfo : public Object
+	{
+		ProjectorCanvasConfig CanvasCfg; //Geometry and configuration for the surface we draw on.
+		std::vector<PinnedAsset> Assets;
+		SinkType SinkTypes;
+		
+		MSGPACK_DEFINE_MAP(Assets, SinkTypes)
+	};
+	
 	struct PresetMark : public Object
 	{
-		std::string MarkNumber;
-		std::string MarkName;
-		std::string MarkDisplayTime;
-		int32_t MarkTime;
+		int32_t ID;
+		int32_t TimeMS;
+		std::string Name;
 		
-		MSGPACK_DEFINE_MAP(MarkNumber, MarkName, MarkDisplayTime, MarkTime)
+		MSGPACK_DEFINE_MAP(ID, TimeMS, Name)
 	};
 	
 	struct LANCoyote : public Object
@@ -65,54 +175,26 @@ namespace Coyote
 		std::string Nickname;
 		std::string IP;
 		UnitRole CurrentRole;
-		
-		MSGPACK_DEFINE_MAP(APIVersion, CommunicatorVersion, GUID, Nickname, CurrentRole)
+		UnitType Type;
+		MSGPACK_DEFINE_MAP(APIVersion, CommunicatorVersion, GUID, Nickname, CurrentRole, Type)
 	};
 	
 	struct TimeCode : public Object
 	{
-		double ScrubBar;
+		int32_t PK;
 		int32_t Time;
-		int32_t TRT;
-		int32_t PresetKey;
-		int32_t LeftChannelVolume;
-		int32_t RightChannelVolume;
-		int32_t Player1LeftVolume;
-		int32_t Player1RightVolume;
-		int32_t Player2LeftVolume;
-		int32_t Player2RightVolume;
-		int32_t Player3LeftVolume;
-		int32_t Player3RightVolume;
-		int32_t Player4LeftVolume;
-		int32_t Player4RightVolume;
-		bool Selected;
+		std::array<uint8_t, 2> VUData;
 		
-		MSGPACK_DEFINE_MAP(
-			ScrubBar,
-			Time,
-			TRT,
-			PresetKey,
-			LeftChannelVolume,
-			RightChannelVolume,
-			Player1LeftVolume,
-			Player1RightVolume,
-			Player2LeftVolume,
-			Player2RightVolume,
-			Player3LeftVolume,
-			Player3RightVolume,
-			Player4LeftVolume,
-			Player4RightVolume,
-			Selected
-		)
+		MSGPACK_DEFINE_MAP(PK, Time, VUData)
 	};
 	
 	struct Drive : public Object
 	{
-		std::string DriveLetter;
+		std::string Mountpoint;
 		int64_t Total, Used, Free;
 		bool IsExternal;
 		
-		MSGPACK_DEFINE_MAP(DriveLetter, Total, Used, Free, IsExternal)
+		MSGPACK_DEFINE_MAP(Mountpoint, Total, Used, Free, IsExternal)
 	};
 	
 	struct Asset : public Object
@@ -129,115 +211,42 @@ namespace Coyote
 	
 	struct AssetMetadata : public Object
 	{
-		std::string FullPath;
-		std::string FPS; //This is not a Coyote::ResolutionMode because it might list a refresh rate that the Coyote doesn't support.
-		std::string VideoCodec;
-		std::string AudioCodec;
-		int64_t AssetSize;
-		int32_t TRT;
-		int32_t Width;
-		int32_t Height;
-		int32_t NumAudioChannels;
-		int32_t AudioSampleRate;
-		bool SupportedVideoCodec;
-		bool SupportedAudioCodec;
+		std::string FilePath;
+		std::string VideoFormat;
+		std::string AudioFormat;
+		std::string ContainerFormat;
+		Size2D Resolution;
+		uint64_t TotalSize;
+		uint32_t VBitrate;
+		uint32_t ABitrate;
+		uint32_t ASampleRate;
+		uint32_t AChannels;
+		uint32_t FPS;
+		int32_t Duration;
 		
 		MSGPACK_DEFINE_MAP(
-			FullPath,
+			FilePath,
 			FPS,
-			VideoCodec,
-			AudioCodec,
-			AssetSize,
-			TRT,
-			Width,
-			Height,
-			NumAudioChannels,
-			AudioSampleRate,
-			SupportedVideoCodec,
-			SupportedAudioCodec
+			VideoFormat,
+			AudioFormat,
+			ContainerFormat,
+			Resolution,
+			TotalSize,
+			VBitrate,
+			ABitrate,
+			ASampleRate,
+			AChannels,
+			Duration
 		)
 	};
 	
+
 	struct TabOrdering : public Object
 	{
 		int32_t TabID;
 		int32_t Index;
 		
 		MSGPACK_DEFINE_MAP(TabID, Index)
-	};
-	
-	struct Output : public Object
-	{
-		std::string Filename;
-		double 	FadeOut;
-		double 	Delay;
-		int32_t	Hue;
-		int32_t	Saturation;
-		int32_t	Contrast;
-		int32_t	Brightness;
-		int32_t	MediaId;
-		int32_t	AudioChannel1;
-		int32_t	AudioChannel2;
-		int32_t	AudioChannel3;
-		int32_t	AudioChannel4;
-		int32_t	OriginalHeight;
-		int32_t	OriginalWidth;
-		int32_t	CustomDestX;
-		int32_t	CustomDestY;
-		int32_t	CustHeight;
-		int32_t	CustWidth;
-		int32_t	HorizontalCrop;
-		int32_t	VerticalCrop;
-	
-		bool	JustifyTop;
-		bool	JustifyBottom;
-		bool	JustifyRight;
-		bool	JustifyLeft;
-		bool	CenterVideo;
-		bool	NativeSize;
-		bool	LetterPillarBox;
-		bool	TempFlag;
-		bool	Anamorphic;
-		bool	MultiviewAudio;
-		bool	EnableTimeCode;
-		bool	Active;
-		bool	Audio;
-		
-		MSGPACK_DEFINE_MAP(
-			Filename,
-			FadeOut,
-			Delay,
-			Hue,
-			Saturation,
-			Contrast,
-			Brightness,
-			MediaId,
-			AudioChannel1,
-			AudioChannel2,
-			AudioChannel3,
-			AudioChannel4,
-			OriginalHeight,
-			OriginalWidth,
-			CustomDestX,
-			CustomDestY,
-			CustHeight,
-			CustWidth,
-			HorizontalCrop,
-			VerticalCrop,
-			JustifyTop,
-			JustifyBottom,
-			JustifyRight,
-			JustifyLeft,
-			CenterVideo,
-			NativeSize,
-			LetterPillarBox,
-			TempFlag,
-			Anamorphic,
-			MultiviewAudio,
-			EnableTimeCode,
-			Active,
-			Audio
-		)
 	};
 	
 	struct ExternalAsset : public Object
@@ -250,97 +259,76 @@ namespace Coyote
 		MSGPACK_DEFINE_MAP(Filename, FullPath, FileSize, IsDirectory)
 	};
 	
+	struct PresetState : public Object
+	{
+		int32_t PK;
+		uint32_t CurrentLoop;
+		bool IsPlaying;
+		bool IsPaused;
+		bool IsSelected;
+		
+		MSGPACK_DEFINE_MAP(PK, CurrentLoop, IsPlaying, IsPaused, IsSelected)
+	};
+	
 	struct Preset : public Object
 	{
 		std::string Name;
-		PresetLayout Layout;
 		std::string Notes;
 		std::string Color;
-		std::string timeCodeUpdate;
-		std::string tcColor;
-		Output Output1;
-		Output Output2;
-		Output Output3;
-		Output Output4;
-		
-		std::vector<PresetMark> gotoMarks;
-		std::vector<PresetMark> countDowns;
+		std::vector<CanvasInfo> Canvases; //Processed by a custom msgpack handler.
+		std::vector<PresetMark> Gotos;
+		std::vector<PresetMark> Countdowns;
+		std::vector<uint8_t> Volume; //Percentages
 		std::map<int32_t, TabOrdering> TabDisplayOrder;
 		int32_t PK;
 		int32_t TRT;
-		int32_t Index;
 		int32_t Loop;
-		int32_t TotalLoop;
 		int32_t Link;
-		int32_t DisplayLink;
-		int32_t Fade;
-		int32_t LeftVolume;
-		int32_t RightVolume;
-		int32_t ScrubberPosition;
+		int32_t DissolveInMS;
+		int32_t DissolveOutMS;
+		int32_t FadeInMS;
+		int32_t FadeOutMS;
 		int32_t InPosition;
 		int32_t OutPosition;
-		int32_t DisplayOrderIndex;
 		int32_t Dissolve;
-		bool IsPlaying;
-		bool IsPaused;
-		bool Selected;
-		bool VolumeLinked;
 		bool FreezeAtEnd;
 		
 		MSGPACK_DEFINE_MAP(
 			Name,
-			//Layout, !! Purposefully excluded, we have to convert it from a string to an enum. !!
 			Notes,
 			Color,
-			timeCodeUpdate,
-			tcColor,
-			Output1,
-			Output2,
-			Output3,
-			Output4,
-			gotoMarks,
-			countDowns,
-			//TabDisplayOrder, !! Also handled custom !!
+			Gotos,
+			Countdowns,
+			TabDisplayOrder,
 			PK,
 			TRT,
-			Index,
 			Loop,
-			TotalLoop,
 			Link,
-			DisplayLink,
-			Fade,
-			LeftVolume,
-			RightVolume,
-			ScrubberPosition,
+			DissolveInMS,
+			DissolveOutMS,
+			FadeInMS,
+			FadeOutMS,
 			InPosition,
 			OutPosition,
-			DisplayOrderIndex,
 			Dissolve,
-			IsPlaying,
-			IsPaused,
-			Selected,
-			VolumeLinked,
-			FreezeAtEnd
+			FreezeAtEnd,
+			Volume
 		)
 	};
 	
-	struct HardwareState : public Object
+	struct KonaHardwareState : public Object
 	{
-		ResolutionMode Resolution;
+		std::array<ResolutionMode, NUM_KONA_OUTS> Resolutions;
 		RefreshMode RefreshRate;
-		HardwareMode CurrentMode;
 		enum HDRMode HDRMode;
 		EOTFMode EOTFSetting;
-		bool SupportsS12G;
 		bool ConstLumin;
 		
 		MSGPACK_DEFINE_MAP(
 			//Resolution, !! Handled custom !!
 			//RefreshRate, !! Handled custom !!
-			CurrentMode,
 			HDRMode,
 			EOTFSetting,
-			SupportsS12G,
 			ConstLumin
 		)
 	};
@@ -353,35 +341,16 @@ namespace Coyote
 		
 		MSGPACK_DEFINE_MAP(IP, Subnet, AdapterID)
 	};
-	
-	struct MediaState : public Object
-	{
-		std::vector<TimeCode> TimeCodes;
-		std::vector<int32_t> PlayingPresets;
-		std::vector<int32_t> PausedPresets;
-		
-		int32_t NumPresets;
-		int32_t SelectedPreset;
 
-		inline MediaState(void) : Object()
-		{
-			this->PlayingPresets.resize(COYOTE_MAX_OUTPUTS);
-			this->PausedPresets.resize(COYOTE_MAX_OUTPUTS);
-			this->TimeCodes.resize(COYOTE_MAX_OUTPUTS);
-		}
-		
-		MSGPACK_DEFINE_MAP(TimeCodes, PlayingPresets, PausedPresets, NumPresets, SelectedPreset)
-	};
-	
 	struct Mirror : public Object
 	{
 		std::string UnitID;
 		std::string IP;
+		UnitType Type;
 		bool Busy;
-		bool SupportsS12G;
 		bool IsAlive;
 		
-		MSGPACK_DEFINE_MAP(UnitID, IP, Busy, SupportsS12G, IsAlive)
+		MSGPACK_DEFINE_MAP(UnitID, IP, Type, Busy, IsAlive)
 	};
 	
 	struct GenlockSettings : public Object
@@ -395,4 +364,7 @@ namespace Coyote
 	};
 
 }
+
+MSGPACK_ADD_ENUM(Coyote::CanvasOrientationEnum)
+
 #endif //__LIBCOYOTE_DATASTRUCTURES_H__

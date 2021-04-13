@@ -20,12 +20,13 @@
 
 static const std::map<std::string, Coyote::StateEventType> CBMap
 {
-	{ "Presets", Coyote::COYOTE_STATE_PRESETS },
+	{ "PresetsUpdate", Coyote::COYOTE_STATE_PRESETS },
+	{ "PresetStatesUpdate", Coyote::COYOTE_STATE_PRESETSTATES },
 	{ "TimeCode", Coyote::COYOTE_STATE_TIMECODE },
 	{ "AssetSync", Coyote::COYOTE_STATE_ASSETS },
 	{ "AssetPost", Coyote::COYOTE_STATE_ASSETS },
 	{ "AssetDelete", Coyote::COYOTE_STATE_ASSETS },
-	{ "HardwareState", Coyote::COYOTE_STATE_HWSTATE }
+	{ "KonaHardwareStateUpdate", Coyote::COYOTE_STATE_HWSTATE }
 };
 	
 bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::string, msgpack::object> &Values)
@@ -48,16 +49,11 @@ bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::str
 		
 		std::lock_guard<std::mutex> G { this->TimeCodesLock };
 		
-		this->TimeCodes[TC->PresetKey] = *TC;
-
-		if (TC->Selected)
-		{
-			this->TimeCodes[0] = *TC;
-		}
+		this->TimeCodes[TC->PK] = *TC;
 		
 		RetVal = true;
 	}
-	else if (EventName == "Presets")
+	else if (EventName == "PresetsUpdate")
 	{
 		std::vector<msgpack::object> PresetObjects;
 
@@ -72,6 +68,25 @@ bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::str
 			std::unique_ptr<Coyote::Preset> Item { static_cast<Coyote::Preset*>(MsgpackProc::UnpackCoyoteObject(*Iter, typeid(Coyote::Preset))) };
 			
 			this->Presets.emplace(Item->PK, std::move(*Item));
+		}
+		
+		RetVal = true;
+	}
+	else if (EventName == "PresetStatesUpdate")
+	{
+		std::vector<msgpack::object> PStateObjects;
+
+		Values.at("Data").convert(PStateObjects);
+	
+		const std::lock_guard<std::mutex> G { this->PresetStatesLock };
+
+		this->PresetStates.clear();
+		
+		for (auto Iter = PStateObjects.begin(); Iter != PStateObjects.end(); ++Iter)
+		{
+			std::unique_ptr<Coyote::PresetState> Item { static_cast<Coyote::PresetState*>(MsgpackProc::UnpackCoyoteObject(*Iter, typeid(Coyote::PresetState))) };
+			
+			this->PresetStates.emplace(Item->PK, std::move(*Item));
 		}
 		
 		RetVal = true;
@@ -127,11 +142,11 @@ bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::str
 		
 		RetVal = true;
 	}
-	else if (EventName == "HardwareState")
+	else if (EventName == "KonaHardwareStateUpdate")
 	{
 		const std::lock_guard<std::mutex> G { this->HWStateLock };
 		
-		std::unique_ptr<Coyote::HardwareState> Ptr { static_cast<Coyote::HardwareState*>(MsgpackProc::UnpackCoyoteObject(Values.at("Data"), typeid(Coyote::HardwareState))) };
+		std::unique_ptr<Coyote::KonaHardwareState> Ptr { static_cast<Coyote::KonaHardwareState*>(MsgpackProc::UnpackCoyoteObject(Values.at("Data"), typeid(Coyote::KonaHardwareState))) };
 		
 		this->HWState = std::move(*Ptr);
 		
@@ -197,11 +212,11 @@ std::map<int32_t, Coyote::Preset> *Subs::SubscriptionSession::GetPresets(void)
 	return new decltype(this->Presets) { this->Presets }; //Copy, not move.
 }
 
-Coyote::HardwareState *Subs::SubscriptionSession::GetHardwareState(void)
+Coyote::KonaHardwareState *Subs::SubscriptionSession::GetKonaHardwareState(void)
 {
 	const std::lock_guard<std::mutex> G { this->HWStateLock };
 	
-	return new Coyote::HardwareState { this->HWState }; //Call copy constructor
+	return new Coyote::KonaHardwareState { this->HWState }; //Call copy constructor
 }
 
 

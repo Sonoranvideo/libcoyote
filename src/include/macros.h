@@ -17,7 +17,7 @@
 #ifndef __LIBCOYOTE_MACROS_H__
 #define __LIBCOYOTE_MACROS_H__
 
-#define COYOTE_API_VERSION "0.5"
-#define COYOTE_MAX_OUTPUTS 4
+#define COYOTE_API_VERSION "1.0"
+#define NUM_KONA_OUTS 4
 
 #endif //__LIBCOYOTE_MACROS_H__

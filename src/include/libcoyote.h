@@ -24,7 +24,6 @@
 #include "datastructures.h"
 #include "macros.h"
 #include "session.h"
-#include "layouts.h"
 
 namespace Coyote
 { //Empty cuz everything else is in different headers

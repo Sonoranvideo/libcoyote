@@ -15,7 +15,6 @@
 */
 #include "msgpackproc.h"
 #include "include/libcoyote.h"
-#include "include/layouts.h"
 
 
 #include <typeinfo>
@@ -51,6 +50,153 @@ Coyote::Object *CoyoteGenericUnpack(const msgpack::object &Obj)
 	return Ptr;
 }
 
+static void CoyoteCanvasOrientationPack(const Coyote::Object *Obj, msgpack::object *Out, msgpack::zone &TempZone)
+{ //Why is this so painful? Because C++ has a hard time representing algebraic datatypes like our video core Projector uses internally.
+	const Coyote::CanvasOrientation *Orientation = static_cast<const Coyote::CanvasOrientation*>(Obj);
+	using Coyote::CanvasOrientation;
+	using Coyote::CanvasOrientationEnum;
+	
+	if (Orientation->Orientation == Coyote::CanvasOrientationEnum::Custom)
+	{
+		std::unordered_map<std::string, msgpack::object> Coords { { "X", msgpack::object { Orientation->CustomCoords.X } }, { "Y", msgpack::object { Orientation->CustomCoords.Y } } };
+		
+		std::unordered_map<std::string, msgpack::object> Mappy { { "Custom", msgpack::object(std::move(Coords), TempZone) }, };
+		
+		*Out = msgpack::object{ std::move(Mappy), TempZone };
+	}
+	
+	switch (Orientation->Orientation)
+	{
+		case CanvasOrientationEnum::Invalid:
+			*Out = msgpack::object { "Invalid", TempZone };
+			break;
+		case CanvasOrientationEnum::Landscape:
+			*Out = msgpack::object { "Landscape", TempZone };
+			break;
+		case CanvasOrientationEnum::Portrait:
+			*Out = msgpack::object { "Portrait", TempZone };
+			break;
+		case CanvasOrientationEnum::Single:
+			*Out = msgpack::object { "Single", TempZone };
+			break;
+		case CanvasOrientationEnum::Standard:
+			*Out = msgpack::object { "Standard", TempZone };
+			break;
+		default:
+			assert(!"Bad integer value for CanvasOrientationEnum!");
+	}
+}
+
+static Coyote::Object *CoyoteCanvasOrientationUnpack(const msgpack::object &Obj)
+{
+	using Coyote::CanvasOrientation;
+	using Coyote::CanvasOrientationEnum;
+	
+	std::string Value;
+	
+	try //if it's just a string, we're not set to Custom.
+	{
+		Obj.convert(Value);
+	}
+	catch(...)
+	{
+		std::unordered_map<std::string, msgpack::object> Mappy;
+		
+		try
+		{
+			Obj.convert(Mappy);
+		}
+		catch(...)
+		{ //Welp it's corrupted
+			return nullptr;
+		}
+		
+		std::unordered_map<std::string, msgpack::object> CoordsMap;
+
+		Mappy["Custom"].convert(CoordsMap);
+		
+		const Coyote::Coords2D Coords { CoordsMap["X"].as<int32_t>(), CoordsMap["Y"].as<int32_t>() };
+		
+		return new CanvasOrientation(CanvasOrientationEnum::Custom, &Coords);
+	}
+
+	static const std::unordered_map<std::string, CanvasOrientationEnum> EnumMap
+	{
+		{ "Invalid", CanvasOrientationEnum::Invalid },
+		{ "Landscape", CanvasOrientationEnum::Landscape },
+		{ "Portrait", CanvasOrientationEnum::Portrait },
+		{ "Single", CanvasOrientationEnum::Single },
+		{ "Standard", CanvasOrientationEnum::Standard },
+	};
+	
+	return new CanvasOrientation(EnumMap.at(Value));
+}
+
+static void CoyoteProjectorCanvasConfigPack(const Coyote::Object *Obj, msgpack::object *Out, msgpack::zone &TempZone)
+{
+	const Coyote::ProjectorCanvasConfig *Cfg = static_cast<const Coyote::ProjectorCanvasConfig*>(Obj);
+	
+	msgpack::object ConvObj { *Cfg, TempZone };
+	
+	std::unordered_map<std::string, msgpack::object> Mappy;
+	
+	ConvObj.convert(Mappy);
+	
+	msgpack::object PackObj;
+	
+	CoyoteCanvasOrientationPack(&Cfg->Orientation, &PackObj, TempZone);
+	
+	Mappy.emplace("Orientation", std::move(PackObj));
+}
+
+static Coyote::Object *CoyoteProjectorCanvasConfigUnpack(const msgpack::object &Obj)
+{
+	Coyote::ProjectorCanvasConfig *Cfg = static_cast<Coyote::ProjectorCanvasConfig*>(CoyoteGenericUnpack<Coyote::ProjectorCanvasConfig>(Obj));
+	
+	std::unordered_map<std::string, msgpack::object> Mappy;
+	
+	Obj.convert(Mappy);
+	
+	std::unique_ptr<Coyote::CanvasOrientation> Orientation { static_cast<Coyote::CanvasOrientation*>(CoyoteCanvasOrientationUnpack(Mappy["Orientation"])) };
+	
+	Cfg->Orientation = std::move(*Orientation);
+	
+	return Cfg;
+}
+
+static Coyote::Object *CoyoteCanvasInfoUnpack(const msgpack::object &Obj)
+{
+	Coyote::CanvasInfo *Info = static_cast<Coyote::CanvasInfo*>(CoyoteGenericUnpack<Coyote::CanvasInfo>(Obj));
+
+	std::unordered_map<std::string, msgpack::object> Mappy;
+	
+	Obj.convert(Mappy);
+	
+	std::unique_ptr<Coyote::ProjectorCanvasConfig> PJCfg { static_cast<Coyote::ProjectorCanvasConfig*>(CoyoteProjectorCanvasConfigUnpack(Mappy["CanvasCfg"])) };
+	
+	Info->CanvasCfg = std::move(*PJCfg);
+	
+	return Info;
+}
+
+static void CoyoteCanvasInfoPack(const Coyote::Object *Obj, msgpack::object *Out, msgpack::zone &TempZone)
+{
+	const Coyote::CanvasInfo *Info = static_cast<const Coyote::CanvasInfo*>(Obj);
+	
+	msgpack::object ConvObj { *Info, TempZone };
+	
+	std::unordered_map<std::string, msgpack::object> Mappy;
+	
+	ConvObj.convert(Mappy);
+	
+	msgpack::object PackObj;
+	
+	CoyoteProjectorCanvasConfigPack(&Info->CanvasCfg, &PackObj, TempZone);
+	
+	Mappy.emplace("CanvasCfg", std::move(PackObj));
+}
+
+
 static Coyote::Object *CoyotePresetUnpack(const msgpack::object &Obj)
 { //This is a bit expensive, internal work will eventually be done to set it as an enum by default.
 	Coyote::Preset *const PObj = static_cast<Coyote::Preset*>(CoyoteGenericUnpack<Coyote::Preset>(Obj));
@@ -60,21 +206,19 @@ static Coyote::Object *CoyotePresetUnpack(const msgpack::object &Obj)
 	std::unordered_map<std::string, msgpack::object> Mappy;
 	
 	Obj.convert(Mappy);
+
+	std::vector<msgpack::object> RawCanvases;
 	
-	std::vector<Coyote::TabOrdering> Tabs;
+	Mappy["Canvases"].convert(RawCanvases);
 	
-	Mappy["TabDisplayOrder"].convert(Tabs);
+	PObj->Canvases.reserve(RawCanvases.size());
 	
-	for (Coyote::TabOrdering &Tab : Tabs)
+	for (const msgpack::object &Canvas : RawCanvases)
 	{
-		PObj->TabDisplayOrder.emplace(Tab.TabID, std::move(Tab));
+		std::unique_ptr<const Coyote::CanvasInfo> Info { static_cast<Coyote::CanvasInfo*>(CoyoteCanvasInfoUnpack(Canvas)) };
+		
+		PObj->Canvases.emplace_back(std::move(*Info));
 	}
-	
-	const std::string PresetName { Mappy["Layout"].as<std::string>() };
-	
-	const Coyote::LayoutInfo *const L = Coyote::LookupPresetLayoutByString(PresetName);
-	
-	PObj->Layout = ((L != nullptr) ? L->ID : Coyote::COYOTE_PSLAYOUT_INVALID);
 	
 	return PObj;
 }
@@ -88,39 +232,44 @@ static void CoyotePresetPack(const Coyote::Object *const Obj, msgpack::object *c
 	std::unordered_map<std::string, msgpack::object> Mappy;
 	
 	ConvObj.convert(Mappy);
+		
+	std::vector<msgpack::object> OutCanvases;
+	OutCanvases.reserve(PObj->Canvases.size());
 	
-	const Coyote::LayoutInfo *const Layout = Coyote::LookupPresetLayoutByID(PObj->Layout);
-	
-	if (Layout)
+	for (const Coyote::CanvasInfo &Info : PObj->Canvases)
 	{
-		Mappy.emplace("Layout", msgpack::object{ Layout->TextName, TempZone });
+		msgpack::object OutObj;
+		
+		CoyoteCanvasInfoPack(&Info, &OutObj, TempZone);
+		
+		OutCanvases.emplace_back(std::move(OutObj));
 	}
 	
-	std::vector<Coyote::TabOrdering> Tabs;
-	
-	Tabs.reserve(PObj->TabDisplayOrder.size());
-	
-	for (auto &Pair : PObj->TabDisplayOrder)
-	{
-		Tabs.emplace_back(std::move(Pair.second));
-	}
-	
-	Mappy.emplace("TabDisplayOrder", msgpack::object { Tabs, TempZone });
+	Mappy["Canvases"] = msgpack::object { OutCanvases, TempZone };
 	
 	*Out = msgpack::object{ std::move(Mappy), TempZone };
 }
 
 static void CoyoteHWStatePack(const Coyote::Object *const Obj, msgpack::object *const Out, msgpack::zone &TempZone)
 {
-	const Coyote::HardwareState *const HWObj = static_cast<const Coyote::HardwareState*>(Obj);
+	const Coyote::KonaHardwareState *const HWObj = static_cast<const Coyote::KonaHardwareState*>(Obj);
 	
 	msgpack::object ConvObj { *HWObj, TempZone };
 
 	std::unordered_map<std::string, msgpack::object> Mappy;
 	
 	ConvObj.convert(Mappy);
+
+	std::vector<msgpack::object> ResolutionStrings;
 	
-	Mappy.emplace("Resolution", msgpack::object{ ResolutionMap.at(HWObj->Resolution), TempZone });
+	ResolutionStrings.reserve(NUM_KONA_OUTS);
+	
+	for (size_t Inc = 0u; Inc < NUM_KONA_OUTS; ++Inc)
+	{
+		ResolutionStrings.emplace_back(msgpack::object { ResolutionMap.at(HWObj->Resolutions[Inc]).c_str() });
+	}
+	
+	Mappy.emplace("Resolutions", msgpack::object{ MsgpackProc::STLArrayToMsgpackArray(ResolutionStrings, TempZone), TempZone });
 	Mappy.emplace("RefreshRate", msgpack::object{ RefreshMap.at(HWObj->RefreshRate), TempZone });
 	
 	*Out = msgpack::object { std::move(Mappy), TempZone };
@@ -128,7 +277,7 @@ static void CoyoteHWStatePack(const Coyote::Object *const Obj, msgpack::object *
 
 static Coyote::Object *CoyoteHWStateUnpack(const msgpack::object &Obj)
 {
-	Coyote::HardwareState *const HWObj = static_cast<Coyote::HardwareState*>(CoyoteGenericUnpack<Coyote::HardwareState>(Obj));
+	Coyote::KonaHardwareState *const HWObj = static_cast<Coyote::KonaHardwareState*>(CoyoteGenericUnpack<Coyote::KonaHardwareState>(Obj));
 	
 	if (!HWObj) return nullptr;
 
@@ -136,7 +285,13 @@ static Coyote::Object *CoyoteHWStateUnpack(const msgpack::object &Obj)
 	
 	Obj.convert(Mappy);
 	
-	HWObj->Resolution = ReverseResolutionMap(Mappy.at("Resolution").as<std::string>());
+	const auto ResStrings = Mappy.at("Resolutions").as<std::vector<std::string>>();
+	
+	for (size_t Inc = 0; Inc < NUM_KONA_OUTS; ++Inc)
+	{
+		HWObj->Resolutions.at(Inc) = ReverseResolutionMap(ResStrings.at(Inc));
+	}
+	
 	HWObj->RefreshRate = ReverseRefreshMap(Mappy.at("RefreshRate").as<std::string>());
 	
 	return HWObj;
@@ -220,17 +375,20 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::Object *Object, msgp
 		{ std::type_index(typeid(Coyote::ExternalAsset)), &CoyoteGenericPack<Coyote::ExternalAsset> },
 		{ std::type_index(typeid(Coyote::Drive)), &CoyoteGenericPack<Coyote::Drive> },
 		{ std::type_index(typeid(Coyote::AssetMetadata)), &CoyoteGenericPack<Coyote::AssetMetadata> },
-		{ std::type_index(typeid(Coyote::HardwareState)), &CoyoteHWStatePack },
+		{ std::type_index(typeid(Coyote::KonaHardwareState)), &CoyoteHWStatePack },
 		{ std::type_index(typeid(Coyote::TimeCode)), &CoyoteGenericPack<Coyote::TimeCode> },
 		{ std::type_index(typeid(Coyote::PresetMark)), &CoyoteGenericPack<Coyote::PresetMark> },
 		{ std::type_index(typeid(Coyote::TabOrdering)), &CoyoteGenericPack<Coyote::TabOrdering> },
-		{ std::type_index(typeid(Coyote::MediaState)), &CoyoteGenericPack<Coyote::MediaState> },
 		{ std::type_index(typeid(Coyote::NetworkInfo)), &CoyoteGenericPack<Coyote::NetworkInfo> },
 		{ std::type_index(typeid(Coyote::Mirror)), &CoyoteGenericPack<Coyote::Mirror> },
-		{ std::type_index(typeid(Coyote::Output)), &CoyoteGenericPack<Coyote::Output> },
 		{ std::type_index(typeid(Coyote::GenlockSettings)), &CoyoteGenericPack<Coyote::GenlockSettings> },
 		{ std::type_index(typeid(Coyote::LANCoyote)), &CoyoteGenericPack<Coyote::LANCoyote> },
+		{ std::type_index(typeid(Coyote::PresetState)), &CoyoteGenericPack<Coyote::PresetState> },
 		{ std::type_index(typeid(Coyote::Preset)), &CoyotePresetPack },
+		{ std::type_index(typeid(Coyote::CanvasOrientation)), &CoyoteCanvasOrientationPack },
+		{ std::type_index(typeid(Coyote::PinnedAsset)), &CoyoteGenericPack<Coyote::PinnedAsset> },
+		{ std::type_index(typeid(Coyote::CanvasInfo)), &CoyoteCanvasInfoPack },
+		{ std::type_index(typeid(Coyote::ProjectorCanvasConfig)), &CoyoteProjectorCanvasConfigPack },
 	};
 
 	assert(Lookup.count(OurType));
@@ -254,17 +412,20 @@ Coyote::Object *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Obj, cons
 		{ std::type_index(typeid(Coyote::ExternalAsset)), &CoyoteGenericUnpack<Coyote::ExternalAsset> },
 		{ std::type_index(typeid(Coyote::Drive)), &CoyoteGenericUnpack<Coyote::Drive> },
 		{ std::type_index(typeid(Coyote::AssetMetadata)), &CoyoteGenericUnpack<Coyote::AssetMetadata> },
-		{ std::type_index(typeid(Coyote::HardwareState)), &CoyoteHWStateUnpack },
+		{ std::type_index(typeid(Coyote::KonaHardwareState)), &CoyoteHWStateUnpack },
 		{ std::type_index(typeid(Coyote::TimeCode)), &CoyoteGenericUnpack<Coyote::TimeCode> },
 		{ std::type_index(typeid(Coyote::PresetMark)), &CoyoteGenericUnpack<Coyote::PresetMark> },
 		{ std::type_index(typeid(Coyote::TabOrdering)), &CoyoteGenericUnpack<Coyote::TabOrdering> },
-		{ std::type_index(typeid(Coyote::MediaState)), &CoyoteGenericUnpack<Coyote::MediaState> },
 		{ std::type_index(typeid(Coyote::NetworkInfo)), &CoyoteGenericUnpack<Coyote::NetworkInfo> },
 		{ std::type_index(typeid(Coyote::Mirror)), &CoyoteGenericUnpack<Coyote::Mirror> },
-		{ std::type_index(typeid(Coyote::Output)), &CoyoteGenericUnpack<Coyote::Output> },
 		{ std::type_index(typeid(Coyote::GenlockSettings)), &CoyoteGenericUnpack<Coyote::GenlockSettings> },
 		{ std::type_index(typeid(Coyote::LANCoyote)), &CoyoteGenericUnpack<Coyote::LANCoyote> },
+		{ std::type_index(typeid(Coyote::PresetState)), &CoyoteGenericUnpack<Coyote::PresetState> },
 		{ std::type_index(typeid(Coyote::Preset)), &CoyotePresetUnpack },
+		{ std::type_index(typeid(Coyote::CanvasOrientation)), &CoyoteCanvasOrientationUnpack },
+		{ std::type_index(typeid(Coyote::PinnedAsset)), &CoyoteGenericUnpack<Coyote::PinnedAsset> },
+		{ std::type_index(typeid(Coyote::CanvasInfo)), &CoyoteCanvasInfoUnpack },
+		{ std::type_index(typeid(Coyote::ProjectorCanvasConfig)), &CoyoteProjectorCanvasConfigUnpack },
 	};
 	
 	assert(Lookup.count(OurType));

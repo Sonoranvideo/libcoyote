@@ -231,7 +231,7 @@ static const auto &LayoutNameMap
 	} () //Immediately call this lambda
 };
 
-static const std::array<Coyote::Output Coyote::Preset::*, COYOTE_MAX_OUTPUTS> PresetOutputStructs
+static const std::array<Coyote::Output Coyote::Preset::*, NUM_KONA_OUTS> PresetOutputStructs
 {
 	&Coyote::Preset::Output1,
 	&Coyote::Preset::Output2,

@@ -314,8 +314,6 @@ bool WS::WSConnection::EstablishConnection(const std::string &Host)
 		std::cout << "libcoyote: Connection established." << std::endl;
 	});
 
-
-	
 	QObject::connect(TempTimer.get(), &QTimer::timeout, TempTimer.get(),
 	[&, this]
 	{
