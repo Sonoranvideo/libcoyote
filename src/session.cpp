@@ -47,6 +47,7 @@ extern EXPFUNC const std::map<Coyote::RefreshMode, std::string> RefreshMap
 extern EXPFUNC const std::map<Coyote::ResolutionMode, std::string> ResolutionMap
 {
 	{ Coyote::COYOTE_RES_INVALID, "" },
+	{ Coyote::COYOTE_RES_720P, "720p" },
 	{ Coyote::COYOTE_RES_1080P, "1080p" },
 	{ Coyote::COYOTE_RES_2160P, "2160p" },
 	{ Coyote::COYOTE_RES_1080I, "1080i" },
