@@ -699,7 +699,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, GetCommandTimeoutSecs)
 	ACLASSF(Session, HasConnectionError)
 	.def("SetKonaHardwareMode", &Coyote::Session::SetKonaHardwareMode, py::call_guard<py::gil_scoped_release>(),
-	py::arg("Resolution"),
+	py::arg("Resolutions"),
 	py::arg("RefreshRate"),
 	py::arg("HDRMode") = Coyote::COYOTE_HDR_DISABLED,
 	py::arg("EOTFSetting") = Coyote::COYOTE_EOTF_NORMAL,
