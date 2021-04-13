@@ -262,12 +262,13 @@ namespace Coyote
 	struct PresetState : public Object
 	{
 		int32_t PK;
+		int32_t TRT;
 		uint32_t CurrentLoop;
 		bool IsPlaying;
 		bool IsPaused;
 		bool IsSelected;
 		
-		MSGPACK_DEFINE_MAP(PK, CurrentLoop, IsPlaying, IsPaused, IsSelected)
+		MSGPACK_DEFINE_MAP(PK, TRT, CurrentLoop, IsPlaying, IsPaused, IsSelected)
 	};
 	
 	struct Preset : public Object
@@ -281,7 +282,6 @@ namespace Coyote
 		std::vector<uint8_t> Volume; //Percentages
 		std::map<int32_t, TabOrdering> TabDisplayOrder;
 		int32_t PK;
-		int32_t TRT;
 		int32_t Loop;
 		int32_t Link;
 		int32_t DissolveInMS;
@@ -301,7 +301,6 @@ namespace Coyote
 			Countdowns,
 			TabDisplayOrder,
 			PK,
-			TRT,
 			Loop,
 			Link,
 			DissolveInMS,

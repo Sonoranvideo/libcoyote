@@ -228,11 +228,10 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	
 	py::class_<Coyote::Preset, Coyote::Object>(ModObj, "Preset")
 	.def(py::init<>())
-	.def("__repr__", [] (Coyote::Preset &Obj) { return std::string{"<Preset \""} + Obj.Name.c_str() + "\", PK " + std::to_string(Obj.PK) + ", TRT " + std::to_string(Obj.TRT) + ">"; })
+	.def("__repr__", [] (Coyote::Preset &Obj) { return std::string{"<Preset \""} + Obj.Name.c_str() + "\", PK " + std::to_string(Obj.PK) + ">"; })
 	ACLASSD(Preset, PK)
 	ACLASSD(Preset, Name)
-	ACLASSD(Preset, TRT)
-	//~ ACLASSD(Preset, Canvases)
+	ACLASSD(Preset, Canvases)
 	ACLASSD(Preset, Notes)
 	ACLASSD(Preset, Loop)
 	ACLASSD(Preset, Link)
@@ -269,6 +268,24 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSD(GenlockSettings, HorzValue)
 	ACLASSD(GenlockSettings, VertValue)
 	ACLASSD(GenlockSettings, Genlocked);
+	
+	py::class_<Coyote::PresetState, Coyote::Object>(ModObj, "PresetState")
+	.def(py::init<>())
+	.def("__repr__", [] (Coyote::PresetState &Obj)
+	{
+		return std::string{"<PresetState for PK "} + std::to_string(Obj.PK) +
+							", IsPlaying: " + (Obj.IsPlaying ? "True" : "False") +
+							", IsPaused: " + (Obj.IsPaused ? "True" : "False") +
+							", IsSelected: " + (Obj.IsSelected ? "True" : "False") +
+							", CurrentLoop: " + std::to_string(Obj.CurrentLoop) +
+							", TRT: " + std::to_string(Obj.TRT) + ">";
+	})
+	ACLASSD(PresetState, PK)
+	ACLASSD(PresetState, TRT)
+	ACLASSD(PresetState, CurrentLoop)
+	ACLASSD(PresetState, IsPlaying)
+	ACLASSD(PresetState, IsPaused)
+	ACLASSD(PresetState, IsSelected);
 	
 	
 	py::class_<Coyote::Mirror, Coyote::Object>(ModObj, "Mirror")
@@ -585,6 +602,15 @@ PYBIND11_MODULE(pycoyote, ModObj)
 		const Coyote::StatusCode Status = Obj.GetPresets(Presets);
 		
 		return std::make_tuple(Status, Presets);
+	}, py::call_guard<py::gil_scoped_release>())
+	.def("GetPresetStates",
+	[] (Coyote::Session &Obj)
+	{
+		std::vector<Coyote::PresetState> States;
+		
+		const Coyote::StatusCode Status = Obj.GetPresetStates(States);
+		
+		return std::make_tuple(Status, States);
 	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetAssets",
 	[] (Coyote::Session &Obj)

@@ -959,6 +959,25 @@ Coyote::StatusCode Coyote::Session::GetTimeCode(Coyote::TimeCode &Out, const int
 	return Coyote::COYOTE_STATUS_FAILED;
 }
 	
+Coyote::StatusCode Coyote::Session::GetPresetStates(std::vector<Coyote::PresetState> &Out)
+{
+	DEF_SESS;
+
+	std::unique_ptr<std::map<int32_t, Coyote::PresetState> > Ptr { SESS.ASyncSess.SubSession.GetPresetStates() };
+	
+	if (!Ptr) return Coyote::COYOTE_STATUS_FAILED;
+	
+	Out.clear();
+	Out.reserve(Ptr->size());
+	
+	for (auto Pair : *Ptr)
+	{
+		Out.push_back(std::move(Pair.second));
+	}
+
+	return Coyote::COYOTE_STATUS_OK;
+}
+
 Coyote::StatusCode Coyote::Session::GetPresets(std::vector<Coyote::Preset> &Out)
 {
 	DEF_SESS;

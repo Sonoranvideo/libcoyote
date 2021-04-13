@@ -212,6 +212,13 @@ std::map<int32_t, Coyote::Preset> *Subs::SubscriptionSession::GetPresets(void)
 	return new decltype(this->Presets) { this->Presets }; //Copy, not move.
 }
 
+std::map<int32_t, Coyote::PresetState> *Subs::SubscriptionSession::GetPresetStates(void)
+{
+	const std::lock_guard<std::mutex> G { this->PresetStatesLock };
+	
+	return new decltype(this->PresetStates) { this->PresetStates }; //Copy, not move.
+}
+
 Coyote::KonaHardwareState *Subs::SubscriptionSession::GetKonaHardwareState(void)
 {
 	const std::lock_guard<std::mutex> G { this->HWStateLock };

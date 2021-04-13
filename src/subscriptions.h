@@ -54,6 +54,7 @@ namespace Subs
 		bool ProcessSubscriptionEvent(const std::map<std::string, msgpack::object> &Values);
 		Coyote::TimeCode *GetTimeCode(const int32_t PK);
 		std::map<int32_t, Coyote::Preset> *GetPresets(void);
+		std::map<int32_t, Coyote::PresetState> *GetPresetStates(void);
 		std::map<std::string, Coyote::Asset> *GetAssets(void);
 		Coyote::KonaHardwareState *GetKonaHardwareState(void);
 		void SetPlaybackEventCallback(const Coyote::PBEventCallback, void *const UserData = nullptr);
