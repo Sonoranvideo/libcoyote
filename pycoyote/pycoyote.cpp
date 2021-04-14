@@ -374,6 +374,14 @@ PYBIND11_MODULE(pycoyote, ModObj)
 
 	py::class_<Coyote::CanvasOrientation, Coyote::Object>(ModObj, "CanvasOrientation")
 	.def(py::init<>())
+	.def(py::init([] (const Coyote::CanvasOrientationEnum Type, const Coyote::Coords2D &CustomCoords)
+				{
+					return Coyote::CanvasOrientation(Type, &CustomCoords);
+				}))
+	.def(py::init([] (const Coyote::CanvasOrientationEnum Type)
+				{
+					return Coyote::CanvasOrientation(Type);
+				}))
 	ACLASSD(CanvasOrientation, Orientation)
 	ACLASSD(CanvasOrientation, CustomCoords);
 	
