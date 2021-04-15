@@ -72,7 +72,7 @@ namespace Coyote
 		}
 		
 		inline bool operator!=(const Rect &Other) const { return !(*this == Other); }
-		MSGPACK_DEFINE_MAP(MSGPACK_BASE_MAP(Size2D), MSGPACK_BASE_MAP(Coords2D))
+		MSGPACK_DEFINE_MAP(Width, Height, X, Y)
 	};
 	
 	struct Cube : public Rect
@@ -87,7 +87,7 @@ namespace Coyote
 		
 		inline bool operator!=(const Cube &Other) const { return !(*this == Other); }
 		
-		MSGPACK_DEFINE_MAP(MSGPACK_BASE_MAP(Rect), Z, Depth)
+		MSGPACK_DEFINE_MAP(Width, Height, X, Y, Z, Depth)
 	};
 	
 	struct Object
@@ -183,7 +183,7 @@ namespace Coyote
 	{
 		int32_t PK;
 		int32_t Time;
-		std::array<uint8_t, 2> VUData;
+		std::vector<int32_t> VUData;
 		
 		MSGPACK_DEFINE_MAP(PK, Time, VUData)
 	};
@@ -246,8 +246,8 @@ namespace Coyote
 		int32_t TabID;
 		int32_t Index;
 		
-		MSGPACK_DEFINE_MAP(TabID, Index)
-	};
+		inline TabOrdering(const int32_t TabID = 0, const int32_t Index = 0) : TabID(TabID), Index(Index) {}
+	}; //Processed by msgpack manually
 	
 	struct ExternalAsset : public Object
 	{
@@ -279,8 +279,8 @@ namespace Coyote
 		std::vector<CanvasInfo> Canvases; //Processed by a custom msgpack handler.
 		std::vector<PresetMark> Gotos;
 		std::vector<PresetMark> Countdowns;
-		std::vector<uint8_t> Volume; //Percentages
-		std::map<int32_t, TabOrdering> TabDisplayOrder;
+		std::vector<int32_t> Volume; //Percentages. Things break if you change this to a uint8_t.
+		std::map<int32_t, TabOrdering> TabDisplayOrder; //Custom msgpack handler
 		int32_t PK;
 		int32_t Loop;
 		int32_t Link;
@@ -299,7 +299,6 @@ namespace Coyote
 			Color,
 			Gotos,
 			Countdowns,
-			TabDisplayOrder,
 			PK,
 			Loop,
 			Link,

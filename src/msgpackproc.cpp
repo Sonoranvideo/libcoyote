@@ -96,7 +96,7 @@ static Coyote::Object *CoyoteCanvasOrientationUnpack(const msgpack::object &Obj)
 	
 	try //if it's just a string, we're not set to Custom.
 	{
-		Obj.convert(Value);
+		Value = Obj.as<std::string>();
 	}
 	catch(...)
 	{
@@ -147,6 +147,8 @@ static void CoyoteProjectorCanvasConfigPack(const Coyote::Object *Obj, msgpack::
 	CoyoteCanvasOrientationPack(&Cfg->Orientation, &PackObj, TempZone);
 	
 	Mappy.emplace("Orientation", std::move(PackObj));
+	
+	*Out = msgpack::object { std::move(Mappy), TempZone };
 }
 
 static Coyote::Object *CoyoteProjectorCanvasConfigUnpack(const msgpack::object &Obj)
@@ -194,6 +196,8 @@ static void CoyoteCanvasInfoPack(const Coyote::Object *Obj, msgpack::object *Out
 	CoyoteProjectorCanvasConfigPack(&Info->CanvasCfg, &PackObj, TempZone);
 	
 	Mappy.emplace("CanvasCfg", std::move(PackObj));
+	
+	*Out = msgpack::object { std::move(Mappy), TempZone };
 }
 
 
@@ -210,6 +214,15 @@ static Coyote::Object *CoyotePresetUnpack(const msgpack::object &Obj)
 	std::vector<msgpack::object> RawCanvases;
 	
 	Mappy["Canvases"].convert(RawCanvases);
+	
+	std::map<int32_t, int32_t> Tabs;
+	
+	Mappy["TabDisplayOrder"].convert(Tabs);
+	
+	for (const auto &Pair : Tabs)
+	{
+		PObj->TabDisplayOrder.emplace(Pair.first, Coyote::TabOrdering{ Pair.first, Pair.second });
+	}
 	
 	PObj->Canvases.reserve(RawCanvases.size());
 	
@@ -245,8 +258,16 @@ static void CoyotePresetPack(const Coyote::Object *const Obj, msgpack::object *c
 		OutCanvases.emplace_back(std::move(OutObj));
 	}
 	
-	Mappy["Canvases"] = msgpack::object { OutCanvases, TempZone };
+	std::map<int32_t, int32_t> Tabs;
+
+	for (const auto &Pair : PObj->TabDisplayOrder)
+	{
+		Tabs.emplace(Pair.second.TabID, Pair.second.Index);
+	}
 	
+	Mappy["Canvases"] = msgpack::object { std::move(OutCanvases), TempZone };
+	Mappy["TabDisplayOrder"] = msgpack::object { std::move(Tabs), TempZone };
+
 	*Out = msgpack::object{ std::move(Mappy), TempZone };
 }
 
@@ -378,7 +399,6 @@ msgpack::object MsgpackProc::PackCoyoteObject(const Coyote::Object *Object, msgp
 		{ std::type_index(typeid(Coyote::KonaHardwareState)), &CoyoteHWStatePack },
 		{ std::type_index(typeid(Coyote::TimeCode)), &CoyoteGenericPack<Coyote::TimeCode> },
 		{ std::type_index(typeid(Coyote::PresetMark)), &CoyoteGenericPack<Coyote::PresetMark> },
-		{ std::type_index(typeid(Coyote::TabOrdering)), &CoyoteGenericPack<Coyote::TabOrdering> },
 		{ std::type_index(typeid(Coyote::NetworkInfo)), &CoyoteGenericPack<Coyote::NetworkInfo> },
 		{ std::type_index(typeid(Coyote::Mirror)), &CoyoteGenericPack<Coyote::Mirror> },
 		{ std::type_index(typeid(Coyote::GenlockSettings)), &CoyoteGenericPack<Coyote::GenlockSettings> },
@@ -415,7 +435,7 @@ Coyote::Object *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Obj, cons
 		{ std::type_index(typeid(Coyote::KonaHardwareState)), &CoyoteHWStateUnpack },
 		{ std::type_index(typeid(Coyote::TimeCode)), &CoyoteGenericUnpack<Coyote::TimeCode> },
 		{ std::type_index(typeid(Coyote::PresetMark)), &CoyoteGenericUnpack<Coyote::PresetMark> },
-		{ std::type_index(typeid(Coyote::TabOrdering)), &CoyoteGenericUnpack<Coyote::TabOrdering> },
+		//~ { std::type_index(typeid(Coyote::TabOrdering)), &CoyoteGenericUnpack<Coyote::TabOrdering> }, Not in here for a reason
 		{ std::type_index(typeid(Coyote::NetworkInfo)), &CoyoteGenericUnpack<Coyote::NetworkInfo> },
 		{ std::type_index(typeid(Coyote::Mirror)), &CoyoteGenericUnpack<Coyote::Mirror> },
 		{ std::type_index(typeid(Coyote::GenlockSettings)), &CoyoteGenericUnpack<Coyote::GenlockSettings> },
