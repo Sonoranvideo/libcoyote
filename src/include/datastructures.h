@@ -277,8 +277,8 @@ namespace Coyote
 		std::string Notes;
 		std::string Color;
 		std::vector<CanvasInfo> Canvases; //Processed by a custom msgpack handler.
-		std::vector<PresetMark> Gotos;
-		std::vector<PresetMark> Countdowns;
+		std::unordered_map<int32_t, PresetMark> Gotos;
+		std::unordered_map<int32_t, PresetMark> Countdowns;
 		std::vector<int32_t> Volume; //Percentages. Things break if you change this to a uint8_t.
 		std::map<int32_t, TabOrdering> TabDisplayOrder; //Custom msgpack handler
 		int32_t PK;

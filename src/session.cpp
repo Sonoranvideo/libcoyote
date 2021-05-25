@@ -488,7 +488,7 @@ Coyote::StatusCode Coyote::Session::RenameCountdown(const int32_t PK, const int3
 	const std::map<std::string, msgpack::object> Values
 	{
 		{ "PK", msgpack::object{PK, TempZone} },
-		{ "Time", msgpack::object{Time, TempZone} },
+		{ "TimeMS", msgpack::object{Time, TempZone} },
 		{ "NewName", msgpack::object{NewName.c_str(), TempZone} }
 	};
 	
@@ -509,7 +509,7 @@ Coyote::StatusCode Coyote::Session::RenameGoto(const int32_t PK, const int32_t T
 	const std::map<std::string, msgpack::object> Values
 	{
 		{ "PK", msgpack::object{PK, TempZone} },
-		{ "Time", msgpack::object{Time, TempZone} },
+		{ "TimeMS", msgpack::object{Time, TempZone} },
 		{ "NewName", msgpack::object{NewName.c_str(), TempZone} }
 	};
 	
@@ -530,7 +530,7 @@ Coyote::StatusCode Coyote::Session::DeleteCountdown(const int32_t PK, const int3
 	const std::map<std::string, msgpack::object> Values
 	{
 		{ "PK", msgpack::object{PK, TempZone} },
-		{ "Time", msgpack::object{Time, TempZone} },
+		{ "TimeMS", msgpack::object{Time, TempZone} },
 	};
 	
 	const msgpack::object &Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
@@ -550,7 +550,7 @@ Coyote::StatusCode Coyote::Session::DeleteGoto(const int32_t PK, const int32_t T
 	const std::map<std::string, msgpack::object> Values
 	{
 		{ "PK", msgpack::object{PK, TempZone} },
-		{ "Time", msgpack::object{Time, TempZone} },
+		{ "TimeMS", msgpack::object{Time, TempZone} },
 	};
 	
 	const msgpack::object &Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
