@@ -1216,7 +1216,8 @@ Coyote::StatusCode Coyote::Session::SetKonaHardwareMode(const std::array<Resolut
 														const RefreshMode RefreshRate,
 														const HDRMode HDRMode,
 														const EOTFMode EOTFSetting,
-														const bool ConstLumin)
+														const bool ConstLumin,
+														const KonaAudioConfig AudioConfig)
 {
 	DEF_SESS;
 
@@ -1241,6 +1242,7 @@ Coyote::StatusCode Coyote::Session::SetKonaHardwareMode(const std::array<Resolut
 		{ "HDRMode", msgpack::object{ (int)HDRMode } },
 		{ "EOTFSetting", msgpack::object{ (int)EOTFSetting } },
 		{ "ConstLumin", msgpack::object{ ConstLumin } },
+		{ "AudioConfig", msgpack::object{ (int)AudioConfig } },
 	};
 	
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };

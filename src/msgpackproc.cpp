@@ -292,6 +292,7 @@ static void CoyoteHWStatePack(const Coyote::Object *const Obj, msgpack::object *
 	
 	Mappy.emplace("Resolutions", msgpack::object{ MsgpackProc::STLArrayToMsgpackArray(ResolutionStrings, TempZone), TempZone });
 	Mappy.emplace("RefreshRate", msgpack::object{ RefreshMap.at(HWObj->RefreshRate), TempZone });
+	Mappy.emplace("AudioConfig", msgpack::object{ (int)HWObj->AudioConfig, TempZone });
 	
 	*Out = msgpack::object { std::move(Mappy), TempZone };
 }
@@ -314,6 +315,7 @@ static Coyote::Object *CoyoteHWStateUnpack(const msgpack::object &Obj)
 	}
 	
 	HWObj->RefreshRate = ReverseRefreshMap(Mappy.at("RefreshRate").as<std::string>());
+	HWObj->AudioConfig = (Coyote::KonaAudioConfig)Mappy.at("AudioConfig").as<int>();
 	
 	return HWObj;
 }

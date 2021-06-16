@@ -136,8 +136,8 @@ namespace Coyote
 	{
 		std::string FullPath;
 		Cube PinnedCoords;
-		
-		MSGPACK_DEFINE_MAP(FullPath, PinnedCoords)
+		float Hue, Saturation, Brightness, Contrast;
+		MSGPACK_DEFINE_MAP(FullPath, PinnedCoords, Hue, Saturation, Brightness, Contrast)
 	};
 	
 	struct ProjectorCanvasConfig : public Object
@@ -154,8 +154,9 @@ namespace Coyote
 		ProjectorCanvasConfig CanvasCfg; //Geometry and configuration for the surface we draw on.
 		std::vector<PinnedAsset> Assets;
 		SinkType SinkTypes;
+		uint32_t Index;
 		
-		MSGPACK_DEFINE_MAP(Assets, SinkTypes)
+		MSGPACK_DEFINE_MAP(Assets, SinkTypes, Index)
 	};
 	
 	struct PresetMark : public Object
@@ -279,7 +280,7 @@ namespace Coyote
 		std::vector<CanvasInfo> Canvases; //Processed by a custom msgpack handler.
 		std::unordered_map<int32_t, PresetMark> Gotos;
 		std::unordered_map<int32_t, PresetMark> Countdowns;
-		std::vector<int32_t> Volume; //Percentages. Things break if you change this to a uint8_t.
+		std::vector<uint16_t> Volume;
 		std::map<int32_t, TabOrdering> TabDisplayOrder; //Custom msgpack handler
 		int32_t PK;
 		int32_t Loop;
@@ -320,6 +321,7 @@ namespace Coyote
 		RefreshMode RefreshRate;
 		enum HDRMode HDRMode;
 		EOTFMode EOTFSetting;
+		KonaAudioConfig AudioConfig;
 		bool ConstLumin;
 		
 		MSGPACK_DEFINE_MAP(
@@ -328,6 +330,7 @@ namespace Coyote
 			HDRMode,
 			EOTFSetting,
 			ConstLumin
+			//AudioConfig, !! Handled custom !!
 		)
 	};
 	

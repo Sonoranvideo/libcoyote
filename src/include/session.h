@@ -75,7 +75,8 @@ namespace Coyote
 										const RefreshMode RefreshRate,
 										const HDRMode HDRMode = Coyote::COYOTE_HDR_DISABLED,
 										const EOTFMode EOTFSetting = Coyote::COYOTE_EOTF_NORMAL,
-										const bool ConstLumin = false);
+										const bool ConstLumin = false,
+										const KonaAudioConfig AudioConfig = COYOTE_KAC_DISABLED);
 		StatusCode SelectPreset(const int32_t PK);
 		StatusCode MovePreset(const int32_t PK, const int32_t TabID, const uint32_t NewIndex);
 		StatusCode GetServerVersion(std::string &Out);

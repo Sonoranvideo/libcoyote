@@ -79,6 +79,18 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_EOTF_UNSPECIFIED)
 	EMEMDEF(COYOTE_EOTF_MAX)
 	.export_values();
+	
+	py::enum_<Coyote::KonaAudioConfig>(ModObj, "KonaAudioConfig")
+	EMEMDEF(COYOTE_KAC_DISABLED)
+	EMEMDEF(COYOTE_KAC_SDI1)
+	EMEMDEF(COYOTE_KAC_SDI2)
+	EMEMDEF(COYOTE_KAC_SDI3)
+	EMEMDEF(COYOTE_KAC_SDI4)
+	EMEMDEF(COYOTE_KAC_MAX_SDI)
+	EMEMDEF(COYOTE_KAC_DUALMODE_FLAG)
+	EMEMDEF(COYOTE_KAC_MAX)
+
+	.export_values();
 
 	py::enum_<Coyote::AssetState>(ModObj, "AssetState")
 	EMEMDEF(COYOTE_ASSETSTATE_INVALID)
@@ -370,6 +382,10 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	py::class_<Coyote::PinnedAsset, Coyote::Object>(ModObj, "PinnedAsset")
 	.def(py::init<>())
 	ACLASSD(PinnedAsset, FullPath)
+	ACLASSD(PinnedAsset, Hue)
+	ACLASSD(PinnedAsset, Saturation)
+	ACLASSD(PinnedAsset, Contrast)
+	ACLASSD(PinnedAsset, Brightness)
 	ACLASSD(PinnedAsset, PinnedCoords);
 
 	py::class_<Coyote::CanvasOrientation, Coyote::Object>(ModObj, "CanvasOrientation")
@@ -394,6 +410,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	
 	py::class_<Coyote::CanvasInfo, Coyote::Object>(ModObj, "CanvasInfo")
 	.def(py::init<>())
+	ACLASSD(CanvasInfo, Index)
 	ACLASSD(CanvasInfo, CanvasCfg)
 	ACLASSD(CanvasInfo, Assets)
 	ACLASSD(CanvasInfo, SinkTypes);
@@ -711,7 +728,8 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	py::arg("RefreshRate"),
 	py::arg("HDRMode") = Coyote::COYOTE_HDR_DISABLED,
 	py::arg("EOTFSetting") = Coyote::COYOTE_EOTF_NORMAL,
-	py::arg("ConstLumin") = false);
+	py::arg("ConstLumin") = false,
+	py::arg("AudioConfig") = Coyote::COYOTE_KAC_DISABLED);
 
 	ModObj.def("GetLANCoyotes", Coyote::GetLANCoyotes);	
 	

@@ -86,21 +86,6 @@ namespace Coyote
 		COYOTE_REFRESH_MAX
 	};
 	
-	enum PresetLayout
-	{ //Out of order because support is being added incrementally for different layouts
-		COYOTE_PSLAYOUT_INVALID = 0,
-		COYOTE_PSLAYOUT_A		= 1,
-		COYOTE_PSLAYOUT_B		= 2,
-		COYOTE_PSLAYOUT_C1		= 3,
-		COYOTE_PSLAYOUT_C2		= 4,
-		COYOTE_PSLAYOUT_C3		= 5,
-		COYOTE_PSLAYOUT_F		= 6,
-		COYOTE_PSLAYOUT_E		= 7,
-		COYOTE_PSLAYOUT_D1		= 8,
-		COYOTE_PSLAYOUT_D2		= 9,
-		COYOTE_PSLAYOUT_MAX
-	};
-
 	enum SDIOutput
 	{
 		COYOTE_SDI_INVALID = 0,
@@ -168,7 +153,18 @@ namespace Coyote
 		COYOTE_STATE_TIMECODE		= 5,
 		COYOTE_STATE_MAX
 	};
-
+	
+	enum KonaAudioConfig
+	{	
+		COYOTE_KAC_DISABLED = 0,
+		COYOTE_KAC_SDI1 = 1 << 0, //Dump all audio channels to a particular SDI.
+		COYOTE_KAC_SDI2 = 1 << 1,
+		COYOTE_KAC_SDI3 = 1 << 2,
+		COYOTE_KAC_SDI4 = 1 << 3,
+		COYOTE_KAC_MAX_SDI = COYOTE_KAC_SDI4,
+		COYOTE_KAC_DUALMODE_FLAG = 1 << 4, //If this flag is set, the channels are split between two other SDI specified as flags.
+		COYOTE_KAC_MAX,
+	};
 
 }
 
@@ -177,7 +173,6 @@ MSGPACK_ADD_ENUM(Coyote::ResolutionMode)
 MSGPACK_ADD_ENUM(Coyote::UnitRole)
 MSGPACK_ADD_ENUM(Coyote::UnitType)
 MSGPACK_ADD_ENUM(Coyote::RefreshMode)
-MSGPACK_ADD_ENUM(Coyote::PresetLayout)
 MSGPACK_ADD_ENUM(Coyote::SDIOutput)
 MSGPACK_ADD_ENUM(Coyote::HDRMode)
 MSGPACK_ADD_ENUM(Coyote::EOTFMode)
@@ -186,6 +181,7 @@ MSGPACK_ADD_ENUM(Coyote::PlaybackEventType)
 MSGPACK_ADD_ENUM(Coyote::AssetState)
 MSGPACK_ADD_ENUM(Coyote::StateEventType)
 MSGPACK_ADD_ENUM(Coyote::SinkType)
+MSGPACK_ADD_ENUM(Coyote::KonaAudioConfig)
 
 
 #endif //__LIBCOYOTE_STATUSCODES_H__
