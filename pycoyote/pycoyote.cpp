@@ -1,5 +1,5 @@
 /*
-   Copyright 2020 Sonoran Video Systems
+   Copyright 2021 Sonoran Video Systems
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_EOTF_MAX)
 	.export_values();
 	
-	py::enum_<Coyote::KonaAudioConfig>(ModObj, "KonaAudioConfig")
+	py::enum_<Coyote::KonaAudioConfig>(ModObj, "KonaAudioConfig", py::arithmetic())
 	EMEMDEF(COYOTE_KAC_DISABLED)
 	EMEMDEF(COYOTE_KAC_SDI1)
 	EMEMDEF(COYOTE_KAC_SDI2)
@@ -137,7 +137,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_UTYPE_MAX)
 	.export_values();
 	
-	py::enum_<Coyote::SinkType>(ModObj, "SinkType")
+	py::enum_<Coyote::SinkType>(ModObj, "SinkType", py::arithmetic())
 	EMEMDEF(COYOTE_SINK_INVALID)
 	EMEMDEF(COYOTE_SINK_DEMO)
 	EMEMDEF(COYOTE_SINK_KONA)
@@ -145,6 +145,15 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_SINK_MAXVALUE)
 	.export_values();
 	
+	py::enum_<Coyote::Player>(ModObj, "Player", py::arithmetic())
+	EMEMDEF(COYOTE_PLAYER_INVALID)
+	EMEMDEF(COYOTE_PLAYER_1)
+	EMEMDEF(COYOTE_PLAYER_2)
+	EMEMDEF(COYOTE_PLAYER_3)
+	EMEMDEF(COYOTE_PLAYER_4)
+	EMEMDEF(COYOTE_PLAYER_MAXVALUE)
+	.export_values();
+
 	py::enum_<Coyote::StateEventType>(ModObj, "StateEventType")
 	EMEMDEF(COYOTE_STATE_INVALID) 
 	EMEMDEF(COYOTE_STATE_PRESETS)
@@ -258,7 +267,9 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSD(Preset, FreezeAtEnd)
 	ACLASSD(Preset, DissolveInMS)
 	ACLASSD(Preset, DissolveOutMS)
-	ACLASSD(Preset, Volume);
+	ACLASSD(Preset, Volume)
+	ACLASSF(Preset, GetPlayersForCanvas)
+	ACLASSF(Preset, GetActivePlayerForCanvas);
 	
 	py::class_<Coyote::TimeCode, Coyote::Object>(ModObj, "TimeCode")
 	.def(py::init<>())

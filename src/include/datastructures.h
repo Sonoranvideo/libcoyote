@@ -1,5 +1,5 @@
 /*
-   Copyright 2020 Sonoran Video Systems
+   Copyright 2021 Sonoran Video Systems
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -141,7 +141,7 @@ namespace Coyote
 	};
 	
 	struct ProjectorCanvasConfig : public Object
-	{ //This cooresponds to a datatype used in Sonoran's video rendering core, Projector.
+	{ //This cooresponds to a datatype used in Sonoran's video rendering core, Projector, aka Coyote Core.
 		CanvasOrientation Orientation;
 		Size2D Dimensions;
 		uint32_t NumOutputs;
@@ -313,6 +313,11 @@ namespace Coyote
 			FreezeAtEnd,
 			Volume
 		)
+		
+		
+		//Methods
+		Coyote::Player GetPlayersForCanvas(const uint32_t Index) const; //If the preset can't be drawn by our official GUI, don't use this method!
+		Coyote::Player GetActivePlayerForCanvas(const uint32_t Index) const;
 	};
 	
 	struct KonaHardwareState : public Object

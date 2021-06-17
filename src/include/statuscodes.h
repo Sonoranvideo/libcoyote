@@ -1,5 +1,5 @@
 /*
-   Copyright 2020 Sonoran Video Systems
+   Copyright 2021 Sonoran Video Systems
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -115,7 +115,13 @@ namespace Coyote
 	};
 		
 	enum Player
-	{
+	{	/*What's important to understand about "players" is, they're totally an illusion, not even an abstraction.
+		* The internal Coyote code has no such notion of "players", at least as this represents them.
+		* They're only here to make the UI seem easier and more logical to the users.
+		* In reality, "player 1" is the first renderer created, and "player 2" is the second created, regardless of what outputs they do or don't span.
+		* There is no disabled "player 2" and "player 4" if you span two 3840x1080s, etc.
+		* All the player-related utility functions do is compute a value that you can use to put in a GUI, if you decide you want to mimic our look.
+		*/
 		COYOTE_PLAYER_INVALID = 0,
 		COYOTE_PLAYER_1 = 1 << 0,
 		COYOTE_PLAYER_2 = 1 << 1,
