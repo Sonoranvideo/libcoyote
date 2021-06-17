@@ -29,6 +29,7 @@ extern EXPFUNC const std::map<Coyote::ResolutionMode, std::string> ResolutionMap
 namespace py = pybind11;
 
 #define ACLASSF(a, b) .def(#b, &Coyote::a::b, py::call_guard<py::gil_scoped_release>())
+#define ACLASSFREFPTR(a, b) .def(#b, &Coyote::a::b, py::call_guard<py::gil_scoped_release>(), py::return_value_policy::reference_internal)
 #define ACLASSD(a, b) .def_readwrite(#b, &Coyote::a::b)
 
 #define EMEMDEF(a) .value(#a, Coyote::a)
@@ -269,6 +270,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSD(Preset, DissolveOutMS)
 	ACLASSD(Preset, Volume)
 	ACLASSF(Preset, GetPlayersForCanvas)
+	ACLASSFREFPTR(Preset, LookupCanvasByPlayer)
 	ACLASSF(Preset, GetActivePlayerForCanvas);
 	
 	py::class_<Coyote::TimeCode, Coyote::Object>(ModObj, "TimeCode")

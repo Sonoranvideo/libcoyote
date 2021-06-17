@@ -316,8 +316,9 @@ namespace Coyote
 		
 		
 		//Methods
-		Coyote::Player GetPlayersForCanvas(const uint32_t Index) const; //If the preset can't be drawn by our official GUI, don't use this method!
+		Coyote::Player GetPlayersForCanvas(const uint32_t Index) const; //If the preset can't be drawn by our official GUI, don't use these methods!
 		Coyote::Player GetActivePlayerForCanvas(const uint32_t Index) const;
+		const CanvasInfo *LookupCanvasByPlayer(const Coyote::Player PlayerNum) const;
 	};
 	
 	struct KonaHardwareState : public Object

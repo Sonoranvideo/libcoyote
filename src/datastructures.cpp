@@ -58,3 +58,16 @@ Coyote::Player Coyote::Preset::GetActivePlayerForCanvas(const uint32_t Index) co
 	
 	return CurPlayer;
 }
+
+const Coyote::CanvasInfo *Coyote::Preset::LookupCanvasByPlayer(const Coyote::Player PlayerNum) const
+{
+	for (uint32_t Inc = 0u; Inc < this->Canvases.size(); ++Inc)
+	{
+		if (this->GetPlayersForCanvas(Inc) & PlayerNum)
+		{
+			return &this->Canvases.at(Inc);
+		}
+	}
+	
+	return nullptr;
+}
