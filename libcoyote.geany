@@ -69,7 +69,7 @@ FILE_NAME_36=3921;Rust;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-se
 FILE_NAME_37=0;Rust;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fsvsvideoapi%2Fsrc%2Fcanvasorientation.rs;0;4
 FILE_NAME_38=10605;Python;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-communicator%2Fsrc%2Fcomponents%2FCoyoteSession%2FCCCPInterface.py;0;4
 FILE_NAME_39=5017;Python;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-communicator%2Fsrc%2Fcomponents%2FCoyoteSession%2FSubscriptionCore.py;0;4
-FILE_NAME_40=12181;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fpycoyote%2Fpycoyote.cpp;0;4
+FILE_NAME_40=5678;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fpycoyote%2Fpycoyote.cpp;0;4
 FILE_NAME_41=345;None;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fsvsvideoapi%2FCargo.toml;0;4
 FILE_NAME_42=684;None;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-server-ng%2FCargo.toml;0;4
 FILE_NAME_43=1261;Python;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-supervisor%2Fsrc%2Fcoyote-supervisor.py;0;4
@@ -79,12 +79,12 @@ FILE_NAME_46=0;Rust;1;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fsvsvideoapi%
 FILE_NAME_47=0;Rust;1;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fsvsvideoapi%2Fsrc%2Flib.rs;0;4
 FILE_NAME_48=0;Rust;1;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fsvsvideoapi%2Fsrc%2Fmacros.rs;0;4
 FILE_NAME_49=0;Rust;1;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fsvsvideoapi%2Fsrc%2Fsingleton.rs;0;4
-FILE_NAME_50=1724;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fstatuscodes.h;0;4
+FILE_NAME_50=1536;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fstatuscodes.h;0;4
 FILE_NAME_51=1050;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fdatastructures.cpp;0;4
 FILE_NAME_52=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fdiscovery.cpp;0;4
 FILE_NAME_53=1793;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fdiscovery.h;0;4
-FILE_NAME_54=1958;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Feasycanvasalign.cpp;0;4
-FILE_NAME_55=888;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Feasycanvasalign.h;0;4
+FILE_NAME_54=3409;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Feasycanvasalign.cpp;0;4
+FILE_NAME_55=981;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Feasycanvasalign.h;0;4
 
 [VTE]
 last_dir=/home/daniel/volition

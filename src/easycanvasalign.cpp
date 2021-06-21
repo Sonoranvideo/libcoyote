@@ -27,7 +27,16 @@ bool Coyote::AttachAssetToCanvas(const EasyCanvasAlignment Align, const std::str
 	PinnedAsset Pin{}; //Some fields can just be zeroed out and it's fine.
 	
 	Pin.FullPath = FilePath;
+
+	const double CanvasRatio = (double)CanvasDimensions.Width / CanvasDimensions.Height;
+	const double AssetRatio = (double)AssetDimensions.Width / AssetDimensions.Height;
 	
+	const double ScaleRatio = (CanvasRatio > AssetRatio) ?
+						((double)CanvasDimensions.Height / AssetDimensions.Height) :
+						((double)CanvasDimensions.Width / AssetDimensions.Width);
+	
+	(void)ScaleRatio;
+
 	switch (Align)
 	{
 		default:
@@ -38,15 +47,8 @@ bool Coyote::AttachAssetToCanvas(const EasyCanvasAlignment Align, const std::str
 			Pin.PinnedCoords.Height = CanvasDimensions.Height;
 			break;
 		}
-		case COYOTE_ECALIGN_SCALED:
+		case COYOTE_ECALIGN_SCALED_CENTERED:
 		{
-			const double CanvasRatio = CanvasDimensions.Width / CanvasDimensions.Height;
-			const double AssetRatio = AssetDimensions.Width / AssetDimensions.Height;
-			
-			const double ScaleRatio = (CanvasRatio > AssetRatio) ?
-								(CanvasDimensions.Height / AssetDimensions.Height) :
-								(CanvasDimensions.Width / AssetDimensions.Width);
-								
 			Pin.PinnedCoords.Width = AssetDimensions.Width * ScaleRatio;
 			Pin.PinnedCoords.Height = AssetDimensions.Height * ScaleRatio;
 
@@ -60,6 +62,72 @@ bool Coyote::AttachAssetToCanvas(const EasyCanvasAlignment Align, const std::str
 			}
 		
 			break;
+		}
+		case COYOTE_ECALIGN_SCALED_LEFT:
+		{
+			Pin.PinnedCoords.Width = AssetDimensions.Width * ScaleRatio;
+			Pin.PinnedCoords.Height = AssetDimensions.Height * ScaleRatio;
+			Pin.PinnedCoords.X = 0;
+			Pin.PinnedCoords.Y = (CanvasDimensions.Height / 2) - (Pin.PinnedCoords.Height / 2);
+	
+			break;
+		}
+		case COYOTE_ECALIGN_SCALED_RIGHT:
+		{
+			Pin.PinnedCoords.Width = AssetDimensions.Width * ScaleRatio;
+			Pin.PinnedCoords.Height = AssetDimensions.Height * ScaleRatio;
+			Pin.PinnedCoords.X = CanvasDimensions.Width - Pin.PinnedCoords.Width;
+			Pin.PinnedCoords.Y = (CanvasDimensions.Height / 2) - (Pin.PinnedCoords.Height / 2);
+	
+			break;
+		}
+		case COYOTE_ECALIGN_SCALED_TOP:
+		{
+			Pin.PinnedCoords.Width = AssetDimensions.Width * ScaleRatio;
+			Pin.PinnedCoords.Height = AssetDimensions.Height * ScaleRatio;
+			Pin.PinnedCoords.X = (CanvasDimensions.Width / 2) - (Pin.PinnedCoords.Width / 2);
+			Pin.PinnedCoords.Y = 0;
+	
+			break;
+		}
+		case COYOTE_ECALIGN_SCALED_BOTTOM:
+		{
+			Pin.PinnedCoords.Width = AssetDimensions.Width * ScaleRatio;
+			Pin.PinnedCoords.Height = AssetDimensions.Height * ScaleRatio;
+			Pin.PinnedCoords.X = (CanvasDimensions.Width / 2) - (Pin.PinnedCoords.Width / 2);
+			Pin.PinnedCoords.Y = CanvasDimensions.Height - Pin.PinnedCoords.Height;
+	
+			break;
+		}
+		case COYOTE_ECALIGN_BOTTOMCENTER:
+		{
+			if (AssetDimensions.Width > CanvasDimensions.Width ||
+				AssetDimensions.Height > CanvasDimensions.Height)
+			{ //Can't do this if the asset is bigger than the canvas.
+				return false;
+			}
+			
+			Pin.PinnedCoords.X = (CanvasDimensions.Width / 2) - (AssetDimensions.Width / 2);
+			Pin.PinnedCoords.Y = CanvasDimensions.Height - AssetDimensions.Height;
+			Pin.PinnedCoords.Width = AssetDimensions.Width;
+			Pin.PinnedCoords.Height = AssetDimensions.Height;
+			break;
+			
+		}
+		case COYOTE_ECALIGN_TOPCENTER:
+		{
+			if (AssetDimensions.Width > CanvasDimensions.Width ||
+				AssetDimensions.Height > CanvasDimensions.Height)
+			{ //Can't do this if the asset is bigger than the canvas.
+				return false;
+			}
+			
+			Pin.PinnedCoords.X = (CanvasDimensions.Width / 2) - (AssetDimensions.Width / 2);
+			Pin.PinnedCoords.Y = 0;
+			Pin.PinnedCoords.Width = AssetDimensions.Width;
+			Pin.PinnedCoords.Height = AssetDimensions.Height;
+			break;
+			
 		}
 		case COYOTE_ECALIGN_BOTTOMRIGHT:
 		{
@@ -100,6 +168,48 @@ bool Coyote::AttachAssetToCanvas(const EasyCanvasAlignment Align, const std::str
 			Pin.PinnedCoords.Height = AssetDimensions.Height;
 			break;
 		}
+		case COYOTE_ECALIGN_CENTERED:
+		{
+			if (AssetDimensions.Width > CanvasDimensions.Width ||
+				AssetDimensions.Height > CanvasDimensions.Height)
+			{ //Can't do this if the asset is bigger than the canvas.
+				return false;
+			}
+			
+			Pin.PinnedCoords.X = (CanvasDimensions.Width / 2) - (AssetDimensions.Width / 2);
+			Pin.PinnedCoords.Y = (CanvasDimensions.Height / 2) - (AssetDimensions.Height / 2);
+			Pin.PinnedCoords.Width = AssetDimensions.Width;
+			Pin.PinnedCoords.Height = AssetDimensions.Height;
+			break;
+		}
+		case COYOTE_ECALIGN_CENTERLEFT:
+		{
+			if (AssetDimensions.Width > CanvasDimensions.Width ||
+				AssetDimensions.Height > CanvasDimensions.Height)
+			{ //Can't do this if the asset is bigger than the canvas.
+				return false;
+			}
+			
+			Pin.PinnedCoords.X = 0;
+			Pin.PinnedCoords.Y = (CanvasDimensions.Height / 2) - (AssetDimensions.Height / 2);
+			Pin.PinnedCoords.Width = AssetDimensions.Width;
+			Pin.PinnedCoords.Height = AssetDimensions.Height;
+			break;
+		}
+		case COYOTE_ECALIGN_CENTERRIGHT:
+		{
+			if (AssetDimensions.Width > CanvasDimensions.Width ||
+				AssetDimensions.Height > CanvasDimensions.Height)
+			{ //Can't do this if the asset is bigger than the canvas.
+				return false;
+			}
+			
+			Pin.PinnedCoords.X = CanvasDimensions.Width - AssetDimensions.Width;
+			Pin.PinnedCoords.Y = (CanvasDimensions.Height / 2) - (AssetDimensions.Height / 2);
+			Pin.PinnedCoords.Width = AssetDimensions.Width;
+			Pin.PinnedCoords.Height = AssetDimensions.Height;
+			break;
+		}
 		case COYOTE_ECALIGN_BOTTOMLEFT:
 		{
 			if (AssetDimensions.Width > CanvasDimensions.Width ||
@@ -107,7 +217,8 @@ bool Coyote::AttachAssetToCanvas(const EasyCanvasAlignment Align, const std::str
 			{ //Can't do this if the asset is bigger than the canvas.
 				return false;
 			}
-						
+			
+			Pin.PinnedCoords.X = 0;
 			Pin.PinnedCoords.Y = CanvasDimensions.Height - AssetDimensions.Height;
 			Pin.PinnedCoords.Width = AssetDimensions.Width;
 			Pin.PinnedCoords.Height = AssetDimensions.Height;
