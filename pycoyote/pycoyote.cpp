@@ -17,6 +17,7 @@
 #include "../src/include/common.h"
 #include "../src/include/datastructures.h"
 #include "../src/include/session.h"
+#include "../src/include/easycanvasalign.h"
 #include <stddef.h>
 #include <stdint.h>
 #include "pybind11/include/pybind11/pybind11.h"
@@ -153,6 +154,18 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_PLAYER_3)
 	EMEMDEF(COYOTE_PLAYER_4)
 	EMEMDEF(COYOTE_PLAYER_MAXVALUE)
+	.export_values();
+	
+	py::enum_<Coyote::EasyCanvasAlignment>(ModObj, "EasyCanvasAlignment")
+	EMEMDEF(COYOTE_ECALIGN_INVALID)
+	EMEMDEF(COYOTE_ECALIGN_TOPLEFT)
+	EMEMDEF(COYOTE_ECALIGN_TOPRIGHT)
+	EMEMDEF(COYOTE_ECALIGN_BOTTOMLEFT)
+	EMEMDEF(COYOTE_ECALIGN_BOTTOMRIGHT)
+	EMEMDEF(COYOTE_ECALIGN_CENTERED)
+	EMEMDEF(COYOTE_ECALIGN_SCALED)
+	EMEMDEF(COYOTE_ECALIGN_STRETCHED)
+	EMEMDEF(COYOTE_ECALIGN_MAX)
 	.export_values();
 
 	py::enum_<Coyote::StateEventType>(ModObj, "StateEventType")
@@ -330,12 +343,20 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	
 	py::class_<Coyote::Coords2D>(ModObj, "Coords2D")
 	.def(py::init<>())
+	.def(py::init([] (const int32_t X, const int32_t Y)
+				{
+					return Coyote::Coords2D{ X, Y };
+				}))
 	.def("__repr__", [] (Coyote::Coords2D &Obj) { return std::string{"<Coords2D of "} + std::to_string(Obj.X) + ',' + std::to_string(Obj.Y) + ">"; })
 	ACLASSD(Coords2D, X)
 	ACLASSD(Coords2D, Y);
 	
 	py::class_<Coyote::Size2D>(ModObj, "Size2D")
 	.def(py::init<>())
+	.def(py::init([] (const int32_t Width, const int32_t Height)
+				{
+					return Coyote::Size2D{ Width, Height };
+				}))
 	.def("__repr__", [] (Coyote::Size2D &Obj) { return std::string{"<Size2D of "} + std::to_string(Obj.Width) + ',' + std::to_string(Obj.Height) + ">"; })
 	ACLASSD(Size2D, Width)
 	ACLASSD(Size2D, Height);
@@ -745,6 +766,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	py::arg("AudioConfig") = Coyote::COYOTE_KAC_DISABLED);
 
 	ModObj.def("GetLANCoyotes", Coyote::GetLANCoyotes);	
+	ModObj.def("AttachAssetToCanvas", Coyote::AttachAssetToCanvas);	
 	
 	ModObj.doc() = "Interface for controlling Sonoran Video Systems' Coyote playback products";	
 }

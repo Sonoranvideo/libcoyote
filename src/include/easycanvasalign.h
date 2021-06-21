@@ -13,22 +13,16 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#ifndef __LIBCOYOTE_H__
-#define __LIBCOYOTE_H__
 
-#ifndef __cplusplus
-#error "This library requires C++. You could also use the Python bindings, if you prefer, or generate your own bindings to libcoyote."
-#endif //__cplusplus
+#ifndef __LIBCOYOTE_ECA_H__
+#define __LIBCOYOTE_ECA_H__
 
+#include "common.h"
 #include "statuscodes.h"
 #include "datastructures.h"
-#include "easycanvasalign.h"
-#include "macros.h"
-#include "session.h"
 
 namespace Coyote
-{ //Empty cuz everything else is in different headers
-
+{
+	bool AttachAssetToCanvas(const EasyCanvasAlignment Align, const std::string &FilePath, const Size2D &AssetDimensions, CanvasInfo &Canvas); //You need to set a Z coordinate yourself if you're using more than one asset on a canvas.
 }
-
-#endif //__LIBCOYOTE_H__
+#endif //__LIBCOYOTE_ECA_H__
