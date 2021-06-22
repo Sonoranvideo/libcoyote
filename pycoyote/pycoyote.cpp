@@ -292,6 +292,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSD(Preset, Volume)
 	ACLASSF(Preset, GetPlayersForCanvas)
 	ACLASSFREFPTR(Preset, LookupCanvasByPlayer)
+	ACLASSF(Preset, GetPlayerRangeForCanvas)
 	ACLASSF(Preset, GetActivePlayerForCanvas);
 	
 	py::class_<Coyote::TimeCode, Coyote::Object>(ModObj, "TimeCode")

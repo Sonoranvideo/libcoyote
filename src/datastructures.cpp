@@ -54,9 +54,35 @@ Coyote::Player Coyote::Preset::GetActivePlayerForCanvas(const uint32_t Index) co
 	
 	Coyote::Player CurPlayer = Coyote::COYOTE_PLAYER_1;
 	
-	for (; !(CurPlayer & Players); CurPlayer = (Coyote::Player)(CurPlayer << 1));
+	for (; CurPlayer <= COYOTE_PLAYER_MAXVALUE && !(CurPlayer & Players); CurPlayer = (Coyote::Player)(CurPlayer << 1));
 	
 	return CurPlayer;
+}
+
+std::array<uint32_t, 2> *Coyote::Preset::GetPlayerRangeForCanvas(const uint32_t Index)
+{ //1 based indexing, inclusive range. Used for GUI display purposes.
+	const Coyote::Player Players = this->GetPlayersForCanvas(Index);
+	
+	if (Players == COYOTE_PLAYER_INVALID) return nullptr;
+
+	std::unique_ptr<std::array<uint32_t, 2>> RetVal { new std::array<uint32_t, 2>{} };
+	
+	uint32_t &StartOut = RetVal->at(0);
+	uint32_t &EndOut = RetVal->at(1);
+	
+	Coyote::Player CurPlayer = COYOTE_PLAYER_1;
+	
+	StartOut = 0;
+	
+	for (; CurPlayer <= COYOTE_PLAYER_MAXVALUE && !(CurPlayer & Players); ++StartOut, CurPlayer = (Coyote::Player)(CurPlayer << 1));
+		
+	EndOut = StartOut;
+	//Ordering is not a mistake
+	++StartOut;
+	
+	for (; CurPlayer <= COYOTE_PLAYER_MAXVALUE && (CurPlayer & Players) == CurPlayer; ++EndOut, CurPlayer = (Coyote::Player)(CurPlayer << 1));
+
+	return RetVal.release();
 }
 
 const Coyote::CanvasInfo *Coyote::Preset::LookupCanvasByPlayer(const Coyote::Player PlayerNum) const
