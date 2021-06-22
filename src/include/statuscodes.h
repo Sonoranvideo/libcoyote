@@ -43,7 +43,7 @@ namespace Coyote
 		COYOTE_RES_1080I = 4,
 		COYOTE_RES_MAX
 	};
-	
+
 	enum UnitRole
 	{
 		COYOTE_ROLE_INVALID = 0,
@@ -52,8 +52,8 @@ namespace Coyote
 		COYOTE_ROLE_MIRROR = 3,
 		COYOTE_ROLE_MAX
 	};
-	
-	
+
+
 	enum UnitType
 	{
 		COYOTE_UTYPE_INVALID	= 0,
@@ -62,7 +62,7 @@ namespace Coyote
 		COYOTE_UTYPE_FLEX		= 3,
 		COYOTE_UTYPE_MAX
 	};
-	
+
 	enum EasyCanvasAlignment
 	{
 		COYOTE_ECALIGN_INVALID			= 0,
@@ -83,7 +83,7 @@ namespace Coyote
 		COYOTE_ECALIGN_STRETCHED		= 15,
 		COYOTE_ECALIGN_MAX
 	};
-	
+
 	enum SinkType
 	{
 		COYOTE_SINK_INVALID = 0,
@@ -92,7 +92,7 @@ namespace Coyote
 		COYOTE_SINK_NDI = 1 << 2,
 		COYOTE_SINK_MAXVALUE = COYOTE_SINK_NDI
 	};
-	
+
 	enum RefreshMode
 	{
 		COYOTE_REFRESH_INVALID 	= 0,
@@ -106,7 +106,7 @@ namespace Coyote
 		COYOTE_REFRESH_60 		= 8,
 		COYOTE_REFRESH_MAX
 	};
-	
+
 	enum SDIOutput
 	{
 		COYOTE_SDI_INVALID = 0,
@@ -116,7 +116,7 @@ namespace Coyote
 		COYOTE_SDI_4 = 1 << 3,
 		COYOTE_SDI_MAXVALUE = COYOTE_SDI_4
 	};
-	
+
 	enum HDRMode
 	{
 		COYOTE_HDR_DISABLED = 0,
@@ -125,7 +125,7 @@ namespace Coyote
 		COYOTE_HDR_DOLBY,
 		COYOTE_HDR_MAX
 	};
-	
+
 	enum EOTFMode
 	{
 		COYOTE_EOTF_NORMAL = 0,
@@ -134,7 +134,7 @@ namespace Coyote
 		COYOTE_EOTF_UNSPECIFIED = 3,
 		COYOTE_EOTF_MAX
 	};
-		
+
 	enum Player
 	{	/*What's important to understand about "players" is, they're totally an illusion, not even an abstraction.
 		* The internal Coyote code has no such notion of "players", at least as this represents them.
@@ -150,7 +150,7 @@ namespace Coyote
 		COYOTE_PLAYER_4 = 1 << 3,
 		COYOTE_PLAYER_MAXVALUE = COYOTE_PLAYER_4
 	};
-	
+
 	enum PlaybackEventType
 	{
 		COYOTE_PBEVENT_END = 0,
@@ -159,7 +159,7 @@ namespace Coyote
 		COYOTE_PBEVENT_UNPAUSE = 3,
 		COYOTE_PBEVENT_SEEK = 4
 	};
-	
+
 	enum AssetState
 	{
 		COYOTE_ASSETSTATE_INVALID	= 0,
@@ -169,7 +169,7 @@ namespace Coyote
 		COYOTE_ASSETSTATE_PROCESSING= 4,
 		COYOTE_ASSETSTATE_MAX
 	};
-	
+
 	enum StateEventType
 	{
 		COYOTE_STATE_INVALID		= 0,
@@ -180,9 +180,9 @@ namespace Coyote
 		COYOTE_STATE_TIMECODE		= 5,
 		COYOTE_STATE_MAX
 	};
-	
+
 	enum KonaAudioConfig
-	{	
+	{
 		COYOTE_KAC_DISABLED = 0,
 		COYOTE_KAC_SDI1 = 1 << 0, //Dump all audio channels to a particular SDI.
 		COYOTE_KAC_SDI2 = 1 << 1,
@@ -192,6 +192,8 @@ namespace Coyote
 		COYOTE_KAC_DUALMODE_FLAG = 1 << 4, //If this flag is set, the channels are split between two other SDI specified as flags.
 		COYOTE_KAC_MAX,
 	};
+
+	std::array<uint32_t, 2> *GetPlayerRange(const Coyote::Player Players);
 
 }
 
