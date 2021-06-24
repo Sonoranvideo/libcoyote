@@ -84,7 +84,7 @@ std::array<uint32_t, 2> *Coyote::GetPlayerRange(const Coyote::Player Players)
 }
 
 
-std::array<uint32_t, 2> *Coyote::Preset::GetPlayerRangeForCanvas(const uint32_t Index)
+std::array<uint32_t, 2> *Coyote::Preset::GetPlayerRangeForCanvas(const uint32_t Index) const
 { //1 based indexing, inclusive range. Used for GUI display purposes.
 	const Coyote::Player Players = this->GetPlayersForCanvas(Index);
 
