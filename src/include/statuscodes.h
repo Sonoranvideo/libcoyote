@@ -90,6 +90,7 @@ namespace Coyote
 		COYOTE_SINK_DEMO = 1,
 		COYOTE_SINK_KONA = 1 << 1,
 		COYOTE_SINK_NDI = 1 << 2,
+		COYOTE_SINK_BMD = 1 << 3,
 		COYOTE_SINK_MAXVALUE = COYOTE_SINK_NDI
 	};
 
@@ -193,7 +194,7 @@ namespace Coyote
 		COYOTE_KAC_MAX,
 	};
 
-	std::array<uint32_t, 2> *GetPlayerRange(const Coyote::Player Players);
+	EXPFUNC std::array<uint32_t, 2> *GetPlayerRange(const Coyote::Player Players);
 
 }
 

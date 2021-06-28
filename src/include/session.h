@@ -139,6 +139,6 @@ namespace Coyote
 		
 	};
 	
-	std::vector<LANCoyote> GetLANCoyotes(void);
+	EXPFUNC std::vector<LANCoyote> GetLANCoyotes(void);
 }
 #endif //__LIBCOYOTE_SESSION_H__

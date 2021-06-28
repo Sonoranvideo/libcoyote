@@ -272,7 +272,7 @@ namespace Coyote
 		MSGPACK_DEFINE_MAP(PK, TRT, CurrentLoop, IsPlaying, IsPaused, IsSelected)
 	};
 	
-	struct Preset : public Object
+	struct EXPFUNC Preset : public Object
 	{
 		std::string Name;
 		std::string Notes;

@@ -23,6 +23,6 @@
 
 namespace Coyote
 {
-	bool AttachAssetToCanvas(const EasyCanvasAlignment Align, const std::string &FilePath, const Size2D &AssetDimensions, CanvasInfo &Canvas); //You need to set a Z coordinate yourself if you're using more than one asset on a canvas.
+	EXPFUNC bool AttachAssetToCanvas(const EasyCanvasAlignment Align, const std::string &FilePath, const Size2D &AssetDimensions, CanvasInfo &Canvas); //You need to set a Z coordinate yourself if you're using more than one asset on a canvas.
 }
 #endif //__LIBCOYOTE_ECA_H__
