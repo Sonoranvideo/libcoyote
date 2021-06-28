@@ -215,6 +215,13 @@ const std::map<std::string, msgpack::object> InternalSession::PerformSyncedComma
 	//Acquire a new message ID
 	const uint64_t MsgID = this->SyncSess.NewMsgID();
 	
+#ifdef LCVERBOSE
+	if (Values)
+	{
+		LDEBUG_MSG("Outgoing data is " << *Values);
+	}
+#endif //LCVERBOSE
+
 	//Pack our values into a msgpack buffer
 	MsgpackProc::InitOutgoingMsg(Pack, CommandName, MsgID, Values);
 	
