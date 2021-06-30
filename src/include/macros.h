@@ -19,5 +19,6 @@
 
 #define COYOTE_API_VERSION "1.0"
 #define NUM_KONA_OUTS 4
+#define NUM_KONA_AUDIO_CHANNELS 16
 
 #endif //__LIBCOYOTE_MACROS_H__

@@ -53,6 +53,15 @@ extern EXPFUNC const std::map<Coyote::ResolutionMode, std::string> ResolutionMap
 	{ Coyote::COYOTE_RES_1080I, "1080i" },
 };
 
+extern EXPFUNC const std::map<Coyote::ResolutionMode, Coyote::Size2D> ResolutionSizeMap
+{
+	{ Coyote::COYOTE_RES_INVALID, {} },
+	{ Coyote::COYOTE_RES_720P, { 1280, 720 } },
+	{ Coyote::COYOTE_RES_1080P, { 1920, 1080 } },
+	{ Coyote::COYOTE_RES_2160P, { 3840, 2160 } },
+	{ Coyote::COYOTE_RES_1080I, { 1920, 1080 } },
+};
+
 static const auto &ReverseRefreshMapObj { RebuildMapBackwards(RefreshMap) };
 static const auto &ReverseResolutionMapObj { RebuildMapBackwards(ResolutionMap) };
 

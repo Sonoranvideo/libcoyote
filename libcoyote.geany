@@ -28,7 +28,7 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=54
+current_page=21
 FILE_NAME_0=8269;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fdatastructures.h;0;4
 FILE_NAME_1=905;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Flibcoyote.h;0;4
 FILE_NAME_2=6;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fsession.h;0;4
@@ -50,7 +50,7 @@ FILE_NAME_17=20;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fwsmessages%2
 FILE_NAME_18=6;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fcommon.h;0;4
 FILE_NAME_19=16051;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-communicator%2Fsrc%2Finclude%2FPythonTools.h;0;4
 FILE_NAME_20=20730;Python;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-communicator%2Fsrc%2Fcomponents%2FCoyoteTypes.py;0;4
-FILE_NAME_21=6856;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fsession.cpp;0;4
+FILE_NAME_21=1972;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fsession.cpp;0;4
 FILE_NAME_22=391;C++;0;EUTF-8;1;1;0;%2Fhome%2Fben%2Fcoyoterepos%2Fcoyote-communicator%2Fsrc%2Fcomponents%2FCoyoteSynchronizer%2FMediaSyncProtocol.h;0;4
 FILE_NAME_23=712;C++;0;EUTF-8;1;1;0;%2Fusr%2Finclude%2Fmsgpack%2Fv1%2Fadaptor%2Fbool.hpp;0;4
 FILE_NAME_24=31604;C++;0;EUTF-8;1;1;0;%2Fusr%2Finclude%2Fmsgpack%2Fv1%2Fpack.hpp;0;4
