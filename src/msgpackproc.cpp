@@ -426,7 +426,7 @@ Coyote::Object *MsgpackProc::UnpackCoyoteObject(const msgpack::object &Obj, cons
 {
 	const std::type_index OurType { Expected };
 	
-	LDEBUG;
+	LDEBUG_MSG("Got incoming object " << Obj);
 	
 	const static std::unordered_map<std::type_index, Coyote::Object *(*)(const msgpack::object &Obj)> Lookup
 	{

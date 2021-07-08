@@ -773,7 +773,7 @@ Coyote::StatusCode Coyote::Session::AddMirror(const std::string &MirrorIP)
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "BackupIP",  msgpack::object{MirrorIP.c_str(), TempZone } } };
+	const std::map<std::string, msgpack::object> Values { { "IP",  msgpack::object{MirrorIP.c_str(), TempZone } } };
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
 	SESS.PerformSyncedCommand("AddMirror", TempZone, &Status, &Pass);
