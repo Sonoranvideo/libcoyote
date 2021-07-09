@@ -18,7 +18,7 @@
 #define __LIBCOYOTE_SESSION_H__
 
 #ifndef __cplusplus
-#error "This is the C++ set of bindings, you're looking for libcoyote_c.h"
+#error "This library requires C++. You could also use the Python bindings, if you prefer, or generate your own bindings to libcoyote."
 #endif //__cplusplus
 #include "common.h"
 

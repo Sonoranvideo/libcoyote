@@ -384,7 +384,7 @@ Coyote::StatusCode Coyote::Session::SetPausedState(const int32_t PK, const bool 
 {
 	DEF_SESS;
 
-	msgpack::zone TempZone;	
+	msgpack::zone TempZone;
 	Coyote::StatusCode Status{};
 	
 	const std::map<std::string, msgpack::object> Values { MAPARG(PK) };
