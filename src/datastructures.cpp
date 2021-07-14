@@ -103,3 +103,22 @@ const Coyote::CanvasInfo *Coyote::Preset::LookupCanvasByPlayer(const Coyote::Pla
 
 	return nullptr;
 }
+
+std::vector<uint32_t> Coyote::PlayersToIntegers(const Coyote::Player Players)
+{
+	std::vector<uint32_t> RetVal;
+
+	Coyote::Player CurPlayer = COYOTE_PLAYER_1;
+	
+	uint32_t Inc = 0u;
+	
+	for (; CurPlayer <= COYOTE_PLAYER_MAXVALUE; ++Inc, CurPlayer = (Coyote::Player)(CurPlayer << 1))
+	{
+		if (!(CurPlayer & Players)) continue;
+		
+		RetVal.emplace_back(Inc);
+	}
+	
+	return RetVal;
+}
+

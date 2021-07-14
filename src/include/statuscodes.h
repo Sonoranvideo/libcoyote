@@ -195,6 +195,7 @@ namespace Coyote
 	};
 
 	EXPFUNC std::array<uint32_t, 2> *GetPlayerRange(const Coyote::Player Players);
+	EXPFUNC std::vector<uint32_t> PlayersToIntegers(const Coyote::Player Players);
 
 }
 

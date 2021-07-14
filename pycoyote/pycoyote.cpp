@@ -778,6 +778,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ModObj.def("GetLANCoyotes", Coyote::GetLANCoyotes);
 	ModObj.def("AttachAssetToCanvas", Coyote::AttachAssetToCanvas);
 	ModObj.def("GetPlayerRange", Coyote::GetPlayerRange);
+	ModObj.def("PlayersToIntegers", Coyote::PlayersToIntegers);
 
 	ModObj.doc() = "Interface for controlling Sonoran Video Systems' Coyote playback products";
 }
