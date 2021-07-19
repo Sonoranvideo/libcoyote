@@ -87,6 +87,7 @@ struct InternalSession
 	AsyncMsgs::AsynchronousSession ASyncSess;
 	WS::WSConnection *Connection;
 	std::string Host;
+	std::string HostOS;
 	time_t TimeoutSecs;
 	int NumAttempts;
 	
@@ -113,9 +114,11 @@ struct InternalSession
 		
 		static const char *const SubCommands[] = { "SubscribeTC", "SubscribeAssets", "SubscribePresetStates", "SubscribePresets", "SubscribeHWState", "SubscribePlaybackEvents", nullptr };
 		
+		Coyote::StatusCode S = Coyote::COYOTE_STATUS_INVALID;
+
 		for (const char *const *Cmd = SubCommands; *Cmd; ++Cmd)
 		{
-			Coyote::StatusCode S = Coyote::COYOTE_STATUS_INVALID;
+			S = Coyote::COYOTE_STATUS_INVALID;
 			
 			this->PerformSyncedCommand(*Cmd, TempZone, &S);
 			
@@ -133,6 +136,17 @@ struct InternalSession
 				return false;
 			}
 		}
+		
+		const std::map<std::string, msgpack::object> &Msg { this->PerformSyncedCommand("GetHostOS", TempZone, &S) };
+		
+		if (S != Coyote::COYOTE_STATUS_OK) return false;
+		
+		std::map<std::string, msgpack::object> Data;
+		Msg.at("Data").convert(Data);
+		
+		assert(Data.count("HostOS"));
+		
+		this->HostOS = Data.at("HostOS").as<std::string>();
 		
 		return true;
 	}
@@ -1101,6 +1115,13 @@ std::string Coyote::Session::GetHost(void) const
 	DEF_CONST_SESS;
 	
 	return SESS.Host;
+}
+
+std::string Coyote::Session::GetHostOS(void) const
+{
+	DEF_CONST_SESS;
+	
+	return SESS.HostOS;
 }
 
 Coyote::StatusCode Coyote::Session::GetIP(const int32_t AdapterID, Coyote::NetworkInfo &Out)
