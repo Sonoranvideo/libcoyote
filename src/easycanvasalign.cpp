@@ -52,14 +52,8 @@ bool Coyote::AttachAssetToCanvas(const EasyCanvasAlignment Align, const std::str
 			Pin.PinnedCoords.Width = AssetDimensions.Width * ScaleRatio;
 			Pin.PinnedCoords.Height = AssetDimensions.Height * ScaleRatio;
 
-			if (Pin.PinnedCoords.Width < Pin.PinnedCoords.Height)
-			{
-				Pin.PinnedCoords.X = (CanvasDimensions.Width / 2) - (Pin.PinnedCoords.Width / 2);
-			}
-			else if (Pin.PinnedCoords.Height < Pin.PinnedCoords.Width)
-			{
-				Pin.PinnedCoords.Y = (CanvasDimensions.Height / 2) - (Pin.PinnedCoords.Height / 2);
-			}
+			Pin.PinnedCoords.X = (CanvasDimensions.Width / 2) - (Pin.PinnedCoords.Width / 2);
+			Pin.PinnedCoords.Y = (CanvasDimensions.Height / 2) - (Pin.PinnedCoords.Height / 2);
 		
 			break;
 		}
