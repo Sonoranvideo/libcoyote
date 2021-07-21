@@ -282,6 +282,8 @@ namespace Coyote
 		std::unordered_map<int32_t, PresetMark> Countdowns;
 		std::vector<uint16_t> Volume;
 		std::map<int32_t, TabOrdering> TabDisplayOrder; //Custom msgpack handler
+		std::unordered_map<std::string, std::string> SinkOptions;
+		
 		int32_t PK;
 		int32_t Loop;
 		int32_t Link;
@@ -311,7 +313,8 @@ namespace Coyote
 			OutPosition,
 			Dissolve,
 			FreezeAtEnd,
-			Volume
+			Volume,
+			SinkOptions
 		)
 		
 		
