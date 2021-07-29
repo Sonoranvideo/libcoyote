@@ -83,6 +83,7 @@ EXPFUNC Coyote::ResolutionMode ReverseResolutionMap(const std::string &Lookup)
 
 struct InternalSession
 {
+	std::vector<std::string> SupportedSinks;
 	AsyncToSync::SynchronousSession SyncSess;
 	AsyncMsgs::AsynchronousSession ASyncSess;
 	WS::WSConnection *Connection;
@@ -90,12 +91,23 @@ struct InternalSession
 	std::string HostOS;
 	time_t TimeoutSecs;
 	int NumAttempts;
+	Coyote::UnitType UType;
 	
 	const std::map<std::string, msgpack::object> PerformSyncedCommand(const std::string &CommandName, msgpack::zone &TempZone, Coyote::StatusCode *StatusOut = nullptr, const msgpack::object *Values = nullptr);
 	Coyote::StatusCode CreatePreset_Multi(const Coyote::Preset &Ref, const std::string &Cmd);
 	
 	static bool OnMessageReady(WS::WSConnection *Conn, WSMessage *Msg);
 	static bool CheckWSInit(void);
+	
+	inline bool SupportsSink(const std::string &SinkName) const
+	{
+		for (const std::string &Sink : this->SupportedSinks)
+		{
+			if (Sink == SinkName) return true;
+		}
+		
+		return false;
+	}
 	
 	inline bool ConfigConnection(bool *SeriousError = nullptr)
 	{
@@ -111,20 +123,61 @@ struct InternalSession
 		if (!this->Connection) return false;
 		
 		msgpack::zone TempZone;
-		
-		static const char *const SubCommands[] = { "SubscribeTC", "SubscribeAssets", "SubscribePresetStates", "SubscribePresets", "SubscribeHWState", "SubscribePlaybackEvents", nullptr };
-		
 		Coyote::StatusCode S = Coyote::COYOTE_STATUS_INVALID;
-
+		
+		//Get unit type, that helps determine what commands we actually want to send the server.
+		std::map<std::string, msgpack::object> Msg { this->PerformSyncedCommand("GetUnitType", TempZone, &S) };
+	
+		if (S != Coyote::COYOTE_STATUS_OK) return false;
+		
+		std::map<std::string, msgpack::object> Data;
+		Msg.at("Data").convert(Data);
+		
+		this->UType = static_cast<Coyote::UnitType>(Data.at("UnitType").as<int>());
+		
+		//Get host OS
+		Msg = this->PerformSyncedCommand("GetHostOS", TempZone, &S);
+		
+		if (S != Coyote::COYOTE_STATUS_OK) return false;
+		
+		Data.clear();
+		Msg.at("Data").convert(Data);
+		
+		assert(Data.count("HostOS"));
+		
+		this->HostOS = Data.at("HostOS").as<std::string>();
+		
+		//Get supported sinks
+		Msg = this->PerformSyncedCommand("GetSupportedSinks", TempZone, &S);
+		
+		if (S != Coyote::COYOTE_STATUS_OK) return false;
+		
+		Data.clear();
+		Msg.at("Data").convert(Data);
+		
+		this->SupportedSinks.clear();
+		
+		Data.at("SupportedSinks").convert(this->SupportedSinks);
+		
+		static const char *const SubCommands[] = { "SubscribeTC", "SubscribeAssets", "SubscribePresetStates", "SubscribePresets", "!SubscribeHWState", "SubscribePlaybackEvents", nullptr };
+		
 		for (const char *const *Cmd = SubCommands; *Cmd; ++Cmd)
 		{
-			S = Coyote::COYOTE_STATUS_INVALID;
+			const char *Text = *Cmd;
 			
-			this->PerformSyncedCommand(*Cmd, TempZone, &S);
+			if (*Text == '!')
+			{
+				if (!this->SupportsSink("kona")) continue;
+				++Text;
+			}
+			
+			S = Coyote::COYOTE_STATUS_INVALID;
+
+			this->PerformSyncedCommand(Text, TempZone, &S);
 			
 			if (S != Coyote::COYOTE_STATUS_OK)
 			{
-				std::cerr << "libcoyote: Connection registration command \"" << *Cmd << "\" for host " << this->Host << " has failed." << std::endl;
+				std::cerr << "libcoyote: Connection registration command \"" << Text << "\" for host " << this->Host << " has failed." << std::endl;
 				
 				Core->ForgetConnection(this->Connection);
 				this->Connection = nullptr;
@@ -137,17 +190,7 @@ struct InternalSession
 			}
 		}
 		
-		const std::map<std::string, msgpack::object> &Msg { this->PerformSyncedCommand("GetHostOS", TempZone, &S) };
-		
-		if (S != Coyote::COYOTE_STATUS_OK) return false;
-		
-		std::map<std::string, msgpack::object> Data;
-		Msg.at("Data").convert(Data);
-		
-		assert(Data.count("HostOS"));
-		
-		this->HostOS = Data.at("HostOS").as<std::string>();
-		
+
 		return true;
 	}
 	
@@ -155,7 +198,8 @@ struct InternalSession
 		: Connection(),
 		Host(Host),
 		TimeoutSecs(Coyote::Session::DefaultCommandTimeoutSecs), //10 second default operation timeout
-		NumAttempts(NumAttempts)
+		NumAttempts(NumAttempts),
+		UType()
 	{
 		for (int TryCount = 0; this->NumAttempts == -1 || TryCount < this->NumAttempts; ++TryCount)
 		{
@@ -707,27 +751,20 @@ Coyote::StatusCode Coyote::Session::GetIsServerUnit(bool &ValueOut)
 {
 	DEF_SESS;
 
-	msgpack::zone TempZone;	
-	const char *CmdName = "GetIsServerUnit";
+	ValueOut = SESS.UType != COYOTE_UTYPE_FLEX;
 	
-	Coyote::StatusCode Status{};
-
-	const std::map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand(CmdName, TempZone, &Status) };
-	
-	if (Status != Coyote::COYOTE_STATUS_OK) return Status;	
-	
-	std::map<std::string, msgpack::object> DataField;
-	
-	Response.at("Data").convert(DataField);
-		
-	ValueOut = DataField["IsServerUnit"].as<bool>();
-	
-	return Status;
+	return COYOTE_STATUS_OK;
 }
+
 Coyote::StatusCode Coyote::Session::GetSupportsS12G(bool &ValueOut)
 {
 	DEF_SESS;
 
+	if (!SESS.SupportsSink("kona"))
+	{
+		return COYOTE_STATUS_UNSUPPORTED;
+	}
+	
 	msgpack::zone TempZone;	
 	const char *CmdName = "GetSupportsS12G";
 	
@@ -843,29 +880,10 @@ Coyote::StatusCode Coyote::Session::RestartSpoke(const std::string &SpokeName)
 Coyote::StatusCode Coyote::Session::GetSupportedSinks(std::vector<std::string> &Out)
 {
 	DEF_SESS;
+	
+	Out = SESS.SupportedSinks;
 
-	msgpack::zone TempZone;	
-	const char *CmdName = "GetSupportedSinks";
-	
-	Coyote::StatusCode Status{};
-	
-	const std::map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand(CmdName, TempZone, &Status) };
-	
-	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
-	
-	const msgpack::object &Results = Response.at("Data");
-
-	std::map<std::string, msgpack::object> DataField;
-	
-	Results.convert(DataField);
-	
-	std::vector<std::string> Sinks;
-	
-	DataField["SupportedSinks"].convert(Sinks);
-	
-	Out = std::move(Sinks);
-	
-	return Status;
+	return COYOTE_STATUS_OK;
 }
 
 Coyote::StatusCode Coyote::Session::GetDisks(std::vector<Coyote::Drive> &Out)
@@ -1051,6 +1069,11 @@ Coyote::StatusCode Coyote::Session::GetKonaHardwareState(Coyote::KonaHardwareSta
 {
 	DEF_SESS;
 
+	if (!SESS.SupportsSink("kona"))
+	{
+		return COYOTE_STATUS_UNSUPPORTED;
+	}
+	
 	std::unique_ptr<Coyote::KonaHardwareState> Ptr;
 	try
 	{
@@ -1200,6 +1223,11 @@ Coyote::StatusCode Coyote::Session::GetGenlockSettings(Coyote::GenlockSettings &
 {
 	DEF_SESS;
 
+	if (!SESS.SupportsSink("kona"))
+	{
+		return COYOTE_STATUS_UNSUPPORTED;
+	}
+	
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 	
@@ -1218,6 +1246,11 @@ Coyote::StatusCode Coyote::Session::GetGenlockSettings(Coyote::GenlockSettings &
 Coyote::StatusCode Coyote::Session::SetVertGenlock(int32_t VertValue)
 {
 	DEF_SESS;
+
+	if (!SESS.SupportsSink("kona"))
+	{
+		return COYOTE_STATUS_UNSUPPORTED;
+	}
 	
 	msgpack::zone TempZone;
 	
@@ -1235,7 +1268,12 @@ Coyote::StatusCode Coyote::Session::SetVertGenlock(int32_t VertValue)
 Coyote::StatusCode Coyote::Session::SetHorzGenlock(int32_t HorzValue)
 {
 	DEF_SESS;
-	
+
+	if (!SESS.SupportsSink("kona"))
+	{
+		return COYOTE_STATUS_UNSUPPORTED;
+	}
+		
 	msgpack::zone TempZone;
 	
 	StatusCode Status = COYOTE_STATUS_INVALID;
@@ -1258,6 +1296,11 @@ Coyote::StatusCode Coyote::Session::SetKonaHardwareMode(const std::array<Resolut
 {
 	DEF_SESS;
 
+	if (!SESS.SupportsSink("kona"))
+	{
+		return COYOTE_STATUS_UNSUPPORTED;
+	}
+	
 	msgpack::zone TempZone;	
 	assert(RefreshMap.count(RefreshRate));
 	
@@ -1450,19 +1493,9 @@ Coyote::StatusCode Coyote::Session::GetUnitType(UnitType &Out)
 {
 	DEF_SESS;
 
-	msgpack::zone TempZone;
-	StatusCode Status{};
+	Out = SESS.UType;
 	
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetUnitType", TempZone, &Status) };
-
-	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
-	
-	std::map<std::string, msgpack::object> Data;
-	Msg.at("Data").convert(Data);
-	
-	Out = static_cast<UnitType>(Data.at("UnitType").as<int>());
-	
-	return Status;
+	return COYOTE_STATUS_OK;
 }
 
 Coyote::StatusCode Coyote::Session::DetectUpdate(bool &DetectedOut, std::string *Out)
