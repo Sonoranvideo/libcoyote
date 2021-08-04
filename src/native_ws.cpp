@@ -90,7 +90,7 @@ void WS::WSConnection::ProcessOutgoingMsgs(void)
 				Written = -1;
 			}
 			
-			if (Written <= 0) continue;
+			if (Written <= 0) break;
 			
 			this->RegisterActivity(); //Write call didn't fail, so we can count this as a win.
 			
@@ -99,7 +99,7 @@ void WS::WSConnection::ProcessOutgoingMsgs(void)
 		} while (MsgSize > TotalWritten && Written != -1);
 		
 		
-		if (Written != -1 && TotalWritten < MsgSize)
+		if (Written > 0 && TotalWritten < MsgSize)
 		{ //Only partially transmitted
 			Msg->RawSeekForward(TotalWritten);
 			
@@ -108,7 +108,7 @@ void WS::WSConnection::ProcessOutgoingMsgs(void)
 		}
 		
 		//Problems.
-		if (Written == -1)
+		if (Written <= 0)
 		{
 			this->ErrorDetectedFlag = true;
 			

@@ -115,10 +115,14 @@ struct InternalSession
 		
 		WS::WSCore *Core =  WS::WSCore::GetInstance();
 		
-		if (this->Connection) Core->ForgetConnection(this->Connection);
-		this->Connection = Core->NewConnection(this->Host, this);
+		if (this->Connection)
+		{
+			Core->ForgetConnection(this->Connection);
+		}
 		
 		this->SyncSess.DestroyAllTickets();
+		
+		this->Connection = Core->NewConnection(this->Host, this);
 
 		if (!this->Connection) return false;
 		
@@ -226,17 +230,14 @@ struct InternalSession
 
 bool InternalSession::CheckWSInit(void)
 {
-	static std::mutex EnterLock;
 	static std::atomic_bool Entered;
 	
-	const std::lock_guard<std::mutex> G { EnterLock };
-	
-	if (!Entered)
+	if (!Entered.exchange(true))
 	{
 		WS::WSCore::Fireup(&InternalSession::OnMessageReady);
-		Entered = true;
 		return false;
 	}
+	
 	return true;
 }
 
