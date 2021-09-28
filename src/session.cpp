@@ -48,9 +48,15 @@ extern EXPFUNC const std::map<Coyote::ResolutionMode, std::string> ResolutionMap
 {
 	{ Coyote::COYOTE_RES_INVALID, "" },
 	{ Coyote::COYOTE_RES_720P, "720p" },
-	{ Coyote::COYOTE_RES_1080P, "1080p" },
-	{ Coyote::COYOTE_RES_2160P, "2160p" },
 	{ Coyote::COYOTE_RES_1080I, "1080i" },
+	{ Coyote::COYOTE_RES_1080P, "1080p" },
+	{ Coyote::COYOTE_RES_1080PSF, "1080psf" },
+	{ Coyote::COYOTE_RES_2160P, "2160p" },
+	{ Coyote::COYOTE_RES_2160PSF, "2160psf" },
+	{ Coyote::COYOTE_RES_DCI_2048, "DCI 2048" },
+	{ Coyote::COYOTE_RES_DCI_2048PSF, "DCI 2048psf" },
+	{ Coyote::COYOTE_RES_DCI_4096, "DCI 4096" },
+	{ Coyote::COYOTE_RES_DCI_4096PSF, "DCI 4096psf" },
 };
 
 extern EXPFUNC const std::map<Coyote::ResolutionMode, Coyote::Size2D> ResolutionSizeMap
@@ -58,7 +64,13 @@ extern EXPFUNC const std::map<Coyote::ResolutionMode, Coyote::Size2D> Resolution
 	{ Coyote::COYOTE_RES_INVALID, {} },
 	{ Coyote::COYOTE_RES_720P, { 1280, 720 } },
 	{ Coyote::COYOTE_RES_1080P, { 1920, 1080 } },
+	{ Coyote::COYOTE_RES_1080PSF, { 1920, 1080 } },
 	{ Coyote::COYOTE_RES_2160P, { 3840, 2160 } },
+	{ Coyote::COYOTE_RES_2160PSF, { 3840, 2160 } },
+	{ Coyote::COYOTE_RES_DCI_4096, { 4096, 2160 } },
+	{ Coyote::COYOTE_RES_DCI_4096PSF, { 4096, 2160 } },
+	{ Coyote::COYOTE_RES_DCI_2048, { 2048, 1080 } },
+	{ Coyote::COYOTE_RES_DCI_2048PSF, { 2048, 1080 } },
 	{ Coyote::COYOTE_RES_1080I, { 1920, 1080 } },
 };
 
