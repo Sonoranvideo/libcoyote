@@ -146,6 +146,16 @@ namespace Coyote
 		Size2D Dimensions;
 		uint32_t NumOutputs;
 		
+		inline ProjectorCanvasConfig(const CanvasOrientation Orientation, const Size2D Dimensions, const uint32_t NumOutputs)
+			: Orientation(Orientation), Dimensions(Dimensions), NumOutputs(NumOutputs)
+		{
+		}
+		
+		inline ProjectorCanvasConfig(void) : Orientation(), Dimensions(), NumOutputs() {}
+		
+		inline bool operator==(const ProjectorCanvasConfig &Other) const { return this->Orientation == Other.Orientation && this->Dimensions == Other.Dimensions && this->NumOutputs == Other.NumOutputs; }
+		inline bool operator!=(const ProjectorCanvasConfig &Other) const { return !(*this == Other); }
+		
 		MSGPACK_DEFINE_MAP(Dimensions, NumOutputs)
 	};
 	
