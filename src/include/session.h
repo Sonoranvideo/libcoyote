@@ -119,7 +119,9 @@ namespace Coyote
 		StatusCode GetSupportedSinks(std::vector<std::string> &Out);
 		StatusCode GetSupportsS12G(bool &ValueOut);
 		StatusCode GetIsServerUnit(bool &ValueOut);
-
+		StatusCode GetBMDResolution(const uint32_t SDIIndex, Coyote::ResolutionMode &ResOut, Coyote::RefreshMode &FPSOut);
+		StatusCode SetBMDResolution(const uint32_t SDIIndex, const Coyote::ResolutionMode Res, const Coyote::RefreshMode FPS);
+		
 		virtual ~Session(void);
 		
 		void SetCommandTimeoutSecs(const time_t TimeoutSecs = DefaultCommandTimeoutSecs);

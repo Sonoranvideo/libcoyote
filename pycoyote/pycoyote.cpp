@@ -625,6 +625,16 @@ PYBIND11_MODULE(pycoyote, ModObj)
 
 		return std::make_tuple(Status, UnitID, Nickname);
 	}, py::call_guard<py::gil_scoped_release>())
+	.def("GetBMDResolution",
+	[] (Coyote::Session &Obj, const uint32_t SDIIndex)
+	{
+		Coyote::ResolutionMode Res{};
+		Coyote::RefreshMode FPS{};
+
+		const Coyote::StatusCode Status = Obj.GetBMDResolution(SDIIndex, Res, FPS);
+		
+		return std::make_tuple(Status, Res, FPS);
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetTimeCode",
 	[] (Coyote::Session &Obj, int32_t PK)
 	{
@@ -772,6 +782,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, KillSpoke)
 	ACLASSF(Session, ExportLogsZip)
 	ACLASSF(Session, SetUnitNickname)
+	ACLASSF(Session, SetBMDResolution)
 	ACLASSF(Session, SetCommandTimeoutSecs)
 	ACLASSF(Session, GetCommandTimeoutSecs)
 	ACLASSF(Session, HasConnectionError)
