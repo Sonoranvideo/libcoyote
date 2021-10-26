@@ -254,10 +254,10 @@ namespace Coyote
 
 	struct TabOrdering : public Object
 	{
-		int32_t TabID;
+		std::string TabID;
 		int32_t Index;
 		
-		inline TabOrdering(const int32_t TabID = 0, const int32_t Index = 0) : TabID(TabID), Index(Index) {}
+		inline TabOrdering(const std::string TabID = "", const int32_t Index = 0) : TabID(TabID), Index(Index) {}
 	}; //Processed by msgpack manually
 	
 	struct ExternalAsset : public Object
@@ -291,7 +291,7 @@ namespace Coyote
 		std::unordered_map<int32_t, PresetMark> Gotos;
 		std::unordered_map<int32_t, PresetMark> Countdowns;
 		std::vector<uint16_t> Volume;
-		std::map<int32_t, TabOrdering> TabDisplayOrder; //Custom msgpack handler
+		std::map<std::string, TabOrdering> TabDisplayOrder; //Custom msgpack handler
 		std::unordered_map<std::string, std::string> SinkOptions;
 		
 		int32_t PK;

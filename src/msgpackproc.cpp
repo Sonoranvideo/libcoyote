@@ -215,7 +215,7 @@ static Coyote::Object *CoyotePresetUnpack(const msgpack::object &Obj)
 	
 	Mappy["Canvases"].convert(RawCanvases);
 	
-	std::map<int32_t, int32_t> Tabs;
+	std::map<std::string, int32_t> Tabs;
 	
 	Mappy["TabDisplayOrder"].convert(Tabs);
 	
@@ -258,7 +258,7 @@ static void CoyotePresetPack(const Coyote::Object *const Obj, msgpack::object *c
 		OutCanvases.emplace_back(std::move(OutObj));
 	}
 	
-	std::map<int32_t, int32_t> Tabs;
+	std::map<std::string, int32_t> Tabs;
 
 	for (const auto &Pair : PObj->TabDisplayOrder)
 	{

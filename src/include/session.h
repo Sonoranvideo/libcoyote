@@ -78,7 +78,7 @@ namespace Coyote
 										const bool ConstLumin = false,
 										const KonaAudioConfig AudioConfig = COYOTE_KAC_DISABLED);
 		StatusCode SelectPreset(const int32_t PK);
-		StatusCode MovePreset(const int32_t PK, const int32_t TabID, const uint32_t NewIndex);
+		StatusCode MovePreset(const int32_t PK, const std::string TabID, const uint32_t NewIndex);
 		StatusCode GetServerVersion(std::string &Out);
 		StatusCode DetectUpdate(bool &ValueOut, std::string *NewVersionOut = nullptr);
 		StatusCode IsMirror(bool &ValueOut);

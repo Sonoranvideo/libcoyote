@@ -963,7 +963,7 @@ Coyote::StatusCode Coyote::Session::ReorderPresets(const int32_t PK1, const int3
 	return Status;
 }
 
-Coyote::StatusCode Coyote::Session::MovePreset(const int32_t PK, const int32_t TabID, const uint32_t NewIndex)
+Coyote::StatusCode Coyote::Session::MovePreset(const int32_t PK, const std::string TabID, const uint32_t NewIndex)
 {
 
 	DEF_SESS;

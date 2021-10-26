@@ -256,7 +256,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 
 	py::class_<Coyote::TabOrdering, Coyote::Object>(ModObj, "TabOrdering")
 	.def(py::init<>())
-	.def("__repr__", [] (Coyote::TabOrdering &Obj) { return std::string{"<TabOrdering for tab ID "} + std::to_string(Obj.TabID) + " with index " + std::to_string(Obj.Index) + ">"; })
+	.def("__repr__", [] (Coyote::TabOrdering &Obj) { return std::string{"<TabOrdering for tab ID \""} + Obj.TabID + "\" with index " + std::to_string(Obj.Index) + ">"; })
 	ACLASSD(TabOrdering, TabID)
 	ACLASSD(TabOrdering, Index);
 
