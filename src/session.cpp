@@ -1695,6 +1695,38 @@ Coyote::StatusCode Coyote::Session::_SVS_WriteCytLog_(const std::string &Param1,
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::_SVS_RegisterPing_(const std::string &Param1)
+{ //This function is intended for Sonoran Video Systems use only. Use by users will either not work or just confuse unit logs.
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values { { "SpokeName", msgpack::object{Param1.c_str()} } };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+
+	SESS.PerformSyncedCommand("__REGISTER_PING__", TempZone, &Status, &Pass);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::_SVS_RegisterReady_(const std::string &Param1)
+{ //This function is intended for Sonoran Video Systems use only. Use by users will either not work or just confuse unit logs.
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values { { "SpokeName", msgpack::object{Param1.c_str()} } };
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+
+	SESS.PerformSyncedCommand("__REGISTER_READY__", TempZone, &Status, &Pass);
+	
+	return Status;
+}
+
 time_t Coyote::Session::GetCommandTimeoutSecs(void) const
 {
 	DEF_SESS;
