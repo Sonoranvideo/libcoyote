@@ -309,7 +309,9 @@ static Coyote::Object *CoyoteHWStateUnpack(const msgpack::object &Obj)
 	
 	const auto ResStrings = Mappy.at("Resolutions").as<std::vector<std::string>>();
 	
-	for (size_t Inc = 0; Inc < NUM_KONA_OUTS; ++Inc)
+	const size_t NumOuts = std::min(ResStrings.size(), (size_t)NUM_KONA_OUTS);
+	
+	for (size_t Inc = 0; Inc < NumOuts; ++Inc)
 	{
 		HWObj->Resolutions.at(Inc) = ReverseResolutionMap(ResStrings.at(Inc));
 	}
