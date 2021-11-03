@@ -1345,6 +1345,48 @@ Coyote::StatusCode Coyote::Session::SetKonaHardwareMode(const std::array<Resolut
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::UploadState(const std::string &PresetsJson, const std::string &SettingsJson)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values
+	{
+		{ "PresetsJson", msgpack::object{ PresetsJson.c_str() } },
+		{ "SettingsJson", msgpack::object{ SettingsJson.c_str() } },
+	};
+	
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+	
+	SESS.PerformSyncedCommand("UploadState", TempZone, &Status, &Pass);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::DownloadState(std::string &PresetsJsonOut, std::string &SettingsJsonOut)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("DownloadState", TempZone, &Status) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	std::map<std::string, msgpack::object> Data;
+	Msg.at("Data").convert(Data);
+	
+	assert(Data.count("PresetsJson") && Data.count("SettingsJson"));
+	
+	PresetsJsonOut = Data.at("PresetsJson").as<std::string>();
+	SettingsJsonOut = Data.at("SettingsJson").as<std::string>();
+	
+	return Status;
+}
+
 Coyote::StatusCode Coyote::Session::GetCurrentRole(Coyote::UnitRole &CurrentRoleOut)
 {
 	DEF_SESS;

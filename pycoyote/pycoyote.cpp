@@ -734,6 +734,15 @@ PYBIND11_MODULE(pycoyote, ModObj)
 
 		return std::make_tuple(Status, Cfg);
 	}, py::call_guard<py::gil_scoped_release>())
+	.def("DownloadState",
+	[] (Coyote::Session &Obj)
+	{
+		std::string PresetsJson, SettingsJson;
+
+		const Coyote::StatusCode Status = Obj.DownloadState(PresetsJson, SettingsJson);
+
+		return std::make_tuple(Status, PresetsJson, SettingsJson);
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("Reconnect", &Coyote::Session::Reconnect, py::call_guard<py::gil_scoped_release>(),
 	py::arg("Host") = std::string{})
 	ACLASSF(Session, Connected)
@@ -783,6 +792,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, ExportLogsZip)
 	ACLASSF(Session, SetUnitNickname)
 	ACLASSF(Session, SetBMDResolution)
+	ACLASSF(Session, UploadState)
 	ACLASSF(Session, SetCommandTimeoutSecs)
 	ACLASSF(Session, GetCommandTimeoutSecs)
 	ACLASSF(Session, HasConnectionError)

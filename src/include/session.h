@@ -121,7 +121,8 @@ namespace Coyote
 		StatusCode GetIsServerUnit(bool &ValueOut);
 		StatusCode GetBMDResolution(const uint32_t SDIIndex, Coyote::ResolutionMode &ResOut, Coyote::RefreshMode &FPSOut);
 		StatusCode SetBMDResolution(const uint32_t SDIIndex, const Coyote::ResolutionMode Res, const Coyote::RefreshMode FPS);
-		
+		StatusCode DownloadState(std::string &PresetsJsonOut, std::string &SettingsJsonOut);
+		StatusCode UploadState(const std::string &PresetsJson, const std::string &SettingsJson);
 		virtual ~Session(void);
 		
 		void SetCommandTimeoutSecs(const time_t TimeoutSecs = DefaultCommandTimeoutSecs);

@@ -31,7 +31,7 @@ long_line_column=72
 current_page=31
 FILE_NAME_0=7919;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fdatastructures.h;0;4
 FILE_NAME_1=905;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Flibcoyote.h;0;4
-FILE_NAME_2=6678;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fsession.h;0;4
+FILE_NAME_2=5982;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fsession.h;0;4
 FILE_NAME_3=1099;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2FCMakeLists.txt;0;4
 FILE_NAME_4=9550;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fmsgpackproc.cpp;0;4
 FILE_NAME_5=6509;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fnative_ws.cpp;0;4
@@ -50,7 +50,7 @@ FILE_NAME_17=20;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fwsmessages%2
 FILE_NAME_18=6;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fcommon.h;0;4
 FILE_NAME_19=16051;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-communicator%2Fsrc%2Finclude%2FPythonTools.h;0;4
 FILE_NAME_20=20730;Python;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-communicator%2Fsrc%2Fcomponents%2FCoyoteTypes.py;0;4
-FILE_NAME_21=2340;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fsession.cpp;0;4
+FILE_NAME_21=35361;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fsession.cpp;0;4
 FILE_NAME_22=391;C++;0;EUTF-8;1;1;0;%2Fhome%2Fben%2Fcoyoterepos%2Fcoyote-communicator%2Fsrc%2Fcomponents%2FCoyoteSynchronizer%2FMediaSyncProtocol.h;0;4
 FILE_NAME_23=712;C++;0;EUTF-8;1;1;0;%2Fusr%2Finclude%2Fmsgpack%2Fv1%2Fadaptor%2Fbool.hpp;0;4
 FILE_NAME_24=31604;C++;0;EUTF-8;1;1;0;%2Fusr%2Finclude%2Fmsgpack%2Fv1%2Fpack.hpp;0;4
@@ -60,16 +60,16 @@ FILE_NAME_27=210;Python;0;EUTF-8;1;1;0;%2Fhome%2Fben%2Fcoyoterepos%2Fcoyote-comm
 FILE_NAME_28=1332;C++;0;EUTF-8;1;1;0;%2Fhome%2Fben%2Fcoyoterepos%2Fcoyote-communicator%2Fsrc%2Fcomponents%2FCoyoteSynchronizer%2Fcommon.h;0;4
 FILE_NAME_29=0;Rust;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-server-ng%2Fsrc%2Fassetmgr.rs;0;4
 FILE_NAME_30=0;Rust;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-server-ng%2Fsrc%2Fcommon.rs;0;4
-FILE_NAME_31=12335;Rust;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-server-ng%2Fsrc%2Fcommunicatorcccp.rs;0;4
+FILE_NAME_31=18980;Rust;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-server-ng%2Fsrc%2Fcommunicatorcccp.rs;0;4
 FILE_NAME_32=0;Rust;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-server-ng%2Fsrc%2Fmain.rs;0;4
-FILE_NAME_33=12608;Rust;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-server-ng%2Fsrc%2Fplayback.rs;0;4
+FILE_NAME_33=44332;Rust;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-server-ng%2Fsrc%2Fplayback.rs;0;4
 FILE_NAME_34=5570;Rust;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-server-ng%2Fsrc%2Fpresetmgr.rs;0;4
 FILE_NAME_35=0;Rust;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-server-ng%2Fsrc%2Fsupervisorcccp.rs;0;4
 FILE_NAME_36=3921;Rust;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-server-ng%2Fsrc%2Ftypes.rs;0;4
 FILE_NAME_37=0;Rust;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fsvsvideoapi%2Fsrc%2Fcanvasorientation.rs;0;4
 FILE_NAME_38=10605;Python;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-communicator%2Fsrc%2Fcomponents%2FCoyoteSession%2FCCCPInterface.py;0;4
 FILE_NAME_39=5017;Python;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-communicator%2Fsrc%2Fcomponents%2FCoyoteSession%2FSubscriptionCore.py;0;4
-FILE_NAME_40=25753;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fpycoyote%2Fpycoyote.cpp;0;4
+FILE_NAME_40=26058;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fpycoyote%2Fpycoyote.cpp;0;4
 FILE_NAME_41=345;None;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fsvsvideoapi%2FCargo.toml;0;4
 FILE_NAME_42=684;None;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-server-ng%2FCargo.toml;0;4
 FILE_NAME_43=1261;Python;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-supervisor%2Fsrc%2Fcoyote-supervisor.py;0;4
@@ -87,7 +87,7 @@ FILE_NAME_54=1634;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%
 FILE_NAME_55=750;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Feasycanvasalign.h;0;4
 
 [VTE]
-last_dir=/home/daniel/volition
+last_dir=/home/ben/volition
 
 [build-menu]
 C++FT_00_LB=_Compile
