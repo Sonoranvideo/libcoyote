@@ -123,6 +123,9 @@ namespace Coyote
 		StatusCode SetBMDResolution(const uint32_t SDIIndex, const Coyote::ResolutionMode Res, const Coyote::RefreshMode FPS);
 		StatusCode DownloadState(std::string &PresetsJsonOut, std::string &SettingsJsonOut);
 		StatusCode UploadState(const std::string &PresetsJson, const std::string &SettingsJson);
+		StatusCode DeleteWatchPath(const std::string &Path);
+		StatusCode AddWatchPath(const std::string &Path);
+		StatusCode GetWatchPaths(std::vector<std::string> &Out);
 		virtual ~Session(void);
 		
 		void SetCommandTimeoutSecs(const time_t TimeoutSecs = DefaultCommandTimeoutSecs);

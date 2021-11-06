@@ -707,6 +707,15 @@ PYBIND11_MODULE(pycoyote, ModObj)
 
 		return std::make_tuple(Status, Assets);
 	}, py::call_guard<py::gil_scoped_release>())
+	.def("GetWatchPaths",
+	[] (Coyote::Session &Obj)
+	{
+		std::vector<std::string> WatchPaths;
+
+		const Coyote::StatusCode Status = Obj.GetWatchPaths(WatchPaths);
+
+		return std::make_tuple(Status, WatchPaths);
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetMirrors",
 	[] (Coyote::Session &Obj)
 	{
@@ -793,6 +802,8 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, SetUnitNickname)
 	ACLASSF(Session, SetBMDResolution)
 	ACLASSF(Session, UploadState)
+	ACLASSF(Session, AddWatchPath)
+	ACLASSF(Session, DeleteWatchPath)
 	ACLASSF(Session, SetCommandTimeoutSecs)
 	ACLASSF(Session, GetCommandTimeoutSecs)
 	ACLASSF(Session, HasConnectionError)

@@ -1364,6 +1364,42 @@ Coyote::StatusCode Coyote::Session::UploadState(const std::string &PresetsJson, 
 	
 	return Status;
 }
+Coyote::StatusCode Coyote::Session::DeleteWatchPath(const std::string &Path)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values
+	{
+		{ "Path", msgpack::object{ Path.c_str() } },
+	};
+	
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+	
+	SESS.PerformSyncedCommand("DeleteWatchPath", TempZone, &Status, &Pass);
+	
+	return Status;
+}
+Coyote::StatusCode Coyote::Session::AddWatchPath(const std::string &Path)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values
+	{
+		{ "Path", msgpack::object{ Path.c_str() } },
+	};
+	
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+	
+	SESS.PerformSyncedCommand("AddWatchPath", TempZone, &Status, &Pass);
+	
+	return Status;
+}
 
 Coyote::StatusCode Coyote::Session::DownloadState(std::string &PresetsJsonOut, std::string &SettingsJsonOut)
 {
@@ -1518,6 +1554,22 @@ Coyote::StatusCode Coyote::Session::GetDiskAssets(std::vector<ExternalAsset> &Ou
 		Out.emplace_back(std::move(*DAStruct));
 	}
 
+	return Coyote::COYOTE_STATUS_OK;
+}
+
+Coyote::StatusCode Coyote::Session::GetWatchPaths(std::vector<std::string> &Out)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetWatchPaths", TempZone, &Status) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	Msg.at("Data").convert(Out);
+	
 	return Coyote::COYOTE_STATUS_OK;
 }
 
