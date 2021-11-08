@@ -128,6 +128,7 @@ namespace Coyote
 		StatusCode GetWatchPaths(std::vector<std::string> &Out);
 		StatusCode ManualAddAsset(const std::string &FullPath);
 		StatusCode ManualForgetAsset(const std::string &FullPath);
+		StatusCode ExitSupervisor(void);
 		
 		virtual ~Session(void);
 		

@@ -1418,6 +1418,19 @@ Coyote::StatusCode Coyote::Session::ManualAddAsset(const std::string &Path)
 	
 	return Status;
 }
+
+Coyote::StatusCode Coyote::Session::ExitSupervisor(void)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	StatusCode Status{};
+	
+	SESS.PerformSyncedCommand("ExitSupervisor", TempZone, &Status);
+	
+	return Status;
+}
+
 Coyote::StatusCode Coyote::Session::AddWatchPath(const std::string &Path)
 {
 	DEF_SESS;
