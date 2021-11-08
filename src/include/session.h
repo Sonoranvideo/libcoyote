@@ -126,6 +126,9 @@ namespace Coyote
 		StatusCode DeleteWatchPath(const std::string &Path);
 		StatusCode AddWatchPath(const std::string &Path);
 		StatusCode GetWatchPaths(std::vector<std::string> &Out);
+		StatusCode ManualAddAsset(const std::string &FullPath);
+		StatusCode ManualForgetAsset(const std::string &FullPath);
+		
 		virtual ~Session(void);
 		
 		void SetCommandTimeoutSecs(const time_t TimeoutSecs = DefaultCommandTimeoutSecs);

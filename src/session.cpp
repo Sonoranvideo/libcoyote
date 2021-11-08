@@ -1382,6 +1382,42 @@ Coyote::StatusCode Coyote::Session::DeleteWatchPath(const std::string &Path)
 	
 	return Status;
 }
+Coyote::StatusCode Coyote::Session::ManualForgetAsset(const std::string &Path)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values
+	{
+		{ "FullPath", msgpack::object{ Path.c_str() } },
+	};
+	
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+	
+	SESS.PerformSyncedCommand("ManualForgetAsset", TempZone, &Status, &Pass);
+	
+	return Status;
+}
+Coyote::StatusCode Coyote::Session::ManualAddAsset(const std::string &Path)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values
+	{
+		{ "FullPath", msgpack::object{ Path.c_str() } },
+	};
+	
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+	
+	SESS.PerformSyncedCommand("ManualAddAsset", TempZone, &Status, &Pass);
+	
+	return Status;
+}
 Coyote::StatusCode Coyote::Session::AddWatchPath(const std::string &Path)
 {
 	DEF_SESS;
