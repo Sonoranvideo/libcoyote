@@ -28,6 +28,8 @@ if (WIN32)
 		set(PYLIBS -L/c/Coyote/Runtime/Python3/ -lpython310)
 		set(PYHEADERS /c/Coyote/Runtime/Python3/include/)
 	endif()
+elseif (APPLE)
+	add_compile_options("-I/opt/local/include")
 else()
 	pkg_check_modules(PYTHON3 REQUIRED python3)
 	

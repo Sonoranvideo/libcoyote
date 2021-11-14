@@ -3,6 +3,7 @@ project("LibCoyote")
 
 
 set(EXTRA_CXXFLAGS)
+set(EXTRAINCLUDE)
 set(EXTRA_LD "")
 
 if (LCVERBOSE)
@@ -57,10 +58,15 @@ target_include_directories(coyote PUBLIC ${LIBCOYOTE_INCLUDES})
 
 include(CheckIncludeFileCXX)
 
-CHECK_INCLUDE_FILE_CXX(msgpack.hpp MSGPACK_HEADER)
-
-if (NOT MSGPACK_HEADER)
-	message(FATAL_ERROR "msgpack-c was not detected. Only the header files are required for the C++ version, but they're missing.")
+if (NOT APPLE)
+	CHECK_INCLUDE_FILE_CXX(msgpack.hpp MSGPACK_HEADER)
+	
+	if (NOT MSGPACK_HEADER)
+		message(FATAL_ERROR "msgpack-c was not detected. Only the header files are required for the C++ version, but they're missing.")
+	endif()
+else()
+	set(EXTRAINCLUDE ${EXTRAINCLUDE} "/opt/local/include")
 endif()
 
 target_link_libraries(coyote ${EXTRA_LD})
+target_include_directories(coyote PUBLIC ${EXTRAINCLUDE})
