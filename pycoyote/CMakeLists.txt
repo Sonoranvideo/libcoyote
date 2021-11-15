@@ -6,6 +6,7 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../src ${CMAKE_CURRENT_BINARY_DIR}/li
 #This CMake config will only work on MinGW or POSIX. Don't bother trying to build with MSVC.
 
 set(EXTRA_CXXFLAGS)
+set(EXTRAINCLUDE)
 
 if(DEBUG)
 	add_link_options(-fstack-protector-all)
@@ -29,7 +30,19 @@ if (WIN32)
 		set(PYHEADERS /c/Coyote/Runtime/Python3/include/)
 	endif()
 elseif (APPLE)
-	add_compile_options("-I/opt/local/include")
+	if (NOT PYLIBS)
+		set(PYLIBS -L/Library/Frameworks/Python.framework/Versions/3.10/lib/ -lpython3.10)
+	endif()
+	
+	if (NOT PYHEADERS)
+		if (DEFINED ENV{PYHEADERS})
+			set(PYHEADERS $ENV{PYHEADERS})
+		else()
+			set(PYHEADERS /Library/Frameworks/Python.framework/Headers/)
+		endif()
+	endif()
+	
+	set(EXTRAINCLUDE ${EXTRAINCLUDE} "/opt/local/include")
 else()
 	pkg_check_modules(PYTHON3 REQUIRED python3)
 	
@@ -39,7 +52,13 @@ endif()
 
 set_target_properties(pycoyote PROPERTIES PREFIX "")
 target_link_directories(pycoyote PUBLIC "../build/" "../winbuild")
-target_link_libraries(pycoyote coyote ${PYLIBS} ${EXTRA_LD} -Wl,-R -Wl,. -Wl,-R -Wl,../build -Wl,-R -Wl,../winbuild)
-target_include_directories(pycoyote PUBLIC ${PYHEADERS})
+
+if (NOT APPLE)
+	target_link_libraries(pycoyote coyote ${PYLIBS} ${EXTRA_LD} -Wl,-R -Wl,. -Wl,-R -Wl,../build -Wl,-R -Wl,../winbuild)
+else()
+	target_link_libraries(pycoyote coyote ${PYLIBS} ${EXTRA_LD})
+endif()
+
+target_include_directories(pycoyote PUBLIC ${PYHEADERS} ${EXTRAINCLUDE})
 
 #target_compile_options(pycoyote PUBLIC ${PYTHON3_CFLAGS_OTHER})
