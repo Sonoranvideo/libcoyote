@@ -508,14 +508,20 @@ Coyote::StatusCode Coyote::Session::DeleteAsset(const std::string &FullPath)
 	return Status;
 }
 
-Coyote::StatusCode Coyote::Session::InstallAsset(const std::string &FullPath)
+Coyote::StatusCode Coyote::Session::InstallAsset(const std::string &FullPath, const std::string &OutputDir)
 {
 	DEF_SESS;
 
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "FullPath",  msgpack::object{FullPath.c_str(), TempZone } } };
+	std::map<std::string, msgpack::object> Values { { "FullPath",  msgpack::object{FullPath.c_str(), TempZone } } };
+	
+	if (!OutputDir.empty())
+	{
+		Values.emplace("OutputDirectory", msgpack::object{ OutputDir.c_str(), TempZone });
+	}
+	
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
 	SESS.PerformSyncedCommand("InstallAsset", TempZone, &Status, &Pass);

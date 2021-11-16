@@ -54,7 +54,7 @@ namespace Coyote
 		StatusCode Pause(const int32_t PK = 0);
 		StatusCode End(const int32_t PK = 0);
 		StatusCode SeekTo(const int32_t PK, const uint32_t TimeIndex);
-		StatusCode InstallAsset(const std::string &FullPath);
+		StatusCode InstallAsset(const std::string &FullPath, const std::string &OutputDir = {});
 		StatusCode DeleteAsset(const std::string &FullPath);
 		StatusCode RenameAsset(const std::string &FullPath, const std::string &NewName);
 		StatusCode ReorderPresets(const int32_t PK1, const int32_t PK2);

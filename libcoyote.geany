@@ -28,16 +28,16 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=8
+current_page=21
 FILE_NAME_0=7919;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fdatastructures.h;0;4
 FILE_NAME_1=905;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Flibcoyote.h;0;4
-FILE_NAME_2=6297;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fsession.h;0;4
+FILE_NAME_2=1834;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fsession.h;0;4
 FILE_NAME_3=2044;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2FCMakeLists.txt;0;4
 FILE_NAME_4=9550;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fmsgpackproc.cpp;0;4
 FILE_NAME_5=6509;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fnative_ws.cpp;0;4
 FILE_NAME_6=2752;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fasynctosync.cpp;0;4
 FILE_NAME_7=6;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fasyncmsgs.cpp;0;4
-FILE_NAME_8=1550;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fpycoyote%2FCMakeLists.txt;0;4
+FILE_NAME_8=1069;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fpycoyote%2FCMakeLists.txt;0;4
 FILE_NAME_9=6;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fsubscriptions.h;0;4
 FILE_NAME_10=6;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fnative_ws.h;0;4
 FILE_NAME_11=6;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fmtevent.h;0;4
@@ -50,7 +50,7 @@ FILE_NAME_17=20;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fwsmessages%2
 FILE_NAME_18=6;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fcommon.h;0;4
 FILE_NAME_19=16051;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-communicator%2Fsrc%2Finclude%2FPythonTools.h;0;4
 FILE_NAME_20=20730;Python;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-communicator%2Fsrc%2Fcomponents%2FCoyoteTypes.py;0;4
-FILE_NAME_21=13242;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fsession.cpp;0;4
+FILE_NAME_21=14301;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fsession.cpp;0;4
 FILE_NAME_22=391;C++;0;EUTF-8;1;1;0;%2Fhome%2Fben%2Fcoyoterepos%2Fcoyote-communicator%2Fsrc%2Fcomponents%2FCoyoteSynchronizer%2FMediaSyncProtocol.h;0;4
 FILE_NAME_23=712;C++;0;EUTF-8;1;1;0;%2Fusr%2Finclude%2Fmsgpack%2Fv1%2Fadaptor%2Fbool.hpp;0;4
 FILE_NAME_24=31604;C++;0;EUTF-8;1;1;0;%2Fusr%2Finclude%2Fmsgpack%2Fv1%2Fpack.hpp;0;4
@@ -88,7 +88,7 @@ FILE_NAME_55=750;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2
 FILE_NAME_56=191;None;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcccp%2Fsrc%2Flibcccp.i;0;4
 
 [VTE]
-last_dir=/home/ben/volition
+last_dir=/home/daniel/volition
 
 [build-menu]
 C++FT_00_LB=_Compile
