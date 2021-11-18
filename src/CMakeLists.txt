@@ -25,7 +25,11 @@ if (NOT MSVC)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-R  -Wl,.")
 endif()
 
-	
+if (APPLE)
+	set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "/opt/Coyote/Runtime/homebrew/opt/qt5" "/usr/local/opt/qt5/" "/opt/homebrew/opt/qt5/" )
+	set(EXTRAINCLUDE ${EXTRAINCLUDE} "/opt/Coyote/Runtime/homebrew/include" "/opt/homebrew/include" "/usr/local/include" "/opt/local/include")
+endif()
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 message("== Searching for Qt5WebSockets...")
 set(CMAKE_AUTOUIC ON)
@@ -64,8 +68,6 @@ if (NOT APPLE)
 	if (NOT MSGPACK_HEADER)
 		message(FATAL_ERROR "msgpack-c was not detected. Only the header files are required for the C++ version, but they're missing.")
 	endif()
-else()
-	set(EXTRAINCLUDE ${EXTRAINCLUDE} "/opt/local/include")
 endif()
 
 target_link_libraries(coyote ${EXTRA_LD})

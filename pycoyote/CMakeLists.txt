@@ -8,6 +8,11 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../src ${CMAKE_CURRENT_BINARY_DIR}/li
 set(EXTRA_CXXFLAGS)
 set(EXTRAINCLUDE)
 
+if (APPLE)
+	set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "/opt/Coyote/Runtime/homebrew/opt/qt5" "/usr/local/opt/qt5/" "/opt/homebrew/opt/qt5/" )
+	set(EXTRAINCLUDE ${EXTRAINCLUDE} "/opt/Coyote/Runtime/homebrew/include" "/opt/homebrew/include" "/usr/local/include" "/opt/local/include")
+endif()
+
 if(DEBUG)
 	add_link_options(-fstack-protector-all)
 	add_compile_options(-std=gnu++14 -pedantic -Wall -g3 -O0 -fstack-protector-all ${EXTRA_CXXFLAGS})
@@ -41,8 +46,7 @@ elseif (APPLE)
 			set(PYHEADERS /Library/Frameworks/Python.framework/Headers/)
 		endif()
 	endif()
-	
-	set(EXTRAINCLUDE ${EXTRAINCLUDE} "/opt/local/include")
+	set_target_properties(pycoyote PROPERTIES SUFFIX ".so")
 else()
 	pkg_check_modules(PYTHON3 REQUIRED python3)
 	
