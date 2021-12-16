@@ -359,8 +359,9 @@ namespace Coyote
 		std::string IP;
 		std::string Subnet;
 		int32_t AdapterID;
+		bool CableConnected;
 		
-		MSGPACK_DEFINE_MAP(IP, Subnet, AdapterID)
+		MSGPACK_DEFINE_MAP(IP, Subnet, AdapterID, CableConnected)
 	};
 
 	struct Mirror : public Object

@@ -203,11 +203,12 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	.export_values();
 
 	py::class_<Coyote::NetworkInfo, Coyote::Object>(ModObj, "NetworkInfo")
-	.def("__repr__", [] (Coyote::NetworkInfo &Obj) { return std::string{"<NetworkInfo, IP "} + Obj.IP.c_str() + ", subnet " + Obj.Subnet.c_str() + ">"; })
+	.def("__repr__", [] (Coyote::NetworkInfo &Obj) { return std::string{"<NetworkInfo, CableConnected: "} + (Obj.CableConnected ? "True" : "False") + ", IP: " + Obj.IP.c_str() + ", Subnet: " + Obj.Subnet.c_str() + ">"; })
 	.def(py::init<>())
 	ACLASSD(NetworkInfo, IP)
 	ACLASSD(NetworkInfo, Subnet)
-	ACLASSD(NetworkInfo, AdapterID);
+	ACLASSD(NetworkInfo, AdapterID)
+	ACLASSD(NetworkInfo, CableConnected);
 
 	py::class_<Coyote::Drive, Coyote::Object>(ModObj, "Drive")
 	.def("__repr__", [] (Coyote::Drive &Obj) { return std::string{"<Drive "} + Obj.Mountpoint.c_str() + ", " + std::to_string(Obj.Free / (1024ll * 1024ll * 1024ll)) + "/" + std::to_string(Obj.Total / (1024ll * 1024ll * 1024ll)) + " GiB free>"; })
