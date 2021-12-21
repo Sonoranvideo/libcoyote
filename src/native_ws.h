@@ -33,7 +33,7 @@
 
 namespace WS
 {
-	static constexpr uint16_t PortNum = 4488;
+	static constexpr uint16_t PortNum = 4490;
 	static constexpr uint32_t PingInterval = 1000;
 	static constexpr uint32_t PingoutMS = 3000;
 	
