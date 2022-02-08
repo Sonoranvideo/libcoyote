@@ -600,6 +600,15 @@ PYBIND11_MODULE(pycoyote, ModObj)
 
 		return std::make_tuple(Status, Value);
 	}, py::call_guard<py::gil_scoped_release>())
+	.def("GetKonaAVBufferLevels",
+	[] (Coyote::Session &Obj)
+	{
+		std::vector<std::pair<uint32_t, uint32_t>> RetVal;
+		
+		const Coyote::StatusCode Status = Obj.GetKonaAVBufferLevels(RetVal);
+		
+		return std::make_tuple(Status, RetVal);
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetKonaHardwareState",
 	[] (Coyote::Session &Obj)
 	{

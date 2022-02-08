@@ -1741,6 +1741,21 @@ Coyote::StatusCode Coyote::Session::GetLogsZip(std::vector<uint8_t> &OutBuffer)
 	
 	return Status;
 }
+Coyote::StatusCode Coyote::Session::GetKonaAVBufferLevels(std::vector<std::pair<uint32_t, uint32_t>> &OutLevels)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetKonaAVBufferLevels", TempZone, &Status) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+
+	Msg.at("Data").convert(OutLevels);
+	
+	return Status;
+}
 
 bool Coyote::Session::HasConnectionError(void) const
 {
