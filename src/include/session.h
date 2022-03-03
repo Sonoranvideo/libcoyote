@@ -78,7 +78,7 @@ namespace Coyote
 										const bool ConstLumin = false,
 										const KonaAudioConfig AudioConfig = COYOTE_KAC_DISABLED);
 		StatusCode SelectPreset(const int32_t PK);
-		StatusCode GetKonaAVBufferLevels(std::vector<std::pair<uint32_t, uint32_t>> &OutLevels);
+		StatusCode GetKonaAVBufferLevels(std::vector<std::tuple<uint32_t, uint32_t, int64_t>> &OutLevels);
 		StatusCode MovePreset(const int32_t PK, const std::string TabID, const uint32_t NewIndex);
 		StatusCode GetServerVersion(std::string &Out);
 		StatusCode DetectUpdate(bool &ValueOut, std::string *NewVersionOut = nullptr);

@@ -1741,7 +1741,7 @@ Coyote::StatusCode Coyote::Session::GetLogsZip(std::vector<uint8_t> &OutBuffer)
 	
 	return Status;
 }
-Coyote::StatusCode Coyote::Session::GetKonaAVBufferLevels(std::vector<std::pair<uint32_t, uint32_t>> &OutLevels)
+Coyote::StatusCode Coyote::Session::GetKonaAVBufferLevels(std::vector<std::tuple<uint32_t, uint32_t, int64_t>> &OutLevels)
 {
 	DEF_SESS;
 

@@ -37,6 +37,7 @@
 #include <thread>
 #include <array>
 #include <mutex>
+#include <tuple>
 #include <type_traits>
 
 #ifndef MSGPACK_DEFINE

@@ -603,7 +603,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	.def("GetKonaAVBufferLevels",
 	[] (Coyote::Session &Obj)
 	{
-		std::vector<std::pair<uint32_t, uint32_t>> RetVal;
+		std::vector<std::tuple<uint32_t, uint32_t, int64_t>> RetVal;
 		
 		const Coyote::StatusCode Status = Obj.GetKonaAVBufferLevels(RetVal);
 		
