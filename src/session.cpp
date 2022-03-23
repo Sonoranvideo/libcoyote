@@ -398,6 +398,18 @@ Coyote::StatusCode Coyote::Session::SelectNext(void)
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::LoadNetSettings(void)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	Coyote::StatusCode Status{};
+	
+	SESS.PerformSyncedCommand("LoadNetSettings", TempZone, &Status);
+	
+	return Status;
+}
+
 Coyote::StatusCode Coyote::Session::SelectPrev(void)
 {
 	DEF_SESS;

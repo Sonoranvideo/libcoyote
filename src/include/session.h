@@ -95,6 +95,7 @@ namespace Coyote
 		StatusCode ShutdownCoyote(void);
 		StatusCode SoftRebootCoyote(void);
 		StatusCode SelectNext(void);
+		StatusCode LoadNetSettings(void);
 		StatusCode SelectPrev(void);
 		StatusCode TakeNext(void);
 		StatusCode TakePrev(void);
