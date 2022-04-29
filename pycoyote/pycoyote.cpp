@@ -736,6 +736,15 @@ PYBIND11_MODULE(pycoyote, ModObj)
 
 		return std::make_tuple(Status, Mirrors);
 	}, py::call_guard<py::gil_scoped_release>())
+	.def("GetMaxCPUPercentage",
+	[] (Coyote::Session &Obj)
+	{
+		uint8_t P = 0;
+		
+		const Coyote::StatusCode Status = Obj.GetMaxCPUPercentage(P);
+
+		return std::make_tuple(Status, (uint32_t)P);
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetSupportedSinks",
 	[] (Coyote::Session &Obj)
 	{
@@ -821,6 +830,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, DeleteWatchPath)
 	ACLASSF(Session, SetCommandTimeoutSecs)
 	ACLASSF(Session, GetCommandTimeoutSecs)
+	ACLASSF(Session, SetMaxCPUPercentage)
 	ACLASSF(Session, HasConnectionError)
 	.def("SetKonaHardwareMode", &Coyote::Session::SetKonaHardwareMode, py::call_guard<py::gil_scoped_release>(),
 	py::arg("Resolutions"),

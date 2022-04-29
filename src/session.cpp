@@ -386,6 +386,43 @@ Coyote::StatusCode Coyote::Session::Take(const int32_t PK)
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::GetMaxCPUPercentage(uint8_t &ValueOut)
+{
+	DEF_SESS;
+	
+	msgpack::zone TempZone;
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetMaxCPUPercentage", TempZone, &Status) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+
+	std::map<std::string, msgpack::object> DataField;
+
+	Msg.at("Data").convert(DataField);
+
+	ValueOut = (uint8_t)DataField.at("MaxCPUPercentage").as<uint32_t>();
+
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::SetMaxCPUPercentage(const uint8_t MaxCPUPercentage)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;
+
+	Coyote::StatusCode Status{};
+
+	const std::map<std::string, msgpack::object> Values { MAPARG(MaxCPUPercentage) };
+	
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+	
+	SESS.PerformSyncedCommand("SetMaxCPUPercentage", TempZone, &Status, &Pass);
+
+	return Status;
+}
+
 Coyote::StatusCode Coyote::Session::SelectNext(void)
 {
 	DEF_SESS;

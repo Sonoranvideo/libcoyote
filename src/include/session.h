@@ -125,6 +125,8 @@ namespace Coyote
 		StatusCode SetBMDResolution(const uint32_t SDIIndex, const Coyote::ResolutionMode Res, const Coyote::RefreshMode FPS);
 		StatusCode DownloadState(std::string &PresetsJsonOut, std::string &SettingsJsonOut);
 		StatusCode UploadState(const std::string &PresetsJson, const std::string &SettingsJson);
+		StatusCode GetMaxCPUPercentage(uint8_t &ValueOut);
+		StatusCode SetMaxCPUPercentage(const uint8_t MaxCPUPercentage);
 		StatusCode DeleteWatchPath(const std::string &Path);
 		StatusCode AddWatchPath(const std::string &Path);
 		StatusCode GetWatchPaths(std::vector<std::string> &Out);
