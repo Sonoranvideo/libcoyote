@@ -121,6 +121,8 @@ namespace Coyote
 		StatusCode GetSupportedSinks(std::vector<std::string> &Out);
 		StatusCode GetSupportsS12G(bool &ValueOut);
 		StatusCode GetIsServerUnit(bool &ValueOut);
+		StatusCode GetHostSinkResolution(const uint32_t HDMINum, Coyote::ResolutionMode &ResOut, Coyote::RefreshMode &FPSOut);
+		StatusCode SetHostSinkResolution(const uint32_t HDMINum, const Coyote::ResolutionMode Res, const Coyote::RefreshMode FPS);
 		StatusCode GetBMDResolution(const uint32_t SDIIndex, Coyote::ResolutionMode &ResOut, Coyote::RefreshMode &FPSOut);
 		StatusCode SetBMDResolution(const uint32_t SDIIndex, const Coyote::ResolutionMode Res, const Coyote::RefreshMode FPS);
 		StatusCode DownloadState(std::string &PresetsJsonOut, std::string &SettingsJsonOut);

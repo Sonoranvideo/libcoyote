@@ -152,6 +152,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_SINK_KONA)
 	EMEMDEF(COYOTE_SINK_NDI)
 	EMEMDEF(COYOTE_SINK_BMD)
+	EMEMDEF(COYOTE_SINK_HOST)
 	EMEMDEF(COYOTE_SINK_MAXVALUE)
 	.export_values();
 
@@ -636,6 +637,16 @@ PYBIND11_MODULE(pycoyote, ModObj)
 
 		return std::make_tuple(Status, UnitID, Nickname);
 	}, py::call_guard<py::gil_scoped_release>())
+	.def("GetHostSinkResolution",
+	[] (Coyote::Session &Obj, const uint32_t HDMINum)
+	{
+		Coyote::ResolutionMode Res{};
+		Coyote::RefreshMode FPS{};
+
+		const Coyote::StatusCode Status = Obj.GetHostSinkResolution(HDMINum, Res, FPS);
+		
+		return std::make_tuple(Status, Res, FPS);
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetBMDResolution",
 	[] (Coyote::Session &Obj, const uint32_t SDIIndex)
 	{
@@ -821,6 +832,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, KillSpoke)
 	ACLASSF(Session, ExportLogsZip)
 	ACLASSF(Session, SetUnitNickname)
+	ACLASSF(Session, SetHostSinkResolution)
 	ACLASSF(Session, SetBMDResolution)
 	ACLASSF(Session, UploadState)
 	ACLASSF(Session, ExitSupervisor)

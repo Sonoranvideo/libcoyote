@@ -1591,6 +1591,48 @@ Coyote::StatusCode Coyote::Session::GetServerVersion(std::string &Out)
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::GetHostSinkResolution(const uint32_t HDMINum, Coyote::ResolutionMode &ResOut, Coyote::RefreshMode &FPSOut)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values { MAPARG(HDMINum) };
+	
+	const msgpack::object &Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+	
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetHostSinkResolution", TempZone, &Status, &Pass) };
+	
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+	
+	std::map<std::string, msgpack::object> Data;
+	Msg.at("Data").convert(Data);
+	
+	assert(Data.count("Res") && Data.count("FPS"));
+	
+	ResOut = ReverseResolutionMap(Data.at("Res").as<std::string>());
+	FPSOut = ReverseRefreshMap(Data.at("FPS").as<std::string>());
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::SetHostSinkResolution(const uint32_t HDMINum, const Coyote::ResolutionMode Res, const Coyote::RefreshMode FPS)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	StatusCode Status{};
+	
+	const std::map<std::string, msgpack::object> Values { MAPARG(HDMINum), { "Res", msgpack::object{ ResolutionMap.at(Res), TempZone } }, { "FPS", msgpack::object { RefreshMap.at(FPS), TempZone } } };
+	
+	const msgpack::object &Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+	
+	SESS.PerformSyncedCommand("SetHostSinkResolution", TempZone, &Status, &Pass);
+	
+	return Status;
+}
+
 Coyote::StatusCode Coyote::Session::GetBMDResolution(const uint32_t SDIIndex, Coyote::ResolutionMode &ResOut, Coyote::RefreshMode &FPSOut)
 {
 	DEF_SESS;
