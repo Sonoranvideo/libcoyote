@@ -136,6 +136,7 @@ namespace Coyote
 		StatusCode ManualForgetAsset(const std::string &FullPath);
 		StatusCode GetLicenseType(const std::string &LicenseKey, std::string &LicenseTypeOut);
 		StatusCode ActivateMachine(const std::string &LicenseKey);
+		StatusCode DeactivateMachine(const std::string &LicenseKey, const std::string &LicenseMachineUUID);
 		StatusCode GetLicensingStatus(LicensingStatus &LicStats);
 		StatusCode ExitSupervisor(void);
 		

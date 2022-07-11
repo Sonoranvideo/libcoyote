@@ -1567,6 +1567,26 @@ Coyote::StatusCode Coyote::Session::ActivateMachine(const std::string &LicenseKe
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::DeactivateMachine(const std::string &LicenseKey, const std::string &LicenseMachineUUID)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	StatusCode Status{};
+
+	const std::map<std::string, msgpack::object> Values
+	{
+		{ "LicenseKey", msgpack::object{ LicenseKey.c_str() } },
+		{ "LicenseMachineUUID", msgpack::object{ LicenseMachineUUID.c_str() } },
+	};
+	
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+	
+	SESS.PerformSyncedCommand("DeactivateMachine", TempZone, &Status, &Pass);
+	
+	return Status;
+}
+
 Coyote::StatusCode Coyote::Session::GetLicensingStatus(LicensingStatus &LicStats)
 {
 	DEF_SESS;
