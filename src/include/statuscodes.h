@@ -202,6 +202,15 @@ namespace Coyote
 		COYOTE_KAC_MAX,
 	};
 
+	enum LicensingCapabilities : uint64_t
+	{
+		COYOTE_LICCAP_NONE = 0,
+		COYOTE_LICCAP_ALLSINKS = 1 << 0, //If not set, we can only use HostSink
+		COYOTE_LICCAP_4KRESOLUTION = 1 << 1, //If not set, we cannot exceed 1920x1080 resolutions.
+		COYOTE_LICCAP_4PLAYERS = 1 << 2, //If not set, we can only use 1 player.
+		COYOTE_LICCAP_MAXVALUE = COYOTE_LICCAP_4PLAYERS,
+	};
+	
 	EXPFUNC std::array<uint32_t, 2> *GetPlayerRange(const Coyote::Player Players);
 	EXPFUNC std::vector<uint32_t> PlayersToIntegers(const Coyote::Player Players);
 
@@ -221,6 +230,7 @@ MSGPACK_ADD_ENUM(Coyote::AssetState)
 MSGPACK_ADD_ENUM(Coyote::StateEventType)
 MSGPACK_ADD_ENUM(Coyote::SinkType)
 MSGPACK_ADD_ENUM(Coyote::KonaAudioConfig)
+MSGPACK_ADD_ENUM(Coyote::LicensingCapabilities)
 
 
 #endif //__LIBCOYOTE_STATUSCODES_H__

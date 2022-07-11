@@ -385,6 +385,17 @@ namespace Coyote
 		MSGPACK_DEFINE_MAP(FormatString, HorzValue, VertValue, Genlocked)
 	};
 
+	struct LicensingStatus : public Object
+	{
+		std::string LicenseKey;
+		std::string ProductName;
+		std::string LicenseMachineUUID;
+		LicensingCapabilities LicenseCaps;
+		bool ValidLicense;
+
+		MSGPACK_DEFINE_MAP(LicenseKey, ProductName, LicenseMachineUUID, LicenseCaps, ValidLicense)
+	};
+
 }
 
 MSGPACK_ADD_ENUM(Coyote::CanvasOrientationEnum)

@@ -134,6 +134,9 @@ namespace Coyote
 		StatusCode GetWatchPaths(std::vector<std::string> &Out);
 		StatusCode ManualAddAsset(const std::string &FullPath);
 		StatusCode ManualForgetAsset(const std::string &FullPath);
+		StatusCode GetLicenseType(const std::string &LicenseKey, std::string &LicenseTypeOut);
+		StatusCode ActivateMachine(const std::string &LicenseKey);
+		StatusCode GetLicensingStatus(LicensingStatus &LicStats);
 		StatusCode ExitSupervisor(void);
 		
 		virtual ~Session(void);

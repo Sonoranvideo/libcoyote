@@ -164,6 +164,14 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_PLAYER_4)
 	EMEMDEF(COYOTE_PLAYER_MAXVALUE)
 	.export_values();
+	
+	py::enum_<Coyote::LicensingCapabilities>(ModObj, "LicensingCapabilities", py::arithmetic())
+	EMEMDEF(COYOTE_LICCAP_NONE)
+	EMEMDEF(COYOTE_LICCAP_ALLSINKS)
+	EMEMDEF(COYOTE_LICCAP_4KRESOLUTION)
+	EMEMDEF(COYOTE_LICCAP_4PLAYERS)
+	EMEMDEF(COYOTE_LICCAP_MAXVALUE)
+	.export_values();
 
 	py::enum_<Coyote::EasyCanvasAlignment>(ModObj, "EasyCanvasAlignment")
 	EMEMDEF(COYOTE_ECALIGN_INVALID)
@@ -211,6 +219,15 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSD(NetworkInfo, Subnet)
 	ACLASSD(NetworkInfo, AdapterID)
 	ACLASSD(NetworkInfo, CableConnected);
+	
+	py::class_<Coyote::LicensingStatus, Coyote::Object>(ModObj, "LicensingStatus")
+	.def("__repr__", [] (Coyote::LicensingStatus &Obj) { return std::string{"<LicensingStatus, Valid: "} + (Obj.ValidLicense ? "True" : "False") + ", Product: " + Obj.ProductName + ", Key: " + Obj.LicenseKey + ">"; })
+	.def(py::init<>())
+	ACLASSD(LicensingStatus, LicenseKey)
+	ACLASSD(LicensingStatus, LicenseMachineUUID)
+	ACLASSD(LicensingStatus, ProductName)
+	ACLASSD(LicensingStatus, ValidLicense)
+	ACLASSD(LicensingStatus, LicenseCaps);
 
 	py::class_<Coyote::Drive, Coyote::Object>(ModObj, "Drive")
 	.def("__repr__", [] (Coyote::Drive &Obj) { return std::string{"<Drive "} + Obj.Mountpoint.c_str() + ", " + std::to_string(Obj.Free / (1024ll * 1024ll * 1024ll)) + "/" + std::to_string(Obj.Total / (1024ll * 1024ll * 1024ll)) + " GiB free>"; })
@@ -774,6 +791,24 @@ PYBIND11_MODULE(pycoyote, ModObj)
 
 		return std::make_tuple(Status, Cfg);
 	}, py::call_guard<py::gil_scoped_release>())
+	.def("GetLicensingStatus",
+	[] (Coyote::Session &Obj)
+	{
+		Coyote::LicensingStatus LicStats{};
+		
+		const Coyote::StatusCode Status = Obj.GetLicensingStatus(LicStats);
+
+		return std::make_tuple(Status, LicStats);
+	}, py::call_guard<py::gil_scoped_release>())
+	.def("GetLicenseType",
+	[] (Coyote::Session &Obj, std::string &LicenseKey)
+	{
+		std::string Type;
+		
+		const Coyote::StatusCode Status = Obj.GetLicenseType(LicenseKey, Type);
+
+		return std::make_tuple(Status, Type);
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("DownloadState",
 	[] (Coyote::Session &Obj)
 	{
@@ -844,6 +879,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, GetCommandTimeoutSecs)
 	ACLASSF(Session, SetMaxCPUPercentage)
 	ACLASSF(Session, HasConnectionError)
+	ACLASSF(Session, ActivateMachine)
 	.def("SetKonaHardwareMode", &Coyote::Session::SetKonaHardwareMode, py::call_guard<py::gil_scoped_release>(),
 	py::arg("Resolutions"),
 	py::arg("RefreshRate"),

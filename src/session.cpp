@@ -1548,6 +1548,70 @@ Coyote::StatusCode Coyote::Session::GetCurrentRole(Coyote::UnitRole &CurrentRole
 	return Status;
 }
 
+Coyote::StatusCode Coyote::Session::ActivateMachine(const std::string &LicenseKey)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	StatusCode Status{};
+
+	const std::map<std::string, msgpack::object> Values
+	{
+		{ "LicenseKey", msgpack::object{ LicenseKey.c_str() } },
+	};
+	
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+	
+	SESS.PerformSyncedCommand("ActivateMachine", TempZone, &Status, &Pass);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::GetLicensingStatus(LicensingStatus &LicStats)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	StatusCode Status{};
+
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetLicensingStatus", TempZone, &Status) };
+
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+
+	std::map<std::string, msgpack::object> Data;
+
+	Msg.at("Data").convert(LicStats);
+
+	return Coyote::COYOTE_STATUS_OK;
+}
+
+Coyote::StatusCode Coyote::Session::GetLicenseType(const std::string &LicenseKey, std::string &LicenseTypeOut)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	StatusCode Status{};
+
+	const std::map<std::string, msgpack::object> Values
+	{
+		{ "LicenseKey", msgpack::object{ LicenseKey.c_str() } },
+	};
+	
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+	
+	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetLicenseType", TempZone, &Status, &Pass) };
+
+	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
+
+	std::map<std::string, msgpack::object> Data;
+
+	Msg.at("Data").convert(Data);
+
+	LicenseTypeOut = Data["LicenseType"].as<std::string>();
+	
+	return Coyote::COYOTE_STATUS_OK;
+}
+
 Coyote::StatusCode Coyote::Session::GetUnitID(std::string &UnitIDOut, std::string &NicknameOut)
 {
 	DEF_SESS;
