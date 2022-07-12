@@ -226,6 +226,9 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSD(LicensingStatus, LicenseKey)
 	ACLASSD(LicensingStatus, LicenseMachineUUID)
 	ACLASSD(LicensingStatus, ProductName)
+	ACLASSD(LicensingStatus, UserName)
+	ACLASSD(LicensingStatus, UsedSeats)
+	ACLASSD(LicensingStatus, TotalSeats)
 	ACLASSD(LicensingStatus, ValidLicense)
 	ACLASSD(LicensingStatus, LicenseCaps);
 

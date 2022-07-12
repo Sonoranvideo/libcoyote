@@ -390,10 +390,13 @@ namespace Coyote
 		std::string LicenseKey;
 		std::string ProductName;
 		std::string LicenseMachineUUID;
+		std::string UserName;
 		LicensingCapabilities LicenseCaps;
+		uint32_t UsedSeats;
+		uint32_t TotalSeats;
 		bool ValidLicense;
 
-		MSGPACK_DEFINE_MAP(LicenseKey, ProductName, LicenseMachineUUID, LicenseCaps, ValidLicense)
+		MSGPACK_DEFINE_MAP(LicenseKey, ProductName, UserName, LicenseMachineUUID, LicenseCaps, UsedSeats, TotalSeats, ValidLicense)
 	};
 
 }
