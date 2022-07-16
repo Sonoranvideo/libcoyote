@@ -1605,6 +1605,18 @@ Coyote::StatusCode Coyote::Session::GetLicensingStatus(LicensingStatus &LicStats
 	return Coyote::COYOTE_STATUS_OK;
 }
 
+Coyote::StatusCode Coyote::Session::HostSinkEarlyFireup(void)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	StatusCode Status{};
+
+	SESS.PerformSyncedCommand("HostSinkEarlyFireup", TempZone, &Status);
+
+	return Status;
+}
+
 Coyote::StatusCode Coyote::Session::GetLicenseType(const std::string &LicenseKey, std::string &LicenseTypeOut)
 {
 	DEF_SESS;

@@ -884,6 +884,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, HasConnectionError)
 	ACLASSF(Session, ActivateMachine)
 	ACLASSF(Session, DeactivateMachine)
+	ACLASSF(Session, HostSinkEarlyFireup)
 	.def("SetKonaHardwareMode", &Coyote::Session::SetKonaHardwareMode, py::call_guard<py::gil_scoped_release>(),
 	py::arg("Resolutions"),
 	py::arg("RefreshRate"),
