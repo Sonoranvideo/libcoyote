@@ -333,6 +333,7 @@ namespace Coyote
 		Coyote::Player GetActivePlayerForCanvas(const uint32_t Index) const;
 		const CanvasInfo *LookupCanvasByPlayer(const Coyote::Player PlayerNum) const;
 		std::array<uint32_t, 2> *GetPlayerRangeForCanvas(const uint32_t Index) const;
+		bool HasValidSinks(void) const;
 	};
 	
 	struct KonaHardwareState : public Object

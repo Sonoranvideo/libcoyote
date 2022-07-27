@@ -91,6 +91,17 @@ std::array<uint32_t, 2> *Coyote::Preset::GetPlayerRangeForCanvas(const uint32_t 
 	return GetPlayerRange(Players);
 }
 
+
+bool Coyote::Preset::HasValidSinks(void) const
+{
+	for (const CanvasInfo &Info : this->Canvases)
+	{
+		if (Info.SinkTypes != Coyote::COYOTE_SINK_INVALID) return true;
+	}
+
+	return false;
+}
+
 const Coyote::CanvasInfo *Coyote::Preset::LookupCanvasByPlayer(const Coyote::Player PlayerNum) const
 {
 	for (uint32_t Inc = 0u; Inc < this->Canvases.size(); ++Inc)
