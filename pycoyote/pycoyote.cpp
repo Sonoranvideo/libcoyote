@@ -1,5 +1,5 @@
 /*
-   Copyright 2021 Sonoran Video Systems
+   Copyright 2022 Sonoran Video Systems
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ namespace py = pybind11;
 
 static void PBEventFunc(const Coyote::PlaybackEventType EType, const int32_t PK, const int32_t Time, void *const Pass_);
 static void StateEventFunc(const Coyote::StateEventType EType, void *const Pass_);
+static void MiniviewEventFunc(const int32_t PK, const uint32_t CanvasIndex, std::vector<uint8_t> Bytes, void *const Pass_);
 
 PYBIND11_MODULE(pycoyote, ModObj)
 {
@@ -155,6 +156,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	EMEMDEF(COYOTE_SINK_HOST)
 	EMEMDEF(COYOTE_SINK_SIMPLEAUDIO)
 	EMEMDEF(COYOTE_SINK_HOSTAUDIO)
+	EMEMDEF(COYOTE_SINK_MINIVIEW)
 	EMEMDEF(COYOTE_SINK_MAXVALUE)
 	.export_values();
 
@@ -559,6 +561,24 @@ PYBIND11_MODULE(pycoyote, ModObj)
 
 		return std::make_tuple(Status, Version);
 	}, py::call_guard<py::gil_scoped_release>())
+	.def("SetMiniviewCallback",
+	[] (Coyote::Session &Obj, py::object Func, py::object PyUserData)
+	{
+		static auto &Pass = *new std::map<Coyote::Session*, std::pair<py::object, py::object> >; //Prevents the destructor from being called on program exit, because we don't care and it could segfault.
+
+		if (Func.ptr() == Py_None)
+		{
+			Obj.SetMiniviewCallback(nullptr, nullptr);
+			return;
+		}
+
+		Pass[&Obj]	=	{
+							std::move(Func),
+							std::move(PyUserData)
+						};
+
+		Obj.SetMiniviewCallback(MiniviewEventFunc, &Pass[&Obj]);
+	})
 	.def("SetPlaybackEventCallback",
 	[] (Coyote::Session &Obj, py::object Func, py::object PyUserData)
 	{
@@ -901,6 +921,21 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ModObj.def("PlayersToIntegers", Coyote::PlayersToIntegers);
 
 	ModObj.doc() = "Interface for controlling Sonoran Video Systems' Coyote playback products";
+}
+
+static void MiniviewEventFunc(const int32_t PK, const uint32_t CanvasIndex, std::vector<uint8_t> Bytes, void *const Pass_)
+{
+	py::gil_scoped_acquire GILLock;
+
+	std::pair<py::object, py::object> *const Pass = (decltype(Pass))Pass_;
+
+	if (!Pass || !Pass->first || !PyCallable_Check(Pass->first.ptr()))
+	{
+		LDEBUG_MSG("No pass");
+		return;
+	}
+
+	Pass->first(PK, CanvasIndex, py::bytes((const char*)Bytes.data(), Bytes.size()), Pass->second);
 }
 
 static void PBEventFunc(const Coyote::PlaybackEventType EType, const int32_t PK, const int32_t Time, void *const Pass_)

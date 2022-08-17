@@ -1,5 +1,5 @@
 /*
-   Copyright 2021 Sonoran Video Systems
+   Copyright 2022 Sonoran Video Systems
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -154,6 +154,7 @@ namespace Coyote
 		
 		///WARNING: All callbacks will execute in a different thread than the thread calling the setter method!
 		
+		void SetMiniviewCallback(const MiniviewCallback CB, void *const UserData = nullptr); 
 		void SetPlaybackEventCallback(const PBEventCallback CB, void *const UserData = nullptr); 
 		void SetStateEventCallback(const StateEventType EType, const StateEventCallback CB, void *const UserData = nullptr);
 		

@@ -1,5 +1,5 @@
 /*
-   Copyright 2021 Sonoran Video Systems
+   Copyright 2022 Sonoran Video Systems
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ typedef Coyote::EOTFMode EOTFMode;
 
 namespace Coyote
 {
+	typedef void (*MiniviewCallback)(const int32_t PK, const uint32_t CanvasIndex, std::vector<uint8_t> FrameData, void *UserData);
 	typedef void (*PBEventCallback)(const PlaybackEventType EType, const int32_t PK, const int32_t Time, void *UserData);
 	typedef void (*StateEventCallback)(const StateEventType EventType, void *UserData);
 

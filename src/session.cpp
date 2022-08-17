@@ -1,5 +1,5 @@
 /*
-   Copyright 2021 Sonoran Video Systems
+   Copyright 2022 Sonoran Video Systems
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -175,7 +175,7 @@ struct InternalSession
 		
 		Data.at("SupportedSinks").convert(this->SupportedSinks);
 		
-		static const char *const SubCommands[] = { "SubscribeTC", "SubscribeAssets", "SubscribePresetStates", "SubscribePresets", "!SubscribeHWState", "SubscribePlaybackEvents", nullptr };
+		static const char *const SubCommands[] = { "SubscribeTC", "SubscribeAssets", "SubscribePresetStates", "SubscribePresets", "!SubscribeHWState", "SubscribePlaybackEvents", "SubscribeMiniview", nullptr };
 		
 		for (const char *const *Cmd = SubCommands; *Cmd; ++Cmd)
 		{
@@ -1949,6 +1949,13 @@ bool Coyote::Session::HasConnectionError(void) const
 	DEF_SESS;
 	
 	return SESS.Connection->HasError();
+}
+
+void Coyote::Session::SetMiniviewCallback(const MiniviewCallback CB, void *const UserData)
+{
+	DEF_SESS;
+	
+	SESS.ASyncSess.SetMiniviewCallback(CB, UserData);
 }
 
 void Coyote::Session::SetPlaybackEventCallback(const PBEventCallback CB, void *const UserData)

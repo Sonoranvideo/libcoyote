@@ -1,5 +1,5 @@
 /*
-   Copyright 2021 Sonoran Video Systems
+   Copyright 2022 Sonoran Video Systems
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -47,6 +47,8 @@ namespace Subs
 		Coyote::KonaHardwareState HWState;
 		Coyote::PBEventCallback UserPBEventCallback;
 		void *UserPBEventData;
+		Coyote::MiniviewCallback MiniviewCB;
+		void *MiniviewCBData;
 		
 		StateEventCBSettings StateCallbacks[Coyote::COYOTE_STATE_MAX - 1];
 		
@@ -58,6 +60,7 @@ namespace Subs
 		std::map<std::string, Coyote::Asset> *GetAssets(void);
 		Coyote::KonaHardwareState *GetKonaHardwareState(void);
 		void SetPlaybackEventCallback(const Coyote::PBEventCallback, void *const UserData = nullptr);
+		void SetMiniviewCallback(const Coyote::MiniviewCallback, void *const UserData = nullptr);
 		void SetStateEventCallback(const Coyote::StateEventType EType, const Coyote::StateEventCallback CB, void *const UserData);
 		
 		SubscriptionSession() : HWState(), UserPBEventCallback(), UserPBEventData(), StateCallbacks() { }

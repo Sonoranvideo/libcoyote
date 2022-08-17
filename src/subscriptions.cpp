@@ -1,5 +1,5 @@
 /*
-   Copyright 2021 Sonoran Video Systems
+   Copyright 2022 Sonoran Video Systems
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ static const std::map<std::string, Coyote::StateEventType> CBMap
 	{ "AssetSync", Coyote::COYOTE_STATE_ASSETS },
 	{ "AssetPost", Coyote::COYOTE_STATE_ASSETS },
 	{ "AssetDelete", Coyote::COYOTE_STATE_ASSETS },
-	{ "KonaHardwareStateUpdate", Coyote::COYOTE_STATE_HWSTATE }
+	{ "KonaHardwareStateUpdate", Coyote::COYOTE_STATE_HWSTATE },
 };
 	
 bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::string, msgpack::object> &Values)
@@ -51,6 +51,26 @@ bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::str
 		
 		this->TimeCodes[TC->PK] = *TC;
 		
+		RetVal = true;
+	}
+	else if (EventName == "MiniviewPost")
+	{
+		if (this->MiniviewCB)
+		{
+			std::unordered_map<std::string, msgpack::object> Map;
+
+			Values.at("Data").convert(Map);
+			
+			const int32_t PK = Map.at("PK").as<int32_t>();
+			const uint32_t CanvasIndex = Map.at("CanvasIndex").as<uint32_t>();
+			
+			std::vector<uint8_t> Bytes;
+
+			Map.at("Bytes").convert(Bytes);
+			
+			this->MiniviewCB(PK, CanvasIndex, std::move(Bytes), this->MiniviewCBData);
+		}
+
 		RetVal = true;
 	}
 	else if (EventName == "PresetsUpdate")
@@ -244,5 +264,11 @@ void Subs::SubscriptionSession::SetPlaybackEventCallback(const Coyote::PBEventCa
 {
 	this->UserPBEventCallback = CB;
 	this->UserPBEventData = UserData;
+}
+
+void Subs::SubscriptionSession::SetMiniviewCallback(const Coyote::MiniviewCallback CB, void *const UserData)
+{
+	this->MiniviewCB = CB;
+	this->MiniviewCBData = UserData;
 }
 

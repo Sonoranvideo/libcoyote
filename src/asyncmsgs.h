@@ -1,5 +1,5 @@
 /*
-   Copyright 2021 Sonoran Video Systems
+   Copyright 2022 Sonoran Video Systems
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -39,9 +39,15 @@ namespace AsyncMsgs
 		{
 			SubSession.SetStateEventCallback(EType, CB, UserData);
 		}
+		
 		inline void SetPlaybackEventCallback(const Coyote::PBEventCallback CB, void *const UserData)
 		{
 			SubSession.SetPlaybackEventCallback(CB, UserData);
+		}
+		
+		inline void SetMiniviewCallback(const Coyote::MiniviewCallback CB, void *const UserData)
+		{
+			SubSession.SetMiniviewCallback(CB, UserData);
 		}
 
 		

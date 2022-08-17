@@ -1,5 +1,5 @@
 /*
-   Copyright 2021 Sonoran Video Systems
+   Copyright 2022 Sonoran Video Systems
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -101,7 +101,8 @@ namespace Coyote
 		COYOTE_SINK_HOST = 1 << 4,
 		COYOTE_SINK_SIMPLEAUDIO = 1 << 5,
 		COYOTE_SINK_HOSTAUDIO = 1 << 6,
-		COYOTE_SINK_MAXVALUE = COYOTE_SINK_HOSTAUDIO
+		COYOTE_SINK_MINIVIEW = 1 << 7,
+		COYOTE_SINK_MAXVALUE = COYOTE_SINK_MINIVIEW
 	};
 
 	enum RefreshMode
@@ -189,6 +190,7 @@ namespace Coyote
 		COYOTE_STATE_ASSETS			= 3,
 		COYOTE_STATE_HWSTATE		= 4,
 		COYOTE_STATE_TIMECODE		= 5,
+		COYOTE_STATE_MINIVIEW		= 6,
 		COYOTE_STATE_MAX
 	};
 
