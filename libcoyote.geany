@@ -28,7 +28,7 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=39
+current_page=16
 FILE_NAME_0=6;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fdatastructures.h;0;4
 FILE_NAME_1=6;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Flibcoyote.h;0;4
 FILE_NAME_2=402;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fsession.h;0;4
@@ -45,7 +45,7 @@ FILE_NAME_12=6;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fs
 FILE_NAME_13=6;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fasynctosync.h;0;4
 FILE_NAME_14=6;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fasyncmsgs.h;0;4
 FILE_NAME_15=6;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Fsubscriptions.cpp;0;4
-FILE_NAME_16=6;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fmacros.h;0;4
+FILE_NAME_16=689;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fmacros.h;0;4
 FILE_NAME_17=20;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fwsmessages%2Fwsmessages.hpp;0;4
 FILE_NAME_18=6;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Flibcoyote%2Fsrc%2Finclude%2Fcommon.h;0;4
 FILE_NAME_19=16051;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdaniel%2Fcoyoterepos%2Fcoyote-communicator%2Fsrc%2Finclude%2FPythonTools.h;0;4
