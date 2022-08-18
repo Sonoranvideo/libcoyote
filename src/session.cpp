@@ -13,6 +13,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+#define MSGPACK_DEFAULT_API_VERSION 2
+#include "msgpack.hpp"
+
 #define WSMESSAGES_NOLWS
 #include "../wsmessages/wsmessages.hpp"
 #include "include/common.h"

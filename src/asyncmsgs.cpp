@@ -15,6 +15,9 @@
 */
 
 #define WSMESSAGES_NOLWS
+#define MSGPACK_DEFAULT_API_VERSION 2
+#include "msgpack.hpp"
+
 #include "include/common.h"
 #include "../wsmessages/wsmessages.hpp"
 #include "asyncmsgs.h"

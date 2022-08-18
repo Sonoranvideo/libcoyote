@@ -4,3 +4,7 @@
 [submodule "pycoyote/pybind11"]
 	path = pycoyote/pybind11
 	url = https://github.com/pybind/pybind11.git
+[submodule "msgpack-c"]
+	path = msgpack-c
+	url = https://github.com/msgpack/msgpack-c/
+	branch = cpp_master

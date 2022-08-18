@@ -16,6 +16,9 @@
 
 //We have such sights to show you.
 #define WSMESSAGES_NOLWS
+#define MSGPACK_DEFAULT_API_VERSION 2
+#include "msgpack.hpp"
+
 #include "../wsmessages/wsmessages.hpp"
 #include "include/common.h"
 #include "asynctosync.h"

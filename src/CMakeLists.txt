@@ -40,6 +40,7 @@ find_package(Qt5 COMPONENTS WebSockets Core)
 message("== Ok, found Qt5WebSockets")
 
 set(sourcefiles datastructures.cpp msgpackproc.cpp session.cpp asyncmsgs.cpp asynctosync.cpp subscriptions.cpp native_ws.cpp discovery.cpp easycanvasalign.cpp)
+add_compile_options(-DMSGPACK_NO_BOOST)
 
 add_library(coyote SHARED ${sourcefiles})
 add_library(coyote_static STATIC EXCLUDE_FROM_ALL ${sourcefiles})
@@ -60,15 +61,5 @@ endif()
 
 target_include_directories(coyote PUBLIC ${LIBCOYOTE_INCLUDES})
 
-include(CheckIncludeFileCXX)
-
-if (NOT APPLE)
-	CHECK_INCLUDE_FILE_CXX(msgpack.hpp MSGPACK_HEADER)
-	
-	if (NOT MSGPACK_HEADER)
-		message(FATAL_ERROR "msgpack-c was not detected. Only the header files are required for the C++ version, but they're missing.")
-	endif()
-endif()
-
 target_link_libraries(coyote ${EXTRA_LD})
-target_include_directories(coyote PUBLIC ${EXTRAINCLUDE})
+target_include_directories(coyote PUBLIC ${EXTRAINCLUDE} "${CMAKE_CURRENT_LIST_DIR}/../msgpack-c/include")

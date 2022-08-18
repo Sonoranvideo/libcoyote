@@ -40,12 +40,12 @@
 #include <tuple>
 #include <type_traits>
 
-#ifndef MSGPACK_DEFINE
+#ifndef MSGPACK_DEFINE_MAP
 #define MSGPACK_DEFINE(...)
 #define MSGPACK_DEFINE_MAP(...)
 #define MSGPACK_DEFINE_ARRAY(...)
 #define MSGPACK_ADD_ENUM(...)
-#endif //MSGPACK_DEFINE
+#endif //MSGPACK_DEFINE_MAP
 
 
 #ifdef LCVERBOSE //Only usable for C++

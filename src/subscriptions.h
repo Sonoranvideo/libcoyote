@@ -16,13 +16,13 @@
 #ifndef __LIBCOYOTE_SUBSCRIPTIONS_H__
 #define __LIBCOYOTE_SUBSCRIPTIONS_H__
 
+#define MSGPACK_DEFAULT_API_VERSION 2
+#include "msgpack.hpp"
+#include <mutex>
+
 #include "include/common.h"
 #include "include/datastructures.h"
 #include "include/statuscodes.h"
-
-#define MSGPACK_DEFAULT_API_VERSION 2
-#include <msgpack.hpp>
-#include <mutex>
 
 namespace Subs
 {
