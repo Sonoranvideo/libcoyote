@@ -63,7 +63,7 @@ namespace Subs
 		void SetMiniviewCallback(const Coyote::MiniviewCallback, void *const UserData = nullptr);
 		void SetStateEventCallback(const Coyote::StateEventType EType, const Coyote::StateEventCallback CB, void *const UserData);
 		
-		SubscriptionSession() : HWState(), UserPBEventCallback(), UserPBEventData(), StateCallbacks() { }
+		SubscriptionSession() : HWState(), UserPBEventCallback(), UserPBEventData(), MiniviewCB(), MiniviewCBData(), StateCallbacks() { }
 	};
 }
 #endif //__LIBCOYOTE_SUBSCRIPTIONS_H__
