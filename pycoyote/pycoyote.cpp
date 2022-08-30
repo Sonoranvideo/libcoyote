@@ -38,7 +38,7 @@ namespace py = pybind11;
 
 static void PBEventFunc(const Coyote::PlaybackEventType EType, const int32_t PK, const int32_t Time, void *const Pass_);
 static void StateEventFunc(const Coyote::StateEventType EType, void *const Pass_);
-static void MiniviewEventFunc(const int32_t PK, const uint32_t CanvasIndex, std::vector<uint8_t> Bytes, void *const Pass_);
+static void MiniviewEventFunc(const int32_t PK, const uint32_t CanvasIndex, const uint32_t OutputNum, const Coyote::Size2D &Dimensions, std::vector<uint8_t> Bytes, void *const Pass_);
 
 PYBIND11_MODULE(pycoyote, ModObj)
 {
@@ -907,6 +907,8 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ACLASSF(Session, ActivateMachine)
 	ACLASSF(Session, DeactivateMachine)
 	ACLASSF(Session, HostSinkEarlyFireup)
+	ACLASSF(Session, SubscribeMiniview)
+	ACLASSF(Session, UnsubscribeMiniview)
 	.def("SetKonaHardwareMode", &Coyote::Session::SetKonaHardwareMode, py::call_guard<py::gil_scoped_release>(),
 	py::arg("Resolutions"),
 	py::arg("RefreshRate"),
@@ -923,7 +925,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ModObj.doc() = "Interface for controlling Sonoran Video Systems' Coyote playback products";
 }
 
-static void MiniviewEventFunc(const int32_t PK, const uint32_t CanvasIndex, std::vector<uint8_t> Bytes, void *const Pass_)
+static void MiniviewEventFunc(const int32_t PK, const uint32_t CanvasIndex, const uint32_t OutputNum, const Coyote::Size2D &Dimensions, std::vector<uint8_t> Bytes, void *const Pass_)
 {
 	py::gil_scoped_acquire GILLock;
 
@@ -935,7 +937,7 @@ static void MiniviewEventFunc(const int32_t PK, const uint32_t CanvasIndex, std:
 		return;
 	}
 
-	Pass->first(PK, CanvasIndex, py::bytes((const char*)Bytes.data(), Bytes.size()), Pass->second);
+	Pass->first(PK, CanvasIndex, OutputNum, Dimensions, py::bytes((const char*)Bytes.data(), Bytes.size()), Pass->second);
 }
 
 static void PBEventFunc(const Coyote::PlaybackEventType EType, const int32_t PK, const int32_t Time, void *const Pass_)

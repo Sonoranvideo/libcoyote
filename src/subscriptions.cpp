@@ -63,12 +63,14 @@ bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::str
 			
 			const int32_t PK = Map.at("PK").as<int32_t>();
 			const uint32_t CanvasIndex = Map.at("CanvasIndex").as<uint32_t>();
-			
+			const uint32_t OutputNum = Map.at("OutputNum").as<uint32_t>();
+			const int32_t Width = Map.at("Width").as<int32_t>();
+			const int32_t Height = Map.at("Height").as<int32_t>();
 			std::vector<uint8_t> Bytes;
 
 			Map.at("Bytes").convert(Bytes);
 			
-			this->MiniviewCB(PK, CanvasIndex, std::move(Bytes), this->MiniviewCBData);
+			this->MiniviewCB(PK, CanvasIndex, OutputNum, Coyote::Size2D { Width, Height }, std::move(Bytes), this->MiniviewCBData);
 		}
 
 		RetVal = true;

@@ -178,7 +178,7 @@ struct InternalSession
 		
 		Data.at("SupportedSinks").convert(this->SupportedSinks);
 		
-		static const char *const SubCommands[] = { "SubscribeTC", "SubscribeAssets", "SubscribePresetStates", "SubscribePresets", "!SubscribeHWState", "SubscribePlaybackEvents", "SubscribeMiniview", nullptr };
+		static const char *const SubCommands[] = { "SubscribeTC", "SubscribeAssets", "SubscribePresetStates", "SubscribePresets", "!SubscribeHWState", "SubscribePlaybackEvents", nullptr };
 		
 		for (const char *const *Cmd = SubCommands; *Cmd; ++Cmd)
 		{
@@ -577,6 +577,38 @@ Coyote::StatusCode Coyote::Session::InstallAsset(const std::string &FullPath, co
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
 	SESS.PerformSyncedCommand("InstallAsset", TempZone, &Status, &Pass);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::SubscribeMiniview(const int32_t PK)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	Coyote::StatusCode Status{};
+	
+	std::map<std::string, msgpack::object> Values { { "PK", msgpack::object{ PK, TempZone } } };
+	
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+	
+	SESS.PerformSyncedCommand("SubscribeMiniview", TempZone, &Status, &Pass);
+	
+	return Status;
+}
+
+Coyote::StatusCode Coyote::Session::UnsubscribeMiniview(const int32_t PK)
+{
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+	Coyote::StatusCode Status{};
+	
+	std::map<std::string, msgpack::object> Values { { "PK", msgpack::object{ PK, TempZone } } };
+	
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+	
+	SESS.PerformSyncedCommand("UnsubscribeMiniview", TempZone, &Status, &Pass);
 	
 	return Status;
 }

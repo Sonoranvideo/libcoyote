@@ -138,6 +138,8 @@ namespace Coyote
 		StatusCode ActivateMachine(const std::string &LicenseKey);
 		StatusCode DeactivateMachine(const std::string &LicenseKey, const std::string &LicenseMachineUUID);
 		StatusCode GetLicensingStatus(LicensingStatus &LicStats);
+		StatusCode SubscribeMiniview(const int32_t PK);
+		StatusCode UnsubscribeMiniview(const int32_t PK);
 		StatusCode HostSinkEarlyFireup(void);
 		StatusCode ExitSupervisor(void);
 		

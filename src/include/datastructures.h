@@ -36,9 +36,12 @@ typedef Coyote::RefreshMode RefreshMode;
 typedef Coyote::HDRMode HDRMode;
 typedef Coyote::EOTFMode EOTFMode;
 
+
 namespace Coyote
 {
-	typedef void (*MiniviewCallback)(const int32_t PK, const uint32_t CanvasIndex, std::vector<uint8_t> FrameData, void *UserData);
+	struct Size2D;
+
+	typedef void (*MiniviewCallback)(const int32_t PK, const uint32_t CanvasIndex, const uint32_t OutputNum, const Size2D &Dimensions, std::vector<uint8_t> FrameData, void *UserData);
 	typedef void (*PBEventCallback)(const PlaybackEventType EType, const int32_t PK, const int32_t Time, void *UserData);
 	typedef void (*StateEventCallback)(const StateEventType EventType, void *UserData);
 
