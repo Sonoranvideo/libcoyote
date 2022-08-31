@@ -41,6 +41,7 @@ static void StateEventFunc(const Coyote::StateEventType EType, void *const Pass_
 static void MiniviewEventFunc(const int32_t PK, const uint32_t CanvasIndex, const uint32_t OutputNum, const Coyote::Size2D &Dimensions, std::vector<uint8_t> Bytes, void *const Pass_);
 static std::string PyResolutionMap(const Coyote::ResolutionMode Res);
 static std::string PyRefreshMap(const Coyote::RefreshMode Res);
+static Coyote::Size2D PyResolutionSizeMap(const Coyote::ResolutionMode Res);
 
 PYBIND11_MODULE(pycoyote, ModObj)
 {
@@ -954,6 +955,7 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ModObj.def("ReverseResolutionMap", Coyote::ReverseResolutionMap);
 	ModObj.def("RefreshMap", PyRefreshMap);
 	ModObj.def("ReverseRefreshMap", Coyote::ReverseRefreshMap);
+	ModObj.def("ResolutionSizeMap", PyResolutionSizeMap);
 
 	ModObj.doc() = "Interface for controlling Sonoran Video Systems' Coyote playback products";
 }
@@ -963,6 +965,13 @@ static std::string PyRefreshMap(const Coyote::RefreshMode Res)
 	if (!RefreshMap.count(Res)) return "<INVALID>";
 
 	return RefreshMap.at(Res);
+}
+
+static Coyote::Size2D PyResolutionSizeMap(const Coyote::ResolutionMode Res)
+{
+	if (!Coyote::ResolutionSizeMap.count(Res)) return {};
+
+	return Coyote::ResolutionSizeMap.at(Res);
 }
 
 static std::string PyResolutionMap(const Coyote::ResolutionMode Res)
