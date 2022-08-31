@@ -34,7 +34,7 @@
 #define DEF_CONST_SESS const InternalSession &SESS = *static_cast<const InternalSession*>(this->Internal)
 #define MAPARG(x) { #x, msgpack::object{ x, TempZone } }
 
-extern EXPFUNC const std::unordered_map<Coyote::RefreshMode, std::string> RefreshMap
+extern EXPFUNC const std::unordered_map<Coyote::RefreshMode, std::string> Coyote::RefreshMap
 {
 	{ Coyote::COYOTE_REFRESH_INVALID, "" },
 	{ Coyote::COYOTE_REFRESH_23_98, "23.98" },
@@ -47,7 +47,7 @@ extern EXPFUNC const std::unordered_map<Coyote::RefreshMode, std::string> Refres
 	{ Coyote::COYOTE_REFRESH_60, "60" }
 };
 
-extern EXPFUNC const std::unordered_map<Coyote::ResolutionMode, std::string> ResolutionMap
+extern EXPFUNC const std::unordered_map<Coyote::ResolutionMode, std::string> Coyote::ResolutionMap
 {
 	{ Coyote::COYOTE_RES_INVALID, "" },
 	{ Coyote::COYOTE_RES_720P, "720p" },
@@ -62,7 +62,7 @@ extern EXPFUNC const std::unordered_map<Coyote::ResolutionMode, std::string> Res
 	{ Coyote::COYOTE_RES_DCI_4096PSF, "DCI 4096psf" },
 };
 
-extern EXPFUNC const std::unordered_map<Coyote::ResolutionMode, Coyote::Size2D> ResolutionSizeMap
+extern EXPFUNC const std::unordered_map<Coyote::ResolutionMode, Coyote::Size2D> Coyote::ResolutionSizeMap
 {
 	{ Coyote::COYOTE_RES_INVALID, {} },
 	{ Coyote::COYOTE_RES_720P, { 1280, 720 } },
@@ -77,24 +77,28 @@ extern EXPFUNC const std::unordered_map<Coyote::ResolutionMode, Coyote::Size2D> 
 	{ Coyote::COYOTE_RES_1080I, { 1920, 1080 } },
 };
 
-static const auto &ReverseRefreshMapObj { RebuildMapBackwards(RefreshMap) };
-static const auto &ReverseResolutionMapObj { RebuildMapBackwards(ResolutionMap) };
+static const auto &ReverseRefreshMapObj { RebuildMapBackwards(Coyote::RefreshMap) };
+static const auto &ReverseResolutionMapObj { RebuildMapBackwards(Coyote::ResolutionMap) };
 
 
-EXPFUNC Coyote::RefreshMode ReverseRefreshMap(const std::string &Lookup)
+EXPFUNC Coyote::RefreshMode Coyote::ReverseRefreshMap(const std::string &Lookup)
 {
 	if (!ReverseRefreshMapObj.count(Lookup)) return Coyote::COYOTE_REFRESH_INVALID;
 
 	return ReverseRefreshMapObj.at(Lookup);
 }
 
-EXPFUNC Coyote::ResolutionMode ReverseResolutionMap(const std::string &Lookup)
+EXPFUNC Coyote::ResolutionMode Coyote::ReverseResolutionMap(const std::string &Lookup)
 {
 	if (!ReverseResolutionMapObj.count(Lookup)) return Coyote::COYOTE_RES_INVALID;
 	
 	return ReverseResolutionMapObj.at(Lookup);
 }
 
+using Coyote::ResolutionMap;
+using Coyote::RefreshMap;
+using Coyote::ReverseResolutionMap;
+using Coyote::ReverseRefreshMap;
 
 struct InternalSession
 {

@@ -24,11 +24,10 @@
 static bool HasValidIncomingHeaders(const std::unordered_map<std::string, msgpack::object> &Values);
 static bool IsSubscriptionEvent(const std::unordered_map<std::string, msgpack::object> &Values);
 
-extern const std::unordered_map<Coyote::ResolutionMode, std::string> ResolutionMap;
-extern const std::unordered_map<Coyote::RefreshMode, std::string> RefreshMap;
-
-Coyote::RefreshMode ReverseRefreshMap(const std::string &Lookup);
-Coyote::ResolutionMode ReverseResolutionMap(const std::string &Lookup);
+using Coyote::ResolutionMap;
+using Coyote::RefreshMap;
+using Coyote::ReverseResolutionMap;
+using Coyote::ReverseRefreshMap;
 
 template <typename T>
 void CoyoteGenericPack(const Coyote::Object *Obj, msgpack::object *Out, msgpack::zone &TempZone)

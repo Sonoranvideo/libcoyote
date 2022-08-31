@@ -24,8 +24,8 @@
 #include "pybind11/include/pybind11/stl.h"
 #include "pybind11/include/pybind11/stl_bind.h"
 
-extern EXPFUNC const std::map<Coyote::RefreshMode, std::string> RefreshMap;
-extern EXPFUNC const std::map<Coyote::ResolutionMode, std::string> ResolutionMap;
+using Coyote::ResolutionMap;
+using Coyote::RefreshMap;
 
 namespace py = pybind11;
 
@@ -39,6 +39,8 @@ namespace py = pybind11;
 static void PBEventFunc(const Coyote::PlaybackEventType EType, const int32_t PK, const int32_t Time, void *const Pass_);
 static void StateEventFunc(const Coyote::StateEventType EType, void *const Pass_);
 static void MiniviewEventFunc(const int32_t PK, const uint32_t CanvasIndex, const uint32_t OutputNum, const Coyote::Size2D &Dimensions, std::vector<uint8_t> Bytes, void *const Pass_);
+static std::string PyResolutionMap(const Coyote::ResolutionMode Res);
+static std::string PyRefreshMap(const Coyote::RefreshMode Res);
 
 PYBIND11_MODULE(pycoyote, ModObj)
 {
@@ -948,8 +950,26 @@ PYBIND11_MODULE(pycoyote, ModObj)
 	ModObj.def("AttachAssetToCanvas", Coyote::AttachAssetToCanvas);
 	ModObj.def("GetPlayerRange", Coyote::GetPlayerRange);
 	ModObj.def("PlayersToIntegers", Coyote::PlayersToIntegers);
+	ModObj.def("ResolutionMap", PyResolutionMap);
+	ModObj.def("ReverseResolutionMap", Coyote::ReverseResolutionMap);
+	ModObj.def("RefreshMap", PyRefreshMap);
+	ModObj.def("ReverseRefreshMap", Coyote::ReverseRefreshMap);
 
 	ModObj.doc() = "Interface for controlling Sonoran Video Systems' Coyote playback products";
+}
+
+static std::string PyRefreshMap(const Coyote::RefreshMode Res)
+{
+	if (!RefreshMap.count(Res)) return "<INVALID>";
+
+	return RefreshMap.at(Res);
+}
+
+static std::string PyResolutionMap(const Coyote::ResolutionMode Res)
+{
+	if (!ResolutionMap.count(Res)) return "<INVALID>";
+
+	return ResolutionMap.at(Res);
 }
 
 static void MiniviewEventFunc(const int32_t PK, const uint32_t CanvasIndex, const uint32_t OutputNum, const Coyote::Size2D &Dimensions, std::vector<uint8_t> Bytes, void *const Pass_)

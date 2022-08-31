@@ -170,5 +170,13 @@ namespace Coyote
 	};
 	
 	EXPFUNC std::vector<LANCoyote> GetLANCoyotes(void);
+
+	extern EXPFUNC const std::unordered_map<ResolutionMode, Size2D> ResolutionSizeMap;
+	
+	extern EXPFUNC const std::unordered_map<ResolutionMode, std::string> ResolutionMap;
+	EXPFUNC ResolutionMode ReverseResolutionMap(const std::string &Lookup);
+	
+	extern EXPFUNC const std::unordered_map<RefreshMode, std::string> RefreshMap;
+	EXPFUNC RefreshMode ReverseRefreshMap(const std::string &Lookup);
 }
 #endif //__LIBCOYOTE_SESSION_H__
