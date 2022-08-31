@@ -55,6 +55,7 @@ namespace Subs
 	public:
 		bool ProcessSubscriptionEvent(const std::unordered_map<std::string, msgpack::object> &Values);
 		Coyote::TimeCode *GetTimeCode(const int32_t PK);
+		std::unordered_map<int32_t, Coyote::TimeCode> *GetTimeCodesMap(void);
 		std::unordered_map<int32_t, Coyote::Preset> *GetPresets(void);
 		std::unordered_map<int32_t, Coyote::PresetState> *GetPresetStates(void);
 		std::unordered_map<std::string, Coyote::Asset> *GetAssets(void);

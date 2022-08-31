@@ -220,6 +220,13 @@ Coyote::TimeCode *Subs::SubscriptionSession::GetTimeCode(const int32_t PK)
 	return new Coyote::TimeCode{ this->TimeCodes[PK] };
 }
 
+std::unordered_map<int32_t, Coyote::TimeCode> *Subs::SubscriptionSession::GetTimeCodesMap(void)
+{
+	std::lock_guard<std::mutex> G { this->TimeCodesLock };
+
+	return new std::unordered_map<int32_t, Coyote::TimeCode> { this->TimeCodes }; //Copy, not move.
+}
+
 std::unordered_map<std::string, Coyote::Asset> *Subs::SubscriptionSession::GetAssets(void)
 {
 	const std::lock_guard<std::mutex> G { this->AssetsLock };

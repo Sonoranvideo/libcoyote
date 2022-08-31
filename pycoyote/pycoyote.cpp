@@ -708,6 +708,15 @@ PYBIND11_MODULE(pycoyote, ModObj)
 
 		return std::make_tuple(Status, Value);
 	}, py::call_guard<py::gil_scoped_release>())
+	.def("GetTimeCodesMap",
+	[] (Coyote::Session &Obj)
+	{
+		std::unordered_map<int32_t, Coyote::TimeCode> TCs;
+
+		const Coyote::StatusCode Status = Obj.GetTimeCodesMap(TCs);
+
+		return std::make_tuple(Status, TCs);
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("ReadAssetMetadata",
 	[] (Coyote::Session &Obj, const std::string &FullPath)
 	{

@@ -1156,6 +1156,19 @@ Coyote::StatusCode Coyote::Session::GetPresetsMap(std::unordered_map<int32_t, Co
 	return Coyote::COYOTE_STATUS_OK;
 }
 
+Coyote::StatusCode Coyote::Session::GetTimeCodesMap(std::unordered_map<int32_t, Coyote::TimeCode> &Out)
+{
+	DEF_SESS;
+
+	std::unique_ptr<std::unordered_map<int32_t, Coyote::TimeCode> > Ptr { SESS.ASyncSess.SubSession.GetTimeCodesMap() };
+	
+	if (!Ptr) return Coyote::COYOTE_STATUS_FAILED;
+	
+	Out = std::move(*Ptr);
+	
+	return Coyote::COYOTE_STATUS_OK;
+}
+
 Coyote::StatusCode Coyote::Session::GetPresets(std::vector<Coyote::Preset> &Out)
 {
 	DEF_SESS;
