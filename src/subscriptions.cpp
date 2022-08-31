@@ -18,7 +18,7 @@
 #include "msgpackproc.h"
 #include <mutex>
 
-static const std::map<std::string, Coyote::StateEventType> CBMap
+static const std::unordered_map<std::string, Coyote::StateEventType> CBMap
 {
 	{ "PresetsUpdate", Coyote::COYOTE_STATE_PRESETS },
 	{ "PresetStatesUpdate", Coyote::COYOTE_STATE_PRESETSTATES },
@@ -29,7 +29,7 @@ static const std::map<std::string, Coyote::StateEventType> CBMap
 	{ "KonaHardwareStateUpdate", Coyote::COYOTE_STATE_HWSTATE },
 };
 	
-bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::string, msgpack::object> &Values)
+bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::unordered_map<std::string, msgpack::object> &Values)
 {
 	if (!Values.count("SubscriptionEvent") || !Values.count("Data")) return false; //Not a subscription event
 
@@ -176,7 +176,7 @@ bool Subs::SubscriptionSession::ProcessSubscriptionEvent(const std::map<std::str
 	}
 	else if (EventName == "PlaybackEvent")
 	{
-		std::map<std::string, msgpack::object> DataObjs;
+		std::unordered_map<std::string, msgpack::object> DataObjs;
 		
 		Values.at("Data").convert(DataObjs);
 		
@@ -220,21 +220,21 @@ Coyote::TimeCode *Subs::SubscriptionSession::GetTimeCode(const int32_t PK)
 	return new Coyote::TimeCode{ this->TimeCodes[PK] };
 }
 
-std::map<std::string, Coyote::Asset> *Subs::SubscriptionSession::GetAssets(void)
+std::unordered_map<std::string, Coyote::Asset> *Subs::SubscriptionSession::GetAssets(void)
 {
 	const std::lock_guard<std::mutex> G { this->AssetsLock };
 	
 	return new decltype(this->Assets) { this->Assets }; //Copy, not move.
 }
 
-std::map<int32_t, Coyote::Preset> *Subs::SubscriptionSession::GetPresets(void)
+std::unordered_map<int32_t, Coyote::Preset> *Subs::SubscriptionSession::GetPresets(void)
 {
 	const std::lock_guard<std::mutex> G { this->PresetsLock };
 	
 	return new decltype(this->Presets) { this->Presets }; //Copy, not move.
 }
 
-std::map<int32_t, Coyote::PresetState> *Subs::SubscriptionSession::GetPresetStates(void)
+std::unordered_map<int32_t, Coyote::PresetState> *Subs::SubscriptionSession::GetPresetStates(void)
 {
 	const std::lock_guard<std::mutex> G { this->PresetStatesLock };
 	

@@ -92,7 +92,7 @@ namespace AsyncToSync
 	class SynchronousSession
 	{
 	private:
-		std::map<uint64_t, MessageTicket*> Tickets;
+		std::unordered_map<uint64_t, MessageTicket*> Tickets;
 		std::mutex TicketsLock;
 		MsgIDCounter MsgIDs;
 		
@@ -109,7 +109,7 @@ namespace AsyncToSync
 			this->Tickets.clear();
 		}
 		
-		bool OnMessageReady(const std::map<std::string, msgpack::object> &Values, WS::WSConnection *Conn, WSMessage *Msg);
+		bool OnMessageReady(const std::unordered_map<std::string, msgpack::object> &Values, WS::WSConnection *Conn, WSMessage *Msg);
 		MessageTicket *NewTicket(const uint64_t MsgID);
 		bool DestroyTicket(MessageTicket *Ticket);
 		uint64_t NewMsgID(void) { return this->MsgIDs.NewID(); }

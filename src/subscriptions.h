@@ -40,10 +40,10 @@ namespace Subs
 		std::mutex PresetStatesLock;
 		std::mutex AssetsLock;
 		std::mutex HWStateLock;
-		std::map<int32_t, Coyote::TimeCode> TimeCodes;
-		std::map<int32_t, Coyote::Preset> Presets;
-		std::map<int32_t, Coyote::PresetState> PresetStates;
-		std::map<std::string, Coyote::Asset> Assets;
+		std::unordered_map<int32_t, Coyote::TimeCode> TimeCodes;
+		std::unordered_map<int32_t, Coyote::Preset> Presets;
+		std::unordered_map<int32_t, Coyote::PresetState> PresetStates;
+		std::unordered_map<std::string, Coyote::Asset> Assets;
 		Coyote::KonaHardwareState HWState;
 		Coyote::PBEventCallback UserPBEventCallback;
 		void *UserPBEventData;
@@ -53,11 +53,11 @@ namespace Subs
 		StateEventCBSettings StateCallbacks[Coyote::COYOTE_STATE_MAX - 1];
 		
 	public:
-		bool ProcessSubscriptionEvent(const std::map<std::string, msgpack::object> &Values);
+		bool ProcessSubscriptionEvent(const std::unordered_map<std::string, msgpack::object> &Values);
 		Coyote::TimeCode *GetTimeCode(const int32_t PK);
-		std::map<int32_t, Coyote::Preset> *GetPresets(void);
-		std::map<int32_t, Coyote::PresetState> *GetPresetStates(void);
-		std::map<std::string, Coyote::Asset> *GetAssets(void);
+		std::unordered_map<int32_t, Coyote::Preset> *GetPresets(void);
+		std::unordered_map<int32_t, Coyote::PresetState> *GetPresetStates(void);
+		std::unordered_map<std::string, Coyote::Asset> *GetAssets(void);
 		Coyote::KonaHardwareState *GetKonaHardwareState(void);
 		void SetPlaybackEventCallback(const Coyote::PBEventCallback, void *const UserData = nullptr);
 		void SetMiniviewCallback(const Coyote::MiniviewCallback, void *const UserData = nullptr);

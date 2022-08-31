@@ -744,6 +744,24 @@ PYBIND11_MODULE(pycoyote, ModObj)
 
 		return std::make_tuple(Status, DiskAssets);
 	}, py::call_guard<py::gil_scoped_release>(), py::arg("DriveName"), py::arg("Subpath") = "")
+	.def("GetPresetsMap",
+	[] (Coyote::Session &Obj)
+	{
+		std::unordered_map<int32_t, Coyote::Preset> Presets;
+
+		const Coyote::StatusCode Status = Obj.GetPresetsMap(Presets);
+
+		return std::make_tuple(Status, Presets);
+	}, py::call_guard<py::gil_scoped_release>())
+	.def("GetPresetStatesMap",
+	[] (Coyote::Session &Obj)
+	{
+		std::unordered_map<int32_t, Coyote::PresetState> States;
+
+		const Coyote::StatusCode Status = Obj.GetPresetStatesMap(States);
+
+		return std::make_tuple(Status, States);
+	}, py::call_guard<py::gil_scoped_release>())
 	.def("GetPresets",
 	[] (Coyote::Session &Obj)
 	{

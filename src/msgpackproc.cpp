@@ -21,11 +21,11 @@
 #include <typeindex>
 
 //Prototypes
-static bool HasValidIncomingHeaders(const std::map<std::string, msgpack::object> &Values);
-static bool IsSubscriptionEvent(const std::map<std::string, msgpack::object> &Values);
+static bool HasValidIncomingHeaders(const std::unordered_map<std::string, msgpack::object> &Values);
+static bool IsSubscriptionEvent(const std::unordered_map<std::string, msgpack::object> &Values);
 
-extern const std::map<Coyote::ResolutionMode, std::string> ResolutionMap;
-extern const std::map<Coyote::RefreshMode, std::string> RefreshMap;
+extern const std::unordered_map<Coyote::ResolutionMode, std::string> ResolutionMap;
+extern const std::unordered_map<Coyote::RefreshMode, std::string> RefreshMap;
 
 Coyote::RefreshMode ReverseRefreshMap(const std::string &Lookup);
 Coyote::ResolutionMode ReverseResolutionMap(const std::string &Lookup);
@@ -215,7 +215,7 @@ static Coyote::Object *CoyotePresetUnpack(const msgpack::object &Obj)
 	
 	Mappy["Canvases"].convert(RawCanvases);
 	
-	std::map<std::string, int32_t> Tabs;
+	std::unordered_map<std::string, int32_t> Tabs;
 	
 	Mappy["TabDisplayOrder"].convert(Tabs);
 	
@@ -258,7 +258,7 @@ static void CoyotePresetPack(const Coyote::Object *const Obj, msgpack::object *c
 		OutCanvases.emplace_back(std::move(OutObj));
 	}
 	
-	std::map<std::string, int32_t> Tabs;
+	std::unordered_map<std::string, int32_t> Tabs;
 
 	for (const auto &Pair : PObj->TabDisplayOrder)
 	{
@@ -327,7 +327,7 @@ void MsgpackProc::InitOutgoingMsg(msgpack::packer<msgpack::sbuffer> &Pack, const
 {
 	msgpack::zone TempZone;
 	
-	std::map<std::string, msgpack::object> TotalValues
+	std::unordered_map<std::string, msgpack::object> TotalValues
 	{
 		{ "CommandName", msgpack::object{ CommandName.c_str(), TempZone} },
 		{ "CoyoteAPIVersion", msgpack::object{ COYOTE_API_VERSION, TempZone } },
@@ -340,7 +340,7 @@ void MsgpackProc::InitOutgoingMsg(msgpack::packer<msgpack::sbuffer> &Pack, const
 	Pack.pack(TotalValues);
 }
 
-static bool HasValidIncomingHeaders(const std::map<std::string, msgpack::object> &Values)
+static bool HasValidIncomingHeaders(const std::unordered_map<std::string, msgpack::object> &Values)
 {
 	static const char *const Required[] = { "CommandName", "CoyoteAPIVersion", "StatusInt", "StatusText" };
 	static const size_t NumFields = sizeof Required / sizeof *Required;
@@ -353,12 +353,12 @@ static bool HasValidIncomingHeaders(const std::map<std::string, msgpack::object>
 	return true;
 }
 
-static bool IsSubscriptionEvent(const std::map<std::string, msgpack::object> &Values)
+static bool IsSubscriptionEvent(const std::unordered_map<std::string, msgpack::object> &Values)
 {
 	return Values.count("SubscriptionEvent");
 }
 
-std::map<std::string, msgpack::object> MsgpackProc::InitIncomingMsg(const void *Data, const size_t DataLength, msgpack::zone &TempZone, uint64_t *MsgIDOut)
+std::unordered_map<std::string, msgpack::object> MsgpackProc::InitIncomingMsg(const void *Data, const size_t DataLength, msgpack::zone &TempZone, uint64_t *MsgIDOut)
 {
 	//Unpack binary data.
 	msgpack::unpacked Result;
@@ -366,7 +366,7 @@ std::map<std::string, msgpack::object> MsgpackProc::InitIncomingMsg(const void *
 	const msgpack::object &Object { msgpack::unpack(TempZone, (const char*)Data, DataLength) };
 	
 	//Convert into a map of smaller msgpack objects
-	std::map<std::string, msgpack::object> Values;
+	std::unordered_map<std::string, msgpack::object> Values;
 	Object.convert(Values);
 	
 	//Subscription events just get converted and done.

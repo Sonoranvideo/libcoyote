@@ -24,7 +24,7 @@
 #include "msgpackproc.h"
 #include "subscriptions.h"
 
-bool AsyncMsgs::AsynchronousSession::OnMessageReady(const std::map<std::string, msgpack::object> &Values, WS::WSConnection *Conn, WSMessage *Msg_)
+bool AsyncMsgs::AsynchronousSession::OnMessageReady(const std::unordered_map<std::string, msgpack::object> &Values, WS::WSConnection *Conn, WSMessage *Msg_)
 {
 	const std::unique_ptr<WSMessage> Msg { Msg_ };
 	

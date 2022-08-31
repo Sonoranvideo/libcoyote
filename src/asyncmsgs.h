@@ -29,7 +29,7 @@ namespace AsyncMsgs
 	private:
 		
 	public:
-		bool OnMessageReady(const std::map<std::string, msgpack::object> &Values, WS::WSConnection *Conn, WSMessage *Msg);
+		bool OnMessageReady(const std::unordered_map<std::string, msgpack::object> &Values, WS::WSConnection *Conn, WSMessage *Msg);
 		
 		Subs::SubscriptionSession SubSession;
 		

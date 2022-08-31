@@ -46,7 +46,9 @@ namespace Coyote
 		
 		StatusCode GetAssets(std::vector<Asset> &Out);
 		StatusCode GetPresets(std::vector<Preset> &Out);
+		StatusCode GetPresetsMap(std::unordered_map<int32_t, Preset> &Out);
 		StatusCode GetPresetStates(std::vector<PresetState> &Out);
+		StatusCode GetPresetStatesMap(std::unordered_map<int32_t, PresetState> &Out);
 		StatusCode GetTimeCode(TimeCode &Out, const int32_t PK = 0);
 		
 		//Input parameter names must match the expected JSON names

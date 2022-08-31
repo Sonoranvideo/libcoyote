@@ -26,7 +26,7 @@
 #include "native_ws.h"
 #include "asyncmsgs.h"
 
-bool AsyncToSync::SynchronousSession::OnMessageReady(const std::map<std::string, msgpack::object> &Values, WS::WSConnection *Conn, WSMessage *Msg)
+bool AsyncToSync::SynchronousSession::OnMessageReady(const std::unordered_map<std::string, msgpack::object> &Values, WS::WSConnection *Conn, WSMessage *Msg)
 {	
 	assert(Values.count("MsgID"));
 	

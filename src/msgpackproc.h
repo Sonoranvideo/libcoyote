@@ -28,7 +28,7 @@ namespace MsgpackProc
 	msgpack::object PackCoyoteObject(const Coyote::Object *Object, msgpack::zone &TempZone, msgpack::packer<msgpack::sbuffer> *Pack = nullptr);
 	Coyote::Object *UnpackCoyoteObject(const msgpack::object &Object, const std::type_info &Expected);
 	void InitOutgoingMsg(msgpack::packer<msgpack::sbuffer> &Pack, const std::string &CommandName, const uint64_t MsgID = 0u, const msgpack::object *Values = nullptr);
-	std::map<std::string, msgpack::object> InitIncomingMsg(const void *Data, const size_t DataLength, msgpack::zone &TempZone, uint64_t *MsgIDOut = nullptr);
+	std::unordered_map<std::string, msgpack::object> InitIncomingMsg(const void *Data, const size_t DataLength, msgpack::zone &TempZone, uint64_t *MsgIDOut = nullptr);
 
 	
 	template<typename T>

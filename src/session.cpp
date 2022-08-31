@@ -34,7 +34,7 @@
 #define DEF_CONST_SESS const InternalSession &SESS = *static_cast<const InternalSession*>(this->Internal)
 #define MAPARG(x) { #x, msgpack::object{ x, TempZone } }
 
-extern EXPFUNC const std::map<Coyote::RefreshMode, std::string> RefreshMap
+extern EXPFUNC const std::unordered_map<Coyote::RefreshMode, std::string> RefreshMap
 {
 	{ Coyote::COYOTE_REFRESH_INVALID, "" },
 	{ Coyote::COYOTE_REFRESH_23_98, "23.98" },
@@ -47,7 +47,7 @@ extern EXPFUNC const std::map<Coyote::RefreshMode, std::string> RefreshMap
 	{ Coyote::COYOTE_REFRESH_60, "60" }
 };
 
-extern EXPFUNC const std::map<Coyote::ResolutionMode, std::string> ResolutionMap
+extern EXPFUNC const std::unordered_map<Coyote::ResolutionMode, std::string> ResolutionMap
 {
 	{ Coyote::COYOTE_RES_INVALID, "" },
 	{ Coyote::COYOTE_RES_720P, "720p" },
@@ -62,7 +62,7 @@ extern EXPFUNC const std::map<Coyote::ResolutionMode, std::string> ResolutionMap
 	{ Coyote::COYOTE_RES_DCI_4096PSF, "DCI 4096psf" },
 };
 
-extern EXPFUNC const std::map<Coyote::ResolutionMode, Coyote::Size2D> ResolutionSizeMap
+extern EXPFUNC const std::unordered_map<Coyote::ResolutionMode, Coyote::Size2D> ResolutionSizeMap
 {
 	{ Coyote::COYOTE_RES_INVALID, {} },
 	{ Coyote::COYOTE_RES_720P, { 1280, 720 } },
@@ -108,7 +108,7 @@ struct InternalSession
 	int NumAttempts;
 	Coyote::UnitType UType;
 	
-	const std::map<std::string, msgpack::object> PerformSyncedCommand(const std::string &CommandName, msgpack::zone &TempZone, Coyote::StatusCode *StatusOut = nullptr, const msgpack::object *Values = nullptr);
+	const std::unordered_map<std::string, msgpack::object> PerformSyncedCommand(const std::string &CommandName, msgpack::zone &TempZone, Coyote::StatusCode *StatusOut = nullptr, const msgpack::object *Values = nullptr);
 	Coyote::StatusCode CreatePreset_Multi(const Coyote::Preset &Ref, const std::string &Cmd);
 	
 	static bool OnMessageReady(WS::WSConnection *Conn, WSMessage *Msg);
@@ -145,11 +145,11 @@ struct InternalSession
 		Coyote::StatusCode S = Coyote::COYOTE_STATUS_INVALID;
 		
 		//Get unit type, that helps determine what commands we actually want to send the server.
-		std::map<std::string, msgpack::object> Msg { this->PerformSyncedCommand("GetUnitType", TempZone, &S) };
+		std::unordered_map<std::string, msgpack::object> Msg { this->PerformSyncedCommand("GetUnitType", TempZone, &S) };
 	
 		if (S != Coyote::COYOTE_STATUS_OK) return false;
 		
-		std::map<std::string, msgpack::object> Data;
+		std::unordered_map<std::string, msgpack::object> Data;
 		Msg.at("Data").convert(Data);
 		
 		this->UType = static_cast<Coyote::UnitType>(Data.at("UnitType").as<int>());
@@ -261,7 +261,7 @@ bool InternalSession::OnMessageReady(WS::WSConnection *Conn, WSMessage *Msg)
 	InternalSession *Sess = static_cast<InternalSession*>(Conn->UserData);
 	
 	
-	std::map<std::string, msgpack::object> Values;
+	std::unordered_map<std::string, msgpack::object> Values;
 	msgpack::zone TempZone;
 	
 	try
@@ -290,7 +290,7 @@ bool InternalSession::OnMessageReady(WS::WSConnection *Conn, WSMessage *Msg)
 }
 
 
-const std::map<std::string, msgpack::object> InternalSession::PerformSyncedCommand(const std::string &CommandName, msgpack::zone &TempZone, Coyote::StatusCode *StatusOut, const msgpack::object *Values)
+const std::unordered_map<std::string, msgpack::object> InternalSession::PerformSyncedCommand(const std::string &CommandName, msgpack::zone &TempZone, Coyote::StatusCode *StatusOut, const msgpack::object *Values)
 {
 	msgpack::sbuffer Buffer;
 	msgpack::packer<msgpack::sbuffer> Pack { Buffer };
@@ -333,7 +333,7 @@ const std::map<std::string, msgpack::object> InternalSession::PerformSyncedComma
 	}
 	
 	//Decode the messagepack "map" into a real map of other messagepack objects.
-	const std::map<std::string, msgpack::object> Results { MsgpackProc::InitIncomingMsg(ResponsePtr->GetBody(), ResponsePtr->GetBodySize(), TempZone) };
+	const std::unordered_map<std::string, msgpack::object> Results { MsgpackProc::InitIncomingMsg(ResponsePtr->GetBody(), ResponsePtr->GetBodySize(), TempZone) };
 	
 	//Get the status code.
 	assert(Results.count("StatusInt"));
@@ -380,7 +380,7 @@ Coyote::StatusCode Coyote::Session::Take(const int32_t PK)
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { MAPARG(PK) };
+	const std::unordered_map<std::string, msgpack::object> Values { MAPARG(PK) };
 	
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
@@ -396,11 +396,11 @@ Coyote::StatusCode Coyote::Session::GetMaxCPUPercentage(uint8_t &ValueOut)
 	msgpack::zone TempZone;
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetMaxCPUPercentage", TempZone, &Status) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetMaxCPUPercentage", TempZone, &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 
-	std::map<std::string, msgpack::object> DataField;
+	std::unordered_map<std::string, msgpack::object> DataField;
 
 	Msg.at("Data").convert(DataField);
 
@@ -417,7 +417,7 @@ Coyote::StatusCode Coyote::Session::SetMaxCPUPercentage(const uint8_t MaxCPUPerc
 
 	Coyote::StatusCode Status{};
 
-	const std::map<std::string, msgpack::object> Values { MAPARG(MaxCPUPercentage) };
+	const std::unordered_map<std::string, msgpack::object> Values { MAPARG(MaxCPUPercentage) };
 	
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
@@ -494,7 +494,7 @@ Coyote::StatusCode Coyote::Session::Pause(const int32_t PK)
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { MAPARG(PK) };
+	const std::unordered_map<std::string, msgpack::object> Values { MAPARG(PK) };
 	
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
@@ -510,7 +510,7 @@ Coyote::StatusCode Coyote::Session::SetPausedState(const int32_t PK, const bool 
 	msgpack::zone TempZone;
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { MAPARG(PK) };
+	const std::unordered_map<std::string, msgpack::object> Values { MAPARG(PK) };
 	
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
@@ -537,7 +537,7 @@ Coyote::StatusCode Coyote::Session::End(const int32_t PK)
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { MAPARG(PK) };
+	const std::unordered_map<std::string, msgpack::object> Values { MAPARG(PK) };
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
 	SESS.PerformSyncedCommand("End", TempZone, &Status, &Pass);
@@ -552,7 +552,7 @@ Coyote::StatusCode Coyote::Session::DeleteAsset(const std::string &FullPath)
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "FullPath", msgpack::object{FullPath.c_str(), TempZone } } };
+	const std::unordered_map<std::string, msgpack::object> Values { { "FullPath", msgpack::object{FullPath.c_str(), TempZone } } };
 	
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	SESS.PerformSyncedCommand("DeleteAsset", TempZone, &Status, &Pass);
@@ -567,7 +567,7 @@ Coyote::StatusCode Coyote::Session::InstallAsset(const std::string &FullPath, co
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	std::map<std::string, msgpack::object> Values { { "FullPath",  msgpack::object{FullPath.c_str(), TempZone } } };
+	std::unordered_map<std::string, msgpack::object> Values { { "FullPath",  msgpack::object{FullPath.c_str(), TempZone } } };
 	
 	if (!OutputDir.empty())
 	{
@@ -588,7 +588,7 @@ Coyote::StatusCode Coyote::Session::SubscribeMiniview(const int32_t PK)
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	std::map<std::string, msgpack::object> Values { { "PK", msgpack::object{ PK, TempZone } } };
+	std::unordered_map<std::string, msgpack::object> Values { { "PK", msgpack::object{ PK, TempZone } } };
 	
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
@@ -604,7 +604,7 @@ Coyote::StatusCode Coyote::Session::UnsubscribeMiniview(const int32_t PK)
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	std::map<std::string, msgpack::object> Values { { "PK", msgpack::object{ PK, TempZone } } };
+	std::unordered_map<std::string, msgpack::object> Values { { "PK", msgpack::object{ PK, TempZone } } };
 	
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
@@ -620,7 +620,7 @@ Coyote::StatusCode Coyote::Session::RenameAsset(const std::string &FullPath, con
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "FullPath", msgpack::object{FullPath.c_str(), TempZone } }, { "NewName", msgpack::object{NewName.c_str(), TempZone} } };
+	const std::unordered_map<std::string, msgpack::object> Values { { "FullPath", msgpack::object{FullPath.c_str(), TempZone } }, { "NewName", msgpack::object{NewName.c_str(), TempZone} } };
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
 	SESS.PerformSyncedCommand("RenameAsset", TempZone, &Status, &Pass);
@@ -662,7 +662,7 @@ Coyote::StatusCode Coyote::Session::RenameCountdown(const int32_t PK, const int3
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values
+	const std::unordered_map<std::string, msgpack::object> Values
 	{
 		{ "PK", msgpack::object{PK, TempZone} },
 		{ "TimeMS", msgpack::object{Time, TempZone} },
@@ -683,7 +683,7 @@ Coyote::StatusCode Coyote::Session::RenameGoto(const int32_t PK, const int32_t T
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values
+	const std::unordered_map<std::string, msgpack::object> Values
 	{
 		{ "PK", msgpack::object{PK, TempZone} },
 		{ "TimeMS", msgpack::object{Time, TempZone} },
@@ -704,7 +704,7 @@ Coyote::StatusCode Coyote::Session::DeleteCountdown(const int32_t PK, const int3
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values
+	const std::unordered_map<std::string, msgpack::object> Values
 	{
 		{ "PK", msgpack::object{PK, TempZone} },
 		{ "TimeMS", msgpack::object{Time, TempZone} },
@@ -724,7 +724,7 @@ Coyote::StatusCode Coyote::Session::DeleteGoto(const int32_t PK, const int32_t T
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values
+	const std::unordered_map<std::string, msgpack::object> Values
 	{
 		{ "PK", msgpack::object{PK, TempZone} },
 		{ "TimeMS", msgpack::object{Time, TempZone} },
@@ -743,7 +743,7 @@ Coyote::StatusCode Coyote::Session::CreateCountdown(const int32_t PK, const int3
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values
+	const std::unordered_map<std::string, msgpack::object> Values
 	{
 		{ "PK", msgpack::object{PK, TempZone} },
 		{ "TimeMS", msgpack::object{Time, TempZone} },
@@ -764,7 +764,7 @@ Coyote::StatusCode Coyote::Session::CreateGoto(const int32_t PK, const int32_t T
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values
+	const std::unordered_map<std::string, msgpack::object> Values
 	{
 		{ "PK", msgpack::object{PK, TempZone} },
 		{ "TimeMS", msgpack::object{Time, TempZone} },
@@ -837,11 +837,11 @@ Coyote::StatusCode Coyote::Session::IsMirror(bool &ValueOut)
 	
 	Coyote::StatusCode Status{};
 
-	const std::map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand(CmdName, TempZone, &Status) };
+	const std::unordered_map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand(CmdName, TempZone, &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	std::map<std::string, msgpack::object> DataField;
+	std::unordered_map<std::string, msgpack::object> DataField;
 	
 	Response.at("Data").convert(DataField);
 		
@@ -873,11 +873,11 @@ Coyote::StatusCode Coyote::Session::GetSupportsS12G(bool &ValueOut)
 	
 	Coyote::StatusCode Status{};
 
-	const std::map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand(CmdName, TempZone, &Status) };
+	const std::unordered_map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand(CmdName, TempZone, &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;	
 	
-	std::map<std::string, msgpack::object> DataField;
+	std::unordered_map<std::string, msgpack::object> DataField;
 	
 	Response.at("Data").convert(DataField);
 		
@@ -895,11 +895,11 @@ Coyote::StatusCode Coyote::Session::SynchronizerBusy(bool &ValueOut)
 	
 	Coyote::StatusCode Status{};
 
-	const std::map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand(CmdName, TempZone, &Status) };
+	const std::unordered_map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand(CmdName, TempZone, &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;	
 	
-	std::map<std::string, msgpack::object> DataField;
+	std::unordered_map<std::string, msgpack::object> DataField;
 	
 	Response.at("Data").convert(DataField);
 		
@@ -927,7 +927,7 @@ Coyote::StatusCode Coyote::Session::AddMirror(const std::string &MirrorIP)
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "IP",  msgpack::object{MirrorIP.c_str(), TempZone } } };
+	const std::unordered_map<std::string, msgpack::object> Values { { "IP",  msgpack::object{MirrorIP.c_str(), TempZone } } };
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
 	SESS.PerformSyncedCommand("AddMirror", TempZone, &Status, &Pass);
@@ -942,7 +942,7 @@ Coyote::StatusCode Coyote::Session::StartSpoke(const std::string &SpokeName)
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "SpokeName",  msgpack::object{SpokeName.c_str(), TempZone } } };
+	const std::unordered_map<std::string, msgpack::object> Values { { "SpokeName",  msgpack::object{SpokeName.c_str(), TempZone } } };
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
 	SESS.PerformSyncedCommand("StartSpoke", TempZone, &Status, &Pass);
@@ -957,7 +957,7 @@ Coyote::StatusCode Coyote::Session::KillSpoke(const std::string &SpokeName)
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "SpokeName",  msgpack::object{SpokeName.c_str(), TempZone } } };
+	const std::unordered_map<std::string, msgpack::object> Values { { "SpokeName",  msgpack::object{SpokeName.c_str(), TempZone } } };
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
 	SESS.PerformSyncedCommand("KillSpoke", TempZone, &Status, &Pass);
@@ -972,7 +972,7 @@ Coyote::StatusCode Coyote::Session::RestartSpoke(const std::string &SpokeName)
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "SpokeName",  msgpack::object{SpokeName.c_str(), TempZone } } };
+	const std::unordered_map<std::string, msgpack::object> Values { { "SpokeName",  msgpack::object{SpokeName.c_str(), TempZone } } };
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
 	SESS.PerformSyncedCommand("RestartSpoke", TempZone, &Status, &Pass);
@@ -998,7 +998,7 @@ Coyote::StatusCode Coyote::Session::GetDisks(std::vector<Coyote::Drive> &Out)
 	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand(CmdName, TempZone, &Status) };
+	const std::unordered_map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand(CmdName, TempZone, &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
@@ -1031,10 +1031,10 @@ Coyote::StatusCode Coyote::Session::EjectDisk(const std::string &Mountpoint)
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "Mountpoint", msgpack::object{Mountpoint.c_str()} } };
+	const std::unordered_map<std::string, msgpack::object> Values { { "Mountpoint", msgpack::object{Mountpoint.c_str()} } };
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 
-	const std::map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand("EjectDisk", TempZone, &Status, &Pass) };
+	const std::unordered_map<std::string, msgpack::object> &Response { SESS.PerformSyncedCommand("EjectDisk", TempZone, &Status, &Pass) };
 	
 	return Status;
 }
@@ -1045,7 +1045,7 @@ Coyote::StatusCode Coyote::Session::ReorderPresets(const int32_t PK1, const int3
 
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
-	const std::map<std::string, msgpack::object> Values { MAPARG(PK1), MAPARG(PK2) };
+	const std::unordered_map<std::string, msgpack::object> Values { MAPARG(PK1), MAPARG(PK2) };
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 
 	SESS.PerformSyncedCommand("ReorderPresets", TempZone, &Status, &Pass);
@@ -1060,7 +1060,7 @@ Coyote::StatusCode Coyote::Session::MovePreset(const int32_t PK, const std::stri
 
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
-	const std::map<std::string, msgpack::object> Values { MAPARG(PK), MAPARG(TabID), MAPARG(NewIndex) };
+	const std::unordered_map<std::string, msgpack::object> Values { MAPARG(PK), MAPARG(TabID), MAPARG(NewIndex) };
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 
 	SESS.PerformSyncedCommand("MovePreset", TempZone, &Status, &Pass);
@@ -1074,7 +1074,7 @@ Coyote::StatusCode Coyote::Session::DeletePreset(const int32_t PK)
 
 	msgpack::zone TempZone;	
 	Coyote::StatusCode Status{};
-	const std::map<std::string, msgpack::object> Values { MAPARG(PK) };
+	const std::unordered_map<std::string, msgpack::object> Values { MAPARG(PK) };
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 
 	SESS.PerformSyncedCommand("DeletePreset", TempZone, &Status, &Pass);
@@ -1087,7 +1087,7 @@ Coyote::StatusCode Coyote::Session::SeekTo(const int32_t PK, const uint32_t Time
 	DEF_SESS;
 
 	msgpack::zone TempZone;	
-	const std::map<std::string, msgpack::object> Values { MAPARG(PK), MAPARG(TimeIndex) };
+	const std::unordered_map<std::string, msgpack::object> Values { MAPARG(PK), MAPARG(TimeIndex) };
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 
 	Coyote::StatusCode Status{};
@@ -1115,7 +1115,7 @@ Coyote::StatusCode Coyote::Session::GetPresetStates(std::vector<Coyote::PresetSt
 {
 	DEF_SESS;
 
-	std::unique_ptr<std::map<int32_t, Coyote::PresetState> > Ptr { SESS.ASyncSess.SubSession.GetPresetStates() };
+	std::unique_ptr<std::unordered_map<int32_t, Coyote::PresetState> > Ptr { SESS.ASyncSess.SubSession.GetPresetStates() };
 	
 	if (!Ptr) return Coyote::COYOTE_STATUS_FAILED;
 	
@@ -1130,11 +1130,37 @@ Coyote::StatusCode Coyote::Session::GetPresetStates(std::vector<Coyote::PresetSt
 	return Coyote::COYOTE_STATUS_OK;
 }
 
+Coyote::StatusCode Coyote::Session::GetPresetStatesMap(std::unordered_map<int32_t, Coyote::PresetState> &Out)
+{
+	DEF_SESS;
+
+	std::unique_ptr<std::unordered_map<int32_t, Coyote::PresetState> > Ptr { SESS.ASyncSess.SubSession.GetPresetStates() };
+	
+	if (!Ptr) return Coyote::COYOTE_STATUS_FAILED;
+
+	Out = std::move(*Ptr);
+
+	return Coyote::COYOTE_STATUS_OK;
+}
+
+Coyote::StatusCode Coyote::Session::GetPresetsMap(std::unordered_map<int32_t, Coyote::Preset> &Out)
+{
+	DEF_SESS;
+
+	std::unique_ptr<std::unordered_map<int32_t, Coyote::Preset> > Ptr { SESS.ASyncSess.SubSession.GetPresets() };
+	
+	if (!Ptr) return Coyote::COYOTE_STATUS_FAILED;
+	
+	Out = std::move(*Ptr);
+	
+	return Coyote::COYOTE_STATUS_OK;
+}
+
 Coyote::StatusCode Coyote::Session::GetPresets(std::vector<Coyote::Preset> &Out)
 {
 	DEF_SESS;
 
-	std::unique_ptr<std::map<int32_t, Coyote::Preset> > Ptr { SESS.ASyncSess.SubSession.GetPresets() };
+	std::unique_ptr<std::unordered_map<int32_t, Coyote::Preset> > Ptr { SESS.ASyncSess.SubSession.GetPresets() };
 	
 	if (!Ptr) return Coyote::COYOTE_STATUS_FAILED;
 	
@@ -1153,7 +1179,7 @@ Coyote::StatusCode Coyote::Session::GetAssets(std::vector<Coyote::Asset> &Out)
 {
 	DEF_SESS;
 
-	std::unique_ptr<std::map<std::string, Coyote::Asset> > Ptr { SESS.ASyncSess.SubSession.GetAssets() };
+	std::unique_ptr<std::unordered_map<std::string, Coyote::Asset> > Ptr { SESS.ASyncSess.SubSession.GetAssets() };
 	
 	if (!Ptr) return Coyote::COYOTE_STATUS_FAILED;
 	
@@ -1255,12 +1281,12 @@ Coyote::StatusCode Coyote::Session::GetIP(const int32_t AdapterID, Coyote::Netwo
 	DEF_SESS;
 
 	msgpack::zone TempZone;	
-	const std::map<std::string, msgpack::object> Values { MAPARG(AdapterID) };
+	const std::unordered_map<std::string, msgpack::object> Values { MAPARG(AdapterID) };
 	
 	Coyote::StatusCode Status{};
 	
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetIP", TempZone, &Status, &Pass) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetIP", TempZone, &Status, &Pass) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
@@ -1275,12 +1301,12 @@ Coyote::StatusCode Coyote::Session::ReadAssetMetadata(const std::string &FullPat
 	DEF_SESS;
 
 	msgpack::zone TempZone;	
-	const std::map<std::string, msgpack::object> Values { MAPARG(FullPath) };
+	const std::unordered_map<std::string, msgpack::object> Values { MAPARG(FullPath) };
 	
 	Coyote::StatusCode Status{};
 	
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("ReadAssetMetadata", TempZone, &Status, &Pass) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("ReadAssetMetadata", TempZone, &Status, &Pass) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
@@ -1296,7 +1322,7 @@ Coyote::StatusCode Coyote::Session::SetIP(const Coyote::NetworkInfo &Input)
 	DEF_SESS;
 
 	msgpack::zone TempZone;	
-	const std::map<std::string, msgpack::object> Values { { "AdapterID", msgpack::object{Input.AdapterID} }, { "Subnet", msgpack::object{Input.Subnet.c_str()} }, { "IP", msgpack::object{Input.IP.c_str()} } };
+	const std::unordered_map<std::string, msgpack::object> Values { { "AdapterID", msgpack::object{Input.AdapterID} }, { "Subnet", msgpack::object{Input.Subnet.c_str()} }, { "IP", msgpack::object{Input.IP.c_str()} } };
 	
 	Coyote::StatusCode Status{};
 
@@ -1313,7 +1339,7 @@ Coyote::StatusCode Coyote::Session::SelectPreset(const int32_t PK)
 	msgpack::zone TempZone;
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { MAPARG(PK) };
+	const std::unordered_map<std::string, msgpack::object> Values { MAPARG(PK) };
 
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	SESS.PerformSyncedCommand("SelectPreset", TempZone, &Status, &Pass);
@@ -1334,7 +1360,7 @@ Coyote::StatusCode Coyote::Session::GetGenlockSettings(Coyote::GenlockSettings &
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetGenlockSettings", TempZone, &Status) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetGenlockSettings", TempZone, &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
@@ -1359,7 +1385,7 @@ Coyote::StatusCode Coyote::Session::SetVertGenlock(int32_t VertValue)
 	
 	StatusCode Status = COYOTE_STATUS_INVALID;
 	
-	const std::map<std::string, msgpack::object> Values { MAPARG(VertValue) };
+	const std::unordered_map<std::string, msgpack::object> Values { MAPARG(VertValue) };
 
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
@@ -1381,7 +1407,7 @@ Coyote::StatusCode Coyote::Session::SetHorzGenlock(int32_t HorzValue)
 	
 	StatusCode Status = COYOTE_STATUS_INVALID;
 	
-	const std::map<std::string, msgpack::object> Values { MAPARG(HorzValue) };
+	const std::unordered_map<std::string, msgpack::object> Values { MAPARG(HorzValue) };
 
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
@@ -1418,7 +1444,7 @@ Coyote::StatusCode Coyote::Session::SetKonaHardwareMode(const std::array<Resolut
 		ResolutionStrings.emplace_back(ResolutionMap.at(Resolutions[Inc]).c_str());
 	}
 	
-	const std::map<std::string, msgpack::object> Values
+	const std::unordered_map<std::string, msgpack::object> Values
 	{
 		{ "Resolutions", msgpack::object{MsgpackProc::STLArrayToMsgpackArray(ResolutionStrings, TempZone)} },
 		{ "RefreshRate", msgpack::object{RefreshMap.at(RefreshRate).c_str()} },
@@ -1442,7 +1468,7 @@ Coyote::StatusCode Coyote::Session::UploadState(const std::string &PresetsJson, 
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values
+	const std::unordered_map<std::string, msgpack::object> Values
 	{
 		{ "PresetsJson", msgpack::object{ PresetsJson.c_str() } },
 		{ "SettingsJson", msgpack::object{ SettingsJson.c_str() } },
@@ -1461,7 +1487,7 @@ Coyote::StatusCode Coyote::Session::DeleteWatchPath(const std::string &Path)
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values
+	const std::unordered_map<std::string, msgpack::object> Values
 	{
 		{ "Path", msgpack::object{ Path.c_str() } },
 	};
@@ -1479,7 +1505,7 @@ Coyote::StatusCode Coyote::Session::ManualForgetAsset(const std::string &Path)
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values
+	const std::unordered_map<std::string, msgpack::object> Values
 	{
 		{ "FullPath", msgpack::object{ Path.c_str() } },
 	};
@@ -1497,7 +1523,7 @@ Coyote::StatusCode Coyote::Session::ManualAddAsset(const std::string &Path)
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values
+	const std::unordered_map<std::string, msgpack::object> Values
 	{
 		{ "FullPath", msgpack::object{ Path.c_str() } },
 	};
@@ -1528,7 +1554,7 @@ Coyote::StatusCode Coyote::Session::AddWatchPath(const std::string &Path)
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values
+	const std::unordered_map<std::string, msgpack::object> Values
 	{
 		{ "Path", msgpack::object{ Path.c_str() } },
 	};
@@ -1547,11 +1573,11 @@ Coyote::StatusCode Coyote::Session::DownloadState(std::string &PresetsJsonOut, s
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("DownloadState", TempZone, &Status) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("DownloadState", TempZone, &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	std::map<std::string, msgpack::object> Data;
+	std::unordered_map<std::string, msgpack::object> Data;
 	Msg.at("Data").convert(Data);
 	
 	assert(Data.count("PresetsJson") && Data.count("SettingsJson"));
@@ -1569,11 +1595,11 @@ Coyote::StatusCode Coyote::Session::GetCurrentRole(Coyote::UnitRole &CurrentRole
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetCurrentRole", TempZone, &Status) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetCurrentRole", TempZone, &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	std::map<std::string, msgpack::object> Data;
+	std::unordered_map<std::string, msgpack::object> Data;
 	Msg.at("Data").convert(Data);
 	
 	assert(Data.count("CurrentRoleInt") && Data.count("CurrentRoleText"));
@@ -1590,7 +1616,7 @@ Coyote::StatusCode Coyote::Session::ActivateMachine(const std::string &LicenseKe
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 
-	const std::map<std::string, msgpack::object> Values
+	const std::unordered_map<std::string, msgpack::object> Values
 	{
 		{ "LicenseKey", msgpack::object{ LicenseKey.c_str() } },
 	};
@@ -1609,7 +1635,7 @@ Coyote::StatusCode Coyote::Session::DeactivateMachine(const std::string &License
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 
-	const std::map<std::string, msgpack::object> Values
+	const std::unordered_map<std::string, msgpack::object> Values
 	{
 		{ "LicenseKey", msgpack::object{ LicenseKey.c_str() } },
 		{ "LicenseMachineUUID", msgpack::object{ LicenseMachineUUID.c_str() } },
@@ -1629,11 +1655,11 @@ Coyote::StatusCode Coyote::Session::GetLicensingStatus(LicensingStatus &LicStats
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetLicensingStatus", TempZone, &Status) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetLicensingStatus", TempZone, &Status) };
 
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 
-	std::map<std::string, msgpack::object> Data;
+	std::unordered_map<std::string, msgpack::object> Data;
 
 	Msg.at("Data").convert(LicStats);
 
@@ -1659,18 +1685,18 @@ Coyote::StatusCode Coyote::Session::GetLicenseType(const std::string &LicenseKey
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 
-	const std::map<std::string, msgpack::object> Values
+	const std::unordered_map<std::string, msgpack::object> Values
 	{
 		{ "LicenseKey", msgpack::object{ LicenseKey.c_str() } },
 	};
 	
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetLicenseType", TempZone, &Status, &Pass) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetLicenseType", TempZone, &Status, &Pass) };
 
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 
-	std::map<std::string, msgpack::object> Data;
+	std::unordered_map<std::string, msgpack::object> Data;
 
 	Msg.at("Data").convert(Data);
 
@@ -1686,11 +1712,11 @@ Coyote::StatusCode Coyote::Session::GetUnitID(std::string &UnitIDOut, std::strin
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetUnitID", TempZone, &Status) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetUnitID", TempZone, &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	std::map<std::string, msgpack::object> Data;
+	std::unordered_map<std::string, msgpack::object> Data;
 	Msg.at("Data").convert(Data);
 	
 	assert(Data.count("UnitID") && Data.count("Nickname"));
@@ -1708,11 +1734,11 @@ Coyote::StatusCode Coyote::Session::GetServerVersion(std::string &Out)
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetServerVersion", TempZone, &Status) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetServerVersion", TempZone, &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	std::map<std::string, msgpack::object> Data;
+	std::unordered_map<std::string, msgpack::object> Data;
 	Msg.at("Data").convert(Data);
 	
 	assert(Data.count("Version"));
@@ -1729,15 +1755,15 @@ Coyote::StatusCode Coyote::Session::GetHostSinkResolution(const uint32_t HDMINum
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { MAPARG(HDMINum) };
+	const std::unordered_map<std::string, msgpack::object> Values { MAPARG(HDMINum) };
 	
 	const msgpack::object &Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetHostSinkResolution", TempZone, &Status, &Pass) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetHostSinkResolution", TempZone, &Status, &Pass) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	std::map<std::string, msgpack::object> Data;
+	std::unordered_map<std::string, msgpack::object> Data;
 	Msg.at("Data").convert(Data);
 	
 	assert(Data.count("Res") && Data.count("FPS"));
@@ -1755,7 +1781,7 @@ Coyote::StatusCode Coyote::Session::SetHostSinkResolution(const uint32_t HDMINum
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { MAPARG(HDMINum), { "Res", msgpack::object{ ResolutionMap.at(Res), TempZone } }, { "FPS", msgpack::object { RefreshMap.at(FPS), TempZone } } };
+	const std::unordered_map<std::string, msgpack::object> Values { MAPARG(HDMINum), { "Res", msgpack::object{ ResolutionMap.at(Res), TempZone } }, { "FPS", msgpack::object { RefreshMap.at(FPS), TempZone } } };
 	
 	const msgpack::object &Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
@@ -1771,15 +1797,15 @@ Coyote::StatusCode Coyote::Session::GetBMDResolution(const uint32_t SDIIndex, Co
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { MAPARG(SDIIndex) };
+	const std::unordered_map<std::string, msgpack::object> Values { MAPARG(SDIIndex) };
 	
 	const msgpack::object &Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetBMDResolution", TempZone, &Status, &Pass) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetBMDResolution", TempZone, &Status, &Pass) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	std::map<std::string, msgpack::object> Data;
+	std::unordered_map<std::string, msgpack::object> Data;
 	Msg.at("Data").convert(Data);
 	
 	assert(Data.count("Res") && Data.count("FPS"));
@@ -1796,7 +1822,7 @@ Coyote::StatusCode Coyote::Session::SetBMDResolution(const uint32_t SDIIndex, co
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { MAPARG(SDIIndex), { "Res", msgpack::object{ ResolutionMap.at(Res), TempZone } }, { "FPS", msgpack::object { RefreshMap.at(FPS), TempZone } } };
+	const std::unordered_map<std::string, msgpack::object> Values { MAPARG(SDIIndex), { "Res", msgpack::object{ ResolutionMap.at(Res), TempZone } }, { "FPS", msgpack::object { RefreshMap.at(FPS), TempZone } } };
 	
 	const msgpack::object &Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
@@ -1812,11 +1838,11 @@ Coyote::StatusCode Coyote::Session::GetDiskAssets(std::vector<ExternalAsset> &Ou
 	msgpack::zone TempZone;
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { MAPARG(DriveName), MAPARG(Subpath) };
+	const std::unordered_map<std::string, msgpack::object> Values { MAPARG(DriveName), MAPARG(Subpath) };
 	
 	const msgpack::object &Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetDiskAssets", TempZone, &Status, &Pass) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetDiskAssets", TempZone, &Status, &Pass) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
@@ -1841,7 +1867,7 @@ Coyote::StatusCode Coyote::Session::GetWatchPaths(std::vector<std::string> &Out)
 	msgpack::zone TempZone;
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetWatchPaths", TempZone, &Status) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetWatchPaths", TempZone, &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
@@ -1857,7 +1883,7 @@ Coyote::StatusCode Coyote::Session::GetMirrors(std::vector<Coyote::Mirror> &Out)
 	msgpack::zone TempZone;
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetMirrors", TempZone, &Status) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetMirrors", TempZone, &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
@@ -1884,7 +1910,7 @@ Coyote::StatusCode Coyote::Session::GetDesignatedPrimary(Coyote::Mirror &Out)
 	msgpack::zone TempZone;
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetDesignatedPrimary", TempZone, &Status) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetDesignatedPrimary", TempZone, &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
@@ -1902,7 +1928,7 @@ Coyote::StatusCode Coyote::Session::GetEffectivePrimary(Coyote::Mirror &Out)
 	msgpack::zone TempZone;
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetEffectivePrimary", TempZone, &Status) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetEffectivePrimary", TempZone, &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
@@ -1930,11 +1956,11 @@ Coyote::StatusCode Coyote::Session::DetectUpdate(bool &DetectedOut, std::string 
 	msgpack::zone TempZone;
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("DetectUpdate", TempZone, &Status) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("DetectUpdate", TempZone, &Status) };
 
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	std::map<std::string, msgpack::object> Data;
+	std::unordered_map<std::string, msgpack::object> Data;
 	Msg.at("Data").convert(Data);
 	
 	DetectedOut = Data.at("IsUpdateDetected").as<bool>();
@@ -1951,11 +1977,11 @@ Coyote::StatusCode Coyote::Session::GetLogsZip(std::vector<uint8_t> &OutBuffer)
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetLogsZip", TempZone, &Status) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetLogsZip", TempZone, &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	std::map<std::string, msgpack::object> Data;
+	std::unordered_map<std::string, msgpack::object> Data;
 
 	Msg.at("Data").convert(Data);
 	
@@ -1970,7 +1996,7 @@ Coyote::StatusCode Coyote::Session::GetKonaAVBufferLevels(std::vector<std::tuple
 	msgpack::zone TempZone;	
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetKonaAVBufferLevels", TempZone, &Status) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("GetKonaAVBufferLevels", TempZone, &Status) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 
@@ -2016,17 +2042,17 @@ Coyote::StatusCode Coyote::Session::ReadLog(const std::string &SpokeName, const 
 	
 
 	LDEBUG_MSG("Building values");
-	const std::map<std::string, msgpack::object> Values { {"SpokeName", msgpack::object{SpokeName.c_str()} }, { "Year", msgpack::object{Year} }, { "Month", msgpack::object{Month} }, { "Day", msgpack::object{Day} } };
+	const std::unordered_map<std::string, msgpack::object> Values { {"SpokeName", msgpack::object{SpokeName.c_str()} }, { "Year", msgpack::object{Year} }, { "Month", msgpack::object{Month} }, { "Day", msgpack::object{Day} } };
 	
 	LDEBUG_MSG("Performing conversions");
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 	
 	LDEBUG_MSG("Executing method");
-	const std::map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("ReadLog", TempZone, &Status, &Pass) };
+	const std::unordered_map<std::string, msgpack::object> &Msg { SESS.PerformSyncedCommand("ReadLog", TempZone, &Status, &Pass) };
 	
 	if (Status != Coyote::COYOTE_STATUS_OK) return Status;
 	
-	std::map<std::string, msgpack::object> Data;
+	std::unordered_map<std::string, msgpack::object> Data;
 
 	LDEBUG_MSG("Converting Data");
 	Msg.at("Data").convert(Data);
@@ -2046,7 +2072,7 @@ Coyote::StatusCode Coyote::Session::SetUnitNickname(const std::string &Nickname)
 
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "Nickname", msgpack::object{Nickname.c_str()} } };
+	const std::unordered_map<std::string, msgpack::object> Values { { "Nickname", msgpack::object{Nickname.c_str()} } };
 	
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 
@@ -2063,7 +2089,7 @@ Coyote::StatusCode Coyote::Session::ExportLogsZip(const std::string &Mountpoint)
 
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "Mountpoint", msgpack::object{Mountpoint.c_str()} } };
+	const std::unordered_map<std::string, msgpack::object> Values { { "Mountpoint", msgpack::object{Mountpoint.c_str()} } };
 	
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 
@@ -2080,7 +2106,7 @@ Coyote::StatusCode Coyote::Session::_SVS_WriteCytLog_(const std::string &Param1,
 
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "SpokeName", msgpack::object{Param1.c_str()} }, { "LogText", msgpack::object{Param2.c_str()} } };
+	const std::unordered_map<std::string, msgpack::object> Values { { "SpokeName", msgpack::object{Param1.c_str()} }, { "LogText", msgpack::object{Param2.c_str()} } };
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 
 	SESS.PerformSyncedCommand("__LOGWRITE__", TempZone, &Status, &Pass);
@@ -2096,7 +2122,7 @@ Coyote::StatusCode Coyote::Session::_SVS_RegisterPing_(const std::string &Param1
 
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "SpokeName", msgpack::object{Param1.c_str()} } };
+	const std::unordered_map<std::string, msgpack::object> Values { { "SpokeName", msgpack::object{Param1.c_str()} } };
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 
 	SESS.PerformSyncedCommand("__REGISTER_PING__", TempZone, &Status, &Pass);
@@ -2112,7 +2138,7 @@ Coyote::StatusCode Coyote::Session::_SVS_RegisterReady_(const std::string &Param
 
 	StatusCode Status{};
 	
-	const std::map<std::string, msgpack::object> Values { { "SpokeName", msgpack::object{Param1.c_str()} } };
+	const std::unordered_map<std::string, msgpack::object> Values { { "SpokeName", msgpack::object{Param1.c_str()} } };
 	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
 
 	SESS.PerformSyncedCommand("__REGISTER_READY__", TempZone, &Status, &Pass);
