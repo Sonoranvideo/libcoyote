@@ -167,6 +167,7 @@ namespace Coyote
 		StatusCode _SVS_WriteCytLog_(const std::string &Param1, const std::string &Param2); //Users: DO NOT use this method.
 		StatusCode _SVS_RegisterPing_(const std::string &Param1);
 		StatusCode _SVS_RegisterReady_(const std::string &Param1);
+		StatusCode _SVS_APID_(const std::string &Param1, const int64_t Param2);
 	};
 	
 	EXPFUNC std::vector<LANCoyote> GetLANCoyotes(void);

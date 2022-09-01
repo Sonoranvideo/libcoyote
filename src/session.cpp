@@ -2162,6 +2162,22 @@ Coyote::StatusCode Coyote::Session::_SVS_RegisterReady_(const std::string &Param
 	
 	return Status;
 }
+Coyote::StatusCode Coyote::Session::_SVS_APID_(const std::string &Param1, const int64_t Param2)
+{ //This function is intended for Sonoran Video Systems use only. Use by users will either not work or just confuse unit logs.
+	DEF_SESS;
+
+	msgpack::zone TempZone;	
+
+	StatusCode Status{};
+	
+	const std::unordered_map<std::string, msgpack::object> Values { { "SpokeName", msgpack::object{Param1.c_str()} }, { "AssocPID", msgpack::object{Param2} } };
+	
+	const msgpack::object Pass { MsgpackProc::STLMapToMsgpackMap(Values, TempZone) };
+
+	SESS.PerformSyncedCommand("__SVS_APID__", TempZone, &Status, &Pass);
+	
+	return Status;
+}
 
 time_t Coyote::Session::GetCommandTimeoutSecs(void) const
 {
